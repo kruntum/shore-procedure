@@ -72,7 +72,6 @@ export const PortManagementPage: React.FC = () => {
       key: 'code',
       width: 100,
       align: 'center' as const,
-      fixed: 'left' as const,
       render: (code: string) => <Tag color="blue" style={{ fontWeight: 'bold' }}>{code}</Tag>,
     },
     {
@@ -108,7 +107,6 @@ export const PortManagementPage: React.FC = () => {
       title: 'จัดการ',
       key: 'actions',
       width: 100,
-      fixed: 'right' as const,
       align: 'center' as const,
       render: (_: any, record: Port) => (
         <Space size="small">

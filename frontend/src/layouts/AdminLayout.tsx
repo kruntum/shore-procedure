@@ -1,5 +1,5 @@
-import React from 'react';
-import { Layout, Menu, Typography, Card, Breadcrumb } from 'antd';
+import React, { useState } from 'react';
+import { Layout, Menu, Typography } from 'antd';
 import {
   CompassOutlined,
   TeamOutlined,
@@ -8,6 +8,7 @@ import {
   PlusCircleOutlined,
   ArrowLeftOutlined,
   UserSwitchOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 
@@ -17,6 +18,7 @@ const { Title, Text } = Typography;
 export const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [collapsed, setCollapsed] = useState(false);
 
   const menuItems = [
     {
@@ -56,22 +58,37 @@ export const AdminLayout: React.FC = () => {
 
   return (
     <div>
-      <div style={{ marginBottom: 16 }}>
-        <a onClick={() => navigate('/')} style={{ fontSize: 13 }}>
+      <div style={{ marginBottom: 12 }}>
+        <a onClick={() => navigate('/')} style={{ fontSize: 12.5 }}>
           <ArrowLeftOutlined style={{ marginRight: 6 }} /> กลับสู่หน้าผู้ใช้งาน (User Manual)
         </a>
       </div>
 
       <Layout style={{ background: '#fff', borderRadius: 6, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-        <Sider width={190} theme="light" breakpoint="lg" collapsedWidth="50" style={{ borderRight: '1px solid #f0f0f0' }}>
-          <div style={{ padding: '12px 14px 6px' }}>
-            <Title level={5} style={{ margin: 0, color: '#1677ff', fontSize: 14 }}>
-              Admin Console
-            </Title>
-            <Text type="secondary" style={{ fontSize: 11 }}>
-              การจัดการข้อมูลและคู่มือ
-            </Text>
-          </div>
+        <Sider
+          collapsible
+          collapsed={collapsed}
+          onCollapse={setCollapsed}
+          breakpoint="lg"
+          collapsedWidth={56}
+          width={190}
+          theme="light"
+          style={{ borderRight: '1px solid #f0f0f0' }}
+        >
+          {!collapsed ? (
+            <div style={{ padding: '12px 14px 8px', borderBottom: '1px solid #f8fafc', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+              <Title level={5} style={{ margin: 0, color: '#1677ff', fontSize: 13.5 }}>
+                Admin Console
+              </Title>
+              <Text type="secondary" style={{ fontSize: 11 }}>
+                การจัดการข้อมูลและคู่มือ
+              </Text>
+            </div>
+          ) : (
+            <div style={{ padding: '14px 0', textAlign: 'center', borderBottom: '1px solid #f8fafc' }}>
+              <SettingOutlined style={{ fontSize: 18, color: '#1677ff' }} />
+            </div>
+          )}
           <Menu
             mode="inline"
             selectedKeys={[location.pathname]}
@@ -81,7 +98,7 @@ export const AdminLayout: React.FC = () => {
           />
         </Sider>
 
-        <Content style={{ padding: '12px 16px', minHeight: 600, overflowX: 'auto' }}>
+        <Content style={{ padding: '12px 14px', minHeight: 600, overflowX: 'auto' }}>
           <Outlet />
         </Content>
       </Layout>

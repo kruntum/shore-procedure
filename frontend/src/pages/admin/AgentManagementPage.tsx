@@ -94,7 +94,6 @@ export const AgentManagementPage: React.FC = () => {
       title: 'จัดการ',
       key: 'actions',
       width: 100,
-      fixed: 'right' as const,
       align: 'center' as const,
       render: (_: any, record: Agent) => (
         <Space size="small">

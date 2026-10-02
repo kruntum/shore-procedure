@@ -78,7 +78,6 @@ export const MainLayout: React.FC = () => {
           position: 'sticky',
           top: 0,
           zIndex: 100,
-          overflowX: 'auto',
         }}
       >
         <div
@@ -107,8 +106,8 @@ export const MainLayout: React.FC = () => {
                 flexShrink: 0,
               }}
             >
-              <RocketOutlined style={{ fontSize: 18, marginRight: 6 }} />
-              <span>SHORE PROCEDURE</span>
+              <RocketOutlined style={{ fontSize: 20, marginRight: 6 }} />
+              <span className="brand-text">SHORE PROCEDURE</span>
             </div>
 
             <Menu
@@ -116,7 +115,7 @@ export const MainLayout: React.FC = () => {
               selectedKeys={[location.pathname]}
               items={menuItems}
               onClick={({ key }) => navigate(key)}
-              style={{ borderBottom: 'none', minWidth: 220 }}
+              style={{ borderBottom: 'none', minWidth: 160 }}
             />
           </Space>
 

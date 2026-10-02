@@ -85,7 +85,6 @@ export const WorkTypeManagementPage: React.FC = () => {
       title: 'จัดการ',
       key: 'action',
       width: 140,
-      fixed: 'right' as const,
       align: 'center' as const,
       render: (_: any, record: WorkType) => (
         <Space size="small">

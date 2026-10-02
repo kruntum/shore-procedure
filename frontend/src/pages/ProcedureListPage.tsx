@@ -66,7 +66,6 @@ export const ProcedureListPage: React.FC = () => {
       key: 'port',
       width: 90,
       align: 'center' as const,
-      fixed: 'left' as const,
       render: (text: string) => (
         <Tag color="blue" style={{ fontWeight: 700, margin: 0, padding: '2px 8px', borderRadius: 4 }}>
           {text}
@@ -202,7 +201,6 @@ export const ProcedureListPage: React.FC = () => {
       title: 'การกระทำ',
       key: 'actions',
       width: isAuthenticated ? 160 : 70,
-      fixed: 'right' as const,
       align: 'center' as const,
       render: (_: any, record: Procedure) => (
         <Space size={4}>

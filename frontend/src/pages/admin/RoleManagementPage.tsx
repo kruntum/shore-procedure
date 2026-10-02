@@ -158,7 +158,6 @@ export const RoleManagementPage: React.FC = () => {
       title: 'จัดการ',
       key: 'action',
       width: 110,
-      fixed: 'right' as const,
       align: 'center' as const,
       render: (_: any, record: ResponsibleRole) => (
         <Space size="small">
