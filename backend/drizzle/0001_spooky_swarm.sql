@@ -1,0 +1,1 @@
+ALTER TABLE "procedure_steps" ADD COLUMN "responsible_role" text DEFAULT 'พนักงานหน้างาน' NOT NULL;
