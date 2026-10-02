@@ -131,16 +131,17 @@ export const ProcedureListPage: React.FC = () => {
       title: 'ชื่อคู่มือและรายละเอียดขั้นตอน',
       dataIndex: 'title',
       key: 'title',
+      width: 320,
       render: (text: string, record: Procedure) => (
         <div style={{ padding: '2px 0' }}>
           <a
             onClick={() => navigate(`/procedures/${record.id}`)}
             style={{
               fontWeight: 600,
-              fontSize: 13.5,
+              fontSize: 12.5,
               color: '#0958d9',
               display: 'block',
-              lineHeight: 1.45,
+              lineHeight: 1.4,
             }}
           >
             {text}
@@ -148,10 +149,10 @@ export const ProcedureListPage: React.FC = () => {
           {record.description && (
             <div
               style={{
-                fontSize: 12,
+                fontSize: 11.5,
                 color: '#64748b',
-                lineHeight: 1.4,
-                marginTop: 3,
+                lineHeight: 1.35,
+                marginTop: 2,
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
@@ -256,20 +257,20 @@ export const ProcedureListPage: React.FC = () => {
     <div>
       {/* Unified Header & Filter Card */}
       <Card
+        size="small"
         style={{
-          marginBottom: 16,
-          borderRadius: 8,
+          marginBottom: 12,
+          borderRadius: 6,
           border: '1px solid #e2e8f0',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
         }}
-        bodyStyle={{ padding: '16px 20px' }}
+        bodyStyle={{ padding: '12px 14px' }}
       >
-        <Row justify="space-between" align="middle" gutter={[12, 12]} style={{ marginBottom: 14 }}>
+        <Row justify="space-between" align="middle" gutter={[8, 8]} style={{ marginBottom: 10 }}>
           <Col xs={24} sm={16}>
-            <Title level={4} style={{ margin: 0, color: '#0f172a' }}>
+            <Title level={5} style={{ margin: 0, color: '#0f172a', fontSize: 14 }}>
               รายการคู่มือการจ่ายชอร์ทั้งหมด
             </Title>
-            <Text type="secondary" style={{ fontSize: 13 }}>
+            <Text type="secondary" style={{ fontSize: 11.5 }}>
               ค้นหาและจัดการขั้นตอนการปฏิบัติงานของทุกท่าและทุกสายเรือ (ทั้งหมด {procedures?.length || 0} คู่มือ)
             </Text>
           </Col>
@@ -277,9 +278,10 @@ export const ProcedureListPage: React.FC = () => {
             {isAuthenticated && (
               <Button
                 type="primary"
+                size="small"
                 icon={<PlusOutlined />}
                 onClick={() => navigate('/admin/procedures/new')}
-                style={{ borderRadius: 6, fontWeight: 500 }}
+                style={{ borderRadius: 4, fontWeight: 500 }}
               >
                 สร้างคู่มือใหม่
               </Button>
@@ -288,9 +290,10 @@ export const ProcedureListPage: React.FC = () => {
         </Row>
 
         {/* Filter Controls */}
-        <Row gutter={[12, 12]} align="middle">
+        <Row gutter={[8, 8]} align="middle">
           <Col xs={24} sm={10} md={9}>
             <Input
+              size="small"
               placeholder="ค้นหาชื่อคู่มือ..."
               prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
               value={search}
@@ -300,6 +303,7 @@ export const ProcedureListPage: React.FC = () => {
           </Col>
           <Col xs={12} sm={7} md={7}>
             <Select
+              size="small"
               style={{ width: '100%' }}
               placeholder="เลือกท่าเรือทั้งหมด"
               allowClear
@@ -314,6 +318,7 @@ export const ProcedureListPage: React.FC = () => {
           </Col>
           <Col xs={12} sm={7} md={8}>
             <Select
+              size="small"
               style={{ width: '100%' }}
               placeholder="เลือกสายเรือ / เอเย่นต์"
               allowClear
@@ -331,10 +336,10 @@ export const ProcedureListPage: React.FC = () => {
 
       {/* Table Card with Scroll Protection */}
       <Card
+        size="small"
         style={{
-          borderRadius: 8,
+          borderRadius: 6,
           border: '1px solid #e2e8f0',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
           overflow: 'hidden',
         }}
         bodyStyle={{ padding: 0 }}
@@ -344,15 +349,16 @@ export const ProcedureListPage: React.FC = () => {
           dataSource={procedures}
           rowKey="id"
           loading={isLoading}
-          scroll={{ x: 1080 }}
+          scroll={{ x: 1040 }}
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
             pageSizeOptions: ['10', '20', '50'],
             showTotal: (total, range) => `แสดง ${range[0]}-${range[1]} จาก ${total} คู่มือ`,
-            style: { padding: '12px 16px', margin: 0 },
+            style: { padding: '8px 12px', margin: 0 },
+            size: 'small',
           }}
-          size="middle"
+          size="small"
         />
       </Card>
     </div>

@@ -132,17 +132,17 @@ export const PortManagementPage: React.FC = () => {
 
   return (
     <div>
-      <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
+      <Row justify="space-between" align="middle" style={{ marginBottom: 12 }}>
         <Col>
-          <Title level={4} style={{ margin: 0 }}>
+          <Title level={5} style={{ margin: 0, fontSize: 14 }}>
             จัดการรายชื่อท่าเรือ (Ports)
           </Title>
-          <Text type="secondary" style={{ fontSize: 13 }}>
+          <Text type="secondary" style={{ fontSize: 11.5 }}>
             กำหนดรหัสท่าเรือ วิธีการชำระ และเวลาเปิดให้บริการ
           </Text>
         </Col>
         <Col>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
+          <Button type="primary" size="small" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
             เพิ่มท่าเรือใหม่
           </Button>
         </Col>
@@ -153,9 +153,9 @@ export const PortManagementPage: React.FC = () => {
         dataSource={ports}
         rowKey="id"
         loading={isLoading}
-        size="middle"
+        size="small"
         scroll={{ x: 800 }}
-        pagination={{ pageSize: 12, showSizeChanger: true }}
+        pagination={{ pageSize: 12, showSizeChanger: true, size: 'small' }}
       />
 
       <Modal

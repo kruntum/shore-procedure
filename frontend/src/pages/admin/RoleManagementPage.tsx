@@ -112,48 +112,52 @@ export const RoleManagementPage: React.FC = () => {
       title: 'ลำดับ',
       dataIndex: 'sortOrder',
       key: 'sortOrder',
-      width: 70,
+      width: 55,
       align: 'center' as const,
     },
     {
       title: 'ไอคอน',
       dataIndex: 'icon',
       key: 'icon',
-      width: 70,
+      width: 55,
       align: 'center' as const,
-      render: (icon: string) => <span style={{ fontSize: 18 }}>{icon || '👤'}</span>,
+      render: (icon: string) => <span style={{ fontSize: 16 }}>{icon || '👤'}</span>,
     },
     {
       title: 'รหัสบทบาท (Code)',
       dataIndex: 'code',
       key: 'code',
-      width: 170,
-      render: (code: string) => <Tag style={{ fontWeight: 600 }}>{code}</Tag>,
+      width: 130,
+      render: (code: string) => <Tag style={{ fontWeight: 600, margin: 0 }}>{code}</Tag>,
     },
     {
       title: 'ชื่อบทบาท / ผู้รับผิดชอบ',
       dataIndex: 'name',
       key: 'name',
+      width: 160,
       render: (name: string) => <strong style={{ color: '#0f172a' }}>{name}</strong>,
     },
     {
-      title: 'ตัวอย่างป้ายกำกับ (Tag Preview)',
+      title: 'ตัวอย่างป้ายกำกับ',
       key: 'preview',
-      width: 220,
+      width: 160,
       render: (_: any, record: ResponsibleRole) => <RoleTag role={record.name} />,
     },
     {
       title: 'คำอธิบายหน้าที่ความรับผิดชอบ',
       dataIndex: 'description',
       key: 'description',
+      width: 260,
       render: (desc: string) => (
-        <span style={{ color: '#64748b', fontSize: 12 }}>{desc || '-'}</span>
+        <span style={{ color: '#64748b', fontSize: 11.5, lineHeight: 1.35, display: 'block' }}>
+          {desc || '-'}
+        </span>
       ),
     },
     {
       title: 'จัดการ',
       key: 'action',
-      width: 130,
+      width: 110,
       fixed: 'right' as const,
       align: 'center' as const,
       render: (_: any, record: ResponsibleRole) => (
@@ -184,18 +188,19 @@ export const RoleManagementPage: React.FC = () => {
 
   return (
     <div>
-      <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
+      <Row justify="space-between" align="middle" style={{ marginBottom: 12 }}>
         <Col>
-          <Title level={4} style={{ margin: 0 }}>
+          <Title level={5} style={{ margin: 0, fontSize: 14 }}>
             จัดการผู้รับผิดชอบ / บทบาท (Roles & Responsibilities)
           </Title>
-          <Text type="secondary" style={{ fontSize: 13 }}>
+          <Text type="secondary" style={{ fontSize: 11.5 }}>
             กำหนดบทบาท Master Data สำหรับเลือกเป็นผู้ดำเนินการในแต่ละขั้นตอนของคู่มือ SOP
           </Text>
         </Col>
         <Col>
           <Button
             type="primary"
+            size="small"
             icon={<PlusOutlined />}
             onClick={() => handleOpenModal()}
           >
@@ -209,8 +214,8 @@ export const RoleManagementPage: React.FC = () => {
         dataSource={roles}
         rowKey="id"
         loading={isLoading}
-        size="middle"
-        scroll={{ x: 800 }}
+        size="small"
+        scroll={{ x: 930 }}
         pagination={false}
       />
 

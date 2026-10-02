@@ -115,18 +115,19 @@ export const WorkTypeManagementPage: React.FC = () => {
 
   return (
     <div>
-      <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
+      <Row justify="space-between" align="middle" style={{ marginBottom: 12 }}>
         <Col>
-          <Title level={4} style={{ margin: 0 }}>
+          <Title level={5} style={{ margin: 0, fontSize: 14 }}>
             ประเภทงาน (Work Types)
           </Title>
-          <Text type="secondary" style={{ fontSize: 13 }}>
+          <Text type="secondary" style={{ fontSize: 11.5 }}>
             ประเภทงานหลักที่ใช้เชื่อมโยงกับคู่มือปฏิบัติงาน (เช่น จ่ายชอร์, วางบิล/มัดจำตู้)
           </Text>
         </Col>
         <Col>
           <Button
             type="primary"
+            size="small"
             icon={<PlusOutlined />}
             onClick={() => handleOpenModal()}
           >
@@ -140,8 +141,8 @@ export const WorkTypeManagementPage: React.FC = () => {
         dataSource={workTypes}
         rowKey="id"
         loading={isLoading}
-        size="middle"
-        scroll={{ x: 650 }}
+        size="small"
+        scroll={{ x: 600 }}
         pagination={false}
       />
 

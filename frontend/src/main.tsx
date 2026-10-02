@@ -23,8 +23,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           algorithm: theme.compactAlgorithm,
           token: {
             colorPrimary: '#1677ff',
-            borderRadius: 6,
-            fontSize: 13,
+            borderRadius: 4,
+            fontSize: 12,
             colorBgContainer: '#ffffff',
           },
           components: {
@@ -34,7 +34,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               rowHoverBg: '#f1f5f9',
             },
             Card: {
-              borderRadiusLG: 8,
+              borderRadiusLG: 6,
             },
           },
         }}

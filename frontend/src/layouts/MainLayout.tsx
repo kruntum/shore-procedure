@@ -73,11 +73,12 @@ export const MainLayout: React.FC = () => {
       <Header
         style={{
           background: '#fff',
-          padding: '0 24px',
+          padding: '0 16px',
           boxShadow: '0 1px 4px rgba(0,21,41,0.08)',
           position: 'sticky',
           top: 0,
           zIndex: 100,
+          overflowX: 'auto',
         }}
       >
         <div
@@ -89,9 +90,10 @@ export const MainLayout: React.FC = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
             height: '100%',
+            gap: 12,
           }}
         >
-          <Space size="large" align="center">
+          <Space size="middle" align="center" style={{ flexShrink: 0 }}>
             <div
               onClick={() => navigate('/')}
               style={{
@@ -99,11 +101,13 @@ export const MainLayout: React.FC = () => {
                 alignItems: 'center',
                 cursor: 'pointer',
                 fontWeight: 'bold',
-                fontSize: 16,
+                fontSize: 15,
                 color: '#1677ff',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
               }}
             >
-              <RocketOutlined style={{ fontSize: 22, marginRight: 8 }} />
+              <RocketOutlined style={{ fontSize: 18, marginRight: 6 }} />
               <span>SHORE PROCEDURE</span>
             </div>
 
@@ -112,11 +116,11 @@ export const MainLayout: React.FC = () => {
               selectedKeys={[location.pathname]}
               items={menuItems}
               onClick={({ key }) => navigate(key)}
-              style={{ borderBottom: 'none', minWidth: 280 }}
+              style={{ borderBottom: 'none', minWidth: 220 }}
             />
           </Space>
 
-          <Space size="middle" align="center">
+          <Space size="small" align="center" style={{ flexShrink: 0 }}>
             <QuickSearch />
 
             {user ? (
@@ -142,7 +146,7 @@ export const MainLayout: React.FC = () => {
         </div>
       </Header>
 
-      <Content style={{ padding: '20px 24px', maxWidth: 1440, margin: '0 auto', width: '100%' }}>
+      <Content style={{ padding: '16px', maxWidth: 1440, margin: '0 auto', width: '100%' }}>
         <Outlet />
       </Content>
 

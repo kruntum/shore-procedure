@@ -118,30 +118,30 @@ export const AgentManagementPage: React.FC = () => {
 
   return (
     <div>
-      <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
+      <Row justify="space-between" align="middle" style={{ marginBottom: 12 }}>
         <Col>
-          <Title level={4} style={{ margin: 0 }}>
+          <Title level={5} style={{ margin: 0, fontSize: 14 }}>
             จัดการสายเรือ / เอเย่นต์ (Agents)
           </Title>
-          <Text type="secondary" style={{ fontSize: 13 }}>
+          <Text type="secondary" style={{ fontSize: 11.5 }}>
             รายชื่อตัวแทนสายการเดินเรือทั้งหมด {agents?.length || 0} รายการ
           </Text>
         </Col>
         <Col>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
+          <Button type="primary" size="small" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
             เพิ่มสายเรือใหม่
           </Button>
         </Col>
       </Row>
 
-      <div style={{ marginBottom: 12, maxWidth: 300 }}>
+      <div style={{ marginBottom: 12, maxWidth: 280 }}>
         <Input
           placeholder="ค้นหารหัสหรือชื่อสายเรือ..."
           prefix={<SearchOutlined />}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           allowClear
-          size="middle"
+          size="small"
         />
       </div>
 
@@ -150,9 +150,9 @@ export const AgentManagementPage: React.FC = () => {
         dataSource={filteredAgents}
         rowKey="id"
         loading={isLoading}
-        size="middle"
-        scroll={{ x: 750 }}
-        pagination={{ pageSize: 15, showSizeChanger: true }}
+        size="small"
+        scroll={{ x: 700 }}
+        pagination={{ pageSize: 15, showSizeChanger: true, size: 'small' }}
       />
 
       <Modal

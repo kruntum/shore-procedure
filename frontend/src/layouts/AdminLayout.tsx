@@ -62,10 +62,10 @@ export const AdminLayout: React.FC = () => {
         </a>
       </div>
 
-      <Layout style={{ background: '#fff', borderRadius: 8, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-        <Sider width={220} theme="light" style={{ borderRight: '1px solid #f0f0f0' }}>
-          <div style={{ padding: '16px 16px 8px' }}>
-            <Title level={5} style={{ margin: 0, color: '#1677ff' }}>
+      <Layout style={{ background: '#fff', borderRadius: 6, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+        <Sider width={190} theme="light" breakpoint="lg" collapsedWidth="50" style={{ borderRight: '1px solid #f0f0f0' }}>
+          <div style={{ padding: '12px 14px 6px' }}>
+            <Title level={5} style={{ margin: 0, color: '#1677ff', fontSize: 14 }}>
               Admin Console
             </Title>
             <Text type="secondary" style={{ fontSize: 11 }}>
@@ -81,7 +81,7 @@ export const AdminLayout: React.FC = () => {
           />
         </Sider>
 
-        <Content style={{ padding: 20, minHeight: 600 }}>
+        <Content style={{ padding: '12px 16px', minHeight: 600, overflowX: 'auto' }}>
           <Outlet />
         </Content>
       </Layout>
