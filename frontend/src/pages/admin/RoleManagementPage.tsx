@@ -154,6 +154,7 @@ export const RoleManagementPage: React.FC = () => {
       title: 'จัดการ',
       key: 'action',
       width: 130,
+      fixed: 'right' as const,
       align: 'center' as const,
       render: (_: any, record: ResponsibleRole) => (
         <Space size="small">
@@ -208,7 +209,8 @@ export const RoleManagementPage: React.FC = () => {
         dataSource={roles}
         rowKey="id"
         loading={isLoading}
-        size="small"
+        size="middle"
+        scroll={{ x: 800 }}
         pagination={false}
       />
 

@@ -85,6 +85,7 @@ export const WorkTypeManagementPage: React.FC = () => {
       title: 'จัดการ',
       key: 'action',
       width: 140,
+      fixed: 'right' as const,
       align: 'center' as const,
       render: (_: any, record: WorkType) => (
         <Space size="small">
@@ -139,7 +140,8 @@ export const WorkTypeManagementPage: React.FC = () => {
         dataSource={workTypes}
         rowKey="id"
         loading={isLoading}
-        size="small"
+        size="middle"
+        scroll={{ x: 650 }}
         pagination={false}
       />
 

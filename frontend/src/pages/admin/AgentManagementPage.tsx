@@ -82,8 +82,8 @@ export const AgentManagementPage: React.FC = () => {
       title: 'รหัสสายเรือ (Short Name)',
       dataIndex: 'code',
       key: 'code',
-      width: 180,
-      render: (code: string) => <Tag color="green" style={{ fontWeight: 'bold' }}>{code}</Tag>,
+      width: 160,
+      render: (code: string) => <Tag color="cyan" style={{ fontWeight: 'bold' }}>{code}</Tag>,
     },
     {
       title: 'ชื่อเต็ม (Full Name)',
@@ -93,12 +93,14 @@ export const AgentManagementPage: React.FC = () => {
     {
       title: 'จัดการ',
       key: 'actions',
-      width: 110,
+      width: 100,
+      fixed: 'right' as const,
+      align: 'center' as const,
       render: (_: any, record: Agent) => (
         <Space size="small">
           <Button
             size="small"
-            icon={<EditOutlined />}
+            icon={<EditOutlined style={{ color: '#d97706' }} />}
             onClick={() => handleOpenModal(record)}
           />
           {isAdmin && (
@@ -139,7 +141,7 @@ export const AgentManagementPage: React.FC = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           allowClear
-          size="small"
+          size="middle"
         />
       </div>
 
@@ -148,8 +150,9 @@ export const AgentManagementPage: React.FC = () => {
         dataSource={filteredAgents}
         rowKey="id"
         loading={isLoading}
-        size="small"
-        pagination={{ pageSize: 15 }}
+        size="middle"
+        scroll={{ x: 750 }}
+        pagination={{ pageSize: 15, showSizeChanger: true }}
       />
 
       <Modal

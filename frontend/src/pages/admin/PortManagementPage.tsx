@@ -70,13 +70,16 @@ export const PortManagementPage: React.FC = () => {
       title: 'รหัสท่า (Code)',
       dataIndex: 'code',
       key: 'code',
-      width: 120,
+      width: 100,
+      align: 'center' as const,
+      fixed: 'left' as const,
       render: (code: string) => <Tag color="blue" style={{ fontWeight: 'bold' }}>{code}</Tag>,
     },
     {
       title: 'ชื่อท่าเรือ',
       dataIndex: 'name',
       key: 'name',
+      width: 160,
     },
     {
       title: 'วิธีชำระเงิน',
@@ -104,12 +107,14 @@ export const PortManagementPage: React.FC = () => {
     {
       title: 'จัดการ',
       key: 'actions',
-      width: 110,
+      width: 100,
+      fixed: 'right' as const,
+      align: 'center' as const,
       render: (_: any, record: Port) => (
         <Space size="small">
           <Button
             size="small"
-            icon={<EditOutlined />}
+            icon={<EditOutlined style={{ color: '#d97706' }} />}
             onClick={() => handleOpenModal(record)}
           />
           {isAdmin && (
@@ -148,8 +153,9 @@ export const PortManagementPage: React.FC = () => {
         dataSource={ports}
         rowKey="id"
         loading={isLoading}
-        size="small"
-        pagination={{ pageSize: 12 }}
+        size="middle"
+        scroll={{ x: 800 }}
+        pagination={{ pageSize: 12, showSizeChanger: true }}
       />
 
       <Modal

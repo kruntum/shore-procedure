@@ -23,8 +23,19 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           algorithm: theme.compactAlgorithm,
           token: {
             colorPrimary: '#1677ff',
-            borderRadius: 4,
+            borderRadius: 6,
             fontSize: 13,
+            colorBgContainer: '#ffffff',
+          },
+          components: {
+            Table: {
+              headerBg: '#f8fafc',
+              headerColor: '#1e293b',
+              rowHoverBg: '#f1f5f9',
+            },
+            Card: {
+              borderRadiusLG: 8,
+            },
           },
         }}
       >
