@@ -72,7 +72,7 @@ services:
       - shore-network
 
   minio:
-    image: minio/minio:latest
+    image: elestio/minio:latest
     pull_policy: if_not_present
     container_name: shore-minio
     restart: unless-stopped
@@ -96,7 +96,7 @@ services:
       - shore-network
 
   minio-init:
-    image: quay.io/minio/mc:latest
+    image: elestio/minio:latest
     pull_policy: if_not_present
     container_name: shore-minio-init
     depends_on:
