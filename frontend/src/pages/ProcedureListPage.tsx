@@ -127,38 +127,20 @@ export const ProcedureListPage: React.FC = () => {
       render: (text: string) => <Tag color="purple" style={{ margin: 0, borderRadius: 4 }}>{text || 'จ่ายชอร์'}</Tag>,
     },
     {
-      title: 'ชื่อคู่มือและรายละเอียดขั้นตอน',
+      title: 'ชื่อคู่มือขั้นตอน',
       dataIndex: 'title',
       key: 'title',
-      width: 320,
+      width: 300,
       render: (text: string, record: Procedure) => (
-        <div style={{ padding: '2px 0' }}>
+        <div>
           <a
             onClick={() => navigate(`/procedures/${record.id}`)}
-            style={{
-              fontWeight: 600,
-              fontSize: 12.5,
-              color: '#0958d9',
-              display: 'block',
-              lineHeight: 1.4,
-            }}
+            style={{ fontWeight: 500, fontSize: 12 }}
           >
             {text}
           </a>
           {record.description && (
-            <div
-              style={{
-                fontSize: 11.5,
-                color: '#64748b',
-                lineHeight: 1.35,
-                marginTop: 2,
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-              }}
-              title={record.description}
-            >
+            <div style={{ fontSize: 11, color: '#8c8c8c', marginTop: 1, lineHeight: 1.3 }}>
               {record.description}
             </div>
           )}
@@ -168,22 +150,11 @@ export const ProcedureListPage: React.FC = () => {
     {
       title: 'จำนวนเงื่อนไข',
       key: 'variantsCount',
-      width: 120,
+      width: 100,
       align: 'center' as const,
-      render: (_: any, record: Procedure) => {
-        const count = record.variants?.length || 0;
-        const stepsCount = record.variants?.reduce((sum, v) => sum + (v.steps?.length || 0), 0) || 0;
-        return (
-          <Space direction="vertical" size={2} style={{ textAlign: 'center' }}>
-            <Tag color="geekblue" style={{ borderRadius: 10, margin: 0, fontWeight: 500 }}>
-              {count} เงื่อนไข
-            </Tag>
-            {stepsCount > 0 && (
-              <span style={{ fontSize: 11, color: '#94a3b8' }}>({stepsCount} ขั้นตอน)</span>
-            )}
-          </Space>
-        );
-      },
+      render: (_: any, record: Procedure) => (
+        <span>{record.variants?.length || 0} เงื่อนไข</span>
+      ),
     },
     {
       title: 'อัปเดตล่าสุด',
@@ -347,7 +318,7 @@ export const ProcedureListPage: React.FC = () => {
           dataSource={procedures}
           rowKey="id"
           loading={isLoading}
-          scroll={{ x: 1040 }}
+          scroll={{ x: 980 }}
           pagination={{
             pageSize: 10,
             showSizeChanger: true,

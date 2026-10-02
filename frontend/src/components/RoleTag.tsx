@@ -118,8 +118,13 @@ export const RoleTag: React.FC<RoleTagProps> = ({ role, style, bordered = true }
       style={{
         margin: 0,
         fontWeight: 500,
-        fontSize: '12px',
-        padding: '0 7px',
+        fontSize: '11px',
+        padding: '0 6px',
+        height: 20,
+        lineHeight: '18px',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 3,
         borderRadius: 4,
         ...style,
       }}

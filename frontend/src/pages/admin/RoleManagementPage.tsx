@@ -128,14 +128,20 @@ export const RoleManagementPage: React.FC = () => {
       dataIndex: 'code',
       key: 'code',
       width: 130,
-      render: (code: string) => <Tag style={{ fontWeight: 600, margin: 0 }}>{code}</Tag>,
+      render: (code: string) => (
+        <Tag style={{ fontWeight: 600, margin: 0, fontSize: 11, height: 20, lineHeight: '18px' }}>
+          {code}
+        </Tag>
+      ),
     },
     {
       title: 'ชื่อบทบาท / ผู้รับผิดชอบ',
       dataIndex: 'name',
       key: 'name',
       width: 160,
-      render: (name: string) => <strong style={{ color: '#0f172a' }}>{name}</strong>,
+      render: (name: string) => (
+        <span style={{ color: '#0f172a', fontWeight: 500, fontSize: 12 }}>{name}</span>
+      ),
     },
     {
       title: 'ตัวอย่างป้ายกำกับ',
@@ -149,7 +155,7 @@ export const RoleManagementPage: React.FC = () => {
       key: 'description',
       width: 260,
       render: (desc: string) => (
-        <span style={{ color: '#64748b', fontSize: 11.5, lineHeight: 1.35, display: 'block' }}>
+        <span style={{ color: '#64748b', fontSize: 11, lineHeight: 1.35, display: 'block' }}>
           {desc || '-'}
         </span>
       ),
