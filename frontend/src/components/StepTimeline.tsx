@@ -25,17 +25,14 @@ export const StepTimeline: React.FC<{ steps?: ProcedureStep[] }> = ({ steps }) =
             borderRadius: 6,
           }}
         >
-          {/* Step Title Header */}
-          <div style={{ marginBottom: 6 }}>
-            <Title level={5} style={{ margin: 0, color: '#1e293b', fontSize: 13.5 }}>
-              ขั้นตอนที่ {step.stepNumber}: {step.title}
-            </Title>
-          </div>
-
-          {/* 2-Column Responsive Body */}
+          {/* 2-Column Responsive Layout starting from Title */}
           <Row gutter={[16, 12]} align="top">
-            {/* Left Column: Description & RoleTag underneath */}
+            {/* Left Column: Title, Description & RoleTag */}
             <Col xs={24} md={hasImages ? 15 : 24} lg={hasImages ? 16 : 24}>
+              <Title level={5} style={{ margin: '0 0 6px 0', color: '#1e293b', fontSize: 13.5 }}>
+                ขั้นตอนที่ {step.stepNumber}: {step.title}
+              </Title>
+
               {step.description ? (
                 <Paragraph
                   style={{
@@ -67,7 +64,7 @@ export const StepTimeline: React.FC<{ steps?: ProcedureStep[] }> = ({ steps }) =
               )}
             </Col>
 
-            {/* Right Column: Step Images (Right on desktop, wraps cleanly below on mobile) */}
+            {/* Right Column: Step Images (Starts flush at the top with title on desktop, wraps below on mobile) */}
             {hasImages && (
               <Col xs={24} md={9} lg={8}>
                 <div
