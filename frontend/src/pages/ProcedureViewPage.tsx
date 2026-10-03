@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Typography, Space, Tag, Button, Breadcrumb, Spin, Empty, Divider, Row, Col, Modal, message } from 'antd';
+import { Card, Typography, Space, Tag, Button, Breadcrumb, Spin, Empty, Divider, Row, Col, Modal, message, Tooltip } from 'antd';
 import {
   PrinterOutlined,
   EditOutlined,
@@ -63,6 +63,17 @@ export const ProcedureViewPage: React.FC = () => {
     return <Empty description="ไม่พบคู่มือที่ระบุ" />;
   }
 
+  const agentList =
+    proc.agents && proc.agents.length > 0
+      ? proc.agents
+      : proc.agent
+      ? [proc.agent]
+      : [];
+
+  const maxVisibleAgents = 4;
+  const visibleAgents = agentList.slice(0, maxVisibleAgents);
+  const remainingAgents = agentList.slice(maxVisibleAgents);
+
   return (
     <div>
       <Breadcrumb
@@ -72,9 +83,9 @@ export const ProcedureViewPage: React.FC = () => {
           { title: <a onClick={() => navigate(`/ports/${proc.port?.id}`)}>{proc.port?.code}</a> },
           {
             title:
-              proc.agents && proc.agents.length > 0
-                ? proc.agents.map((a) => a.code).join(', ')
-                : proc.agent?.code,
+              agentList.length > 0
+                ? agentList.map((a) => a.code).join(', ')
+                : 'ทุกสายเรือ',
           },
           { title: 'คู่มือขั้นตอน' },
         ]}
@@ -82,81 +93,100 @@ export const ProcedureViewPage: React.FC = () => {
 
       {/* Header Card */}
       <Card style={{ marginBottom: 16, borderRadius: 8 }}>
-        <Row justify="space-between" align="top" gutter={[16, 16]}>
-          <Col xs={24} md={18}>
-            <Space align="start" size="middle">
-              <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)} />
-              <div>
-                <Space wrap style={{ marginBottom: 8 }}>
-                  <Tag color="blue" icon={<CompassOutlined />}>
-                    ท่าเรือ: {proc.port?.code} ({proc.port?.name})
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            flexWrap: 'wrap',
+            gap: 12,
+          }}
+        >
+          {/* Left Title & Metadata */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flex: 1, minWidth: 280 }}>
+            <Button
+              icon={<ArrowLeftOutlined />}
+              onClick={() => navigate(-1)}
+              style={{ marginTop: 2, flexShrink: 0 }}
+            />
+            <div style={{ flex: 1 }}>
+              {/* Category & Metadata Tags */}
+              <Space wrap size={[6, 6]} style={{ marginBottom: 6 }}>
+                {proc.port && (
+                  <Tag color="blue" icon={<CompassOutlined />} style={{ margin: 0 }}>
+                    ท่าเรือ {proc.port.code} ({proc.port.name})
                   </Tag>
-                  {proc.agents && proc.agents.length > 0 ? (
-                    proc.agents.map((ag) => (
-                      <Tag color="green" icon={<TeamOutlined />} key={ag.id}>
-                        สายเรือ: {ag.code} ({ag.name})
-                      </Tag>
-                    ))
-                  ) : proc.agent ? (
-                    <Tag color="green" icon={<TeamOutlined />}>
-                      สายเรือ: {proc.agent.code} ({proc.agent.name})
+                )}
+                {proc.workType && (
+                  <Tag color="purple" style={{ margin: 0 }}>
+                    {proc.workType.name}
+                  </Tag>
+                )}
+                {/* Compact Agent Tags with Full Name in Tooltip */}
+                {visibleAgents.map((ag) => (
+                  <Tooltip key={ag.id} title={`สายเรือ: ${ag.code} - ${ag.name}`}>
+                    <Tag color="cyan" icon={<TeamOutlined />} style={{ margin: 0, cursor: 'default' }}>
+                      {ag.code}
                     </Tag>
-                  ) : null}
-                  <Tag color="purple">
-                    {proc.workType?.name}
-                  </Tag>
-                </Space>
-
-                <Title level={4} style={{ margin: '4px 0', color: '#1f1f1f' }}>
-                  {proc.title}
-                </Title>
-
-                {proc.description && (
-                  <Paragraph type="secondary" style={{ margin: '6px 0 0', fontSize: 13 }}>
-                    {proc.description}
-                  </Paragraph>
+                  </Tooltip>
+                ))}
+                {remainingAgents.length > 0 && (
+                  <Tooltip title={remainingAgents.map((a) => `${a.code} - ${a.name}`).join(', ')}>
+                    <Tag color="geekblue" style={{ margin: 0, cursor: 'pointer' }}>
+                      +{remainingAgents.length} สายเรือ
+                    </Tag>
+                  </Tooltip>
                 )}
+              </Space>
 
-                {proc.referenceDocuments && (
-                  <div style={{ marginTop: 6, fontSize: 12, color: '#4b5563' }}>
-                    <Text strong>เอกสารอ้างอิง: </Text>
-                    <span>{proc.referenceDocuments}</span>
-                  </div>
-                )}
+              <Title level={4} style={{ margin: '4px 0 6px', color: '#1f1f1f', fontSize: 18 }}>
+                {proc.title}
+              </Title>
 
-                <div style={{ marginTop: 8, fontSize: 11, color: '#8c8c8c' }}>
-                  อัปเดตล่าสุด: {proc.updatedAt ? new Date(proc.updatedAt).toLocaleDateString('th-TH') : '-'} โดย {proc.updatedBy || 'ผู้ดูแลระบบ'}
-                </div>
-              </div>
-            </Space>
-          </Col>
-
-          <Col xs={24} md={10} style={{ textAlign: 'right' }}>
-            <Space wrap>
-              <Button icon={<PrinterOutlined />} onClick={handlePrint}>
-                พิมพ์เอกสาร A4 (Print SOP)
-              </Button>
-              {isAuthenticated && (
-                <>
-                  <Button
-                    icon={<CopyOutlined />}
-                    loading={duplicateMutation.isPending}
-                    onClick={handleDuplicate}
-                  >
-                    คัดลอกคู่มือ
-                  </Button>
-                  <Button
-                    type="primary"
-                    icon={<EditOutlined />}
-                    onClick={() => navigate(`/admin/procedures/${proc.id}/edit`)}
-                  >
-                    แก้ไข
-                  </Button>
-                </>
+              {proc.description && (
+                <Paragraph type="secondary" style={{ margin: '4px 0', fontSize: 13, color: '#4b5563' }}>
+                  {proc.description}
+                </Paragraph>
               )}
-            </Space>
-          </Col>
-        </Row>
+
+              {proc.referenceDocuments && (
+                <div style={{ marginTop: 4, fontSize: 12, color: '#4b5563' }}>
+                  <Text strong>เอกสารอ้างอิง: </Text>
+                  <span>{proc.referenceDocuments}</span>
+                </div>
+              )}
+
+              <div style={{ marginTop: 6, fontSize: 11, color: '#8c8c8c' }}>
+                อัปเดตล่าสุด: {proc.updatedAt ? new Date(proc.updatedAt).toLocaleDateString('th-TH') : '-'} โดย {proc.updatedBy || 'ผู้ดูแลระบบ'}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Action Buttons: Print SOP, Copy, Edit */}
+          <Space wrap size="small" style={{ flexShrink: 0, marginTop: 2 }}>
+            <Button icon={<PrinterOutlined />} onClick={handlePrint}>
+              พิมพ์เอกสาร A4
+            </Button>
+            {isAuthenticated && (
+              <>
+                <Button
+                  icon={<CopyOutlined />}
+                  loading={duplicateMutation.isPending}
+                  onClick={handleDuplicate}
+                >
+                  คัดลอกคู่มือ
+                </Button>
+                <Button
+                  type="primary"
+                  icon={<EditOutlined />}
+                  onClick={() => navigate(`/admin/procedures/${proc.id}/edit`)}
+                >
+                  แก้ไข
+                </Button>
+              </>
+            )}
+          </Space>
+        </div>
       </Card>
 
       {/* Operating Guidelines & Steps */}
