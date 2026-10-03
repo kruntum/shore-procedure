@@ -30,16 +30,17 @@ services:
     container_name: shore-backend
     restart: unless-stopped
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       - PORT=3000
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-shore_app}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-shore_db}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-shore_app}:${POSTGRES_PASSWORD:-shore_secure_pass_2026}@postgres:5432/${POSTGRES_DB:-shore_db}
       - MINIO_ENDPOINT=minio
       - MINIO_PORT=9000
       - MINIO_BUCKET=${MINIO_BUCKET:-shore-procedures}
-      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
-      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
-      - JWT_SECRET=${JWT_SECRET}
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER:-shore_admin}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD:-shore_secure_minio_pass_2026}
+      - JWT_SECRET=${JWT_SECRET:-shore_jwt_secret_key_super_secure_2026}
     depends_on:
       postgres:
         condition: service_healthy
@@ -56,13 +57,15 @@ services:
     ports:
       - "3200:5432"
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-shore_db}
       POSTGRES_USER: ${POSTGRES_USER:-shore_app}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-shore_secure_pass_2026}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./shore_db_backup.sql:/docker-entrypoint-initdb.d/01_backup.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-shore_app} -d ${POSTGRES_DB:-shore_db}"]
       interval: 5s
@@ -81,10 +84,11 @@ services:
       - "3201:9000"
       - "3203:9001"
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-shore_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-shore_secure_minio_pass_2026}
     volumes:
       - minio_data:/data
     healthcheck:
@@ -103,10 +107,11 @@ services:
       minio:
         condition: service_healthy
     env_file:
-      - .env
+      - path: .env
+        required: false
     entrypoint: >
       /bin/sh -c "
-      mc alias set local http://minio:9000 $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD};
+      mc alias set local http://minio:9000 $${MINIO_ROOT_USER:-shore_admin} $${MINIO_ROOT_PASSWORD:-shore_secure_minio_pass_2026};
       mc mb --ignore-existing local/$${MINIO_BUCKET:-shore-procedures};
       mc anonymous set none local/$${MINIO_BUCKET:-shore-procedures};
       echo 'MinIO private bucket setup completed.';
