@@ -13,7 +13,6 @@ import {
   message,
   Row,
   Col,
-  Tooltip,
 } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useRoles } from '../../hooks/queries';
@@ -113,9 +112,8 @@ export const RoleManagementPage: React.FC = () => {
       title: 'ลำดับ',
       dataIndex: 'sortOrder',
       key: 'sortOrder',
-      width: 50,
+      width: 55,
       align: 'center' as const,
-      render: (order: number) => <span style={{ fontSize: 11, color: '#64748b' }}>{order}</span>,
     },
     {
       title: 'ไอคอน',
@@ -131,7 +129,7 @@ export const RoleManagementPage: React.FC = () => {
       key: 'code',
       width: 130,
       render: (code: string) => (
-        <Tag color="geekblue" style={{ fontWeight: 500, margin: 0, fontSize: 11, height: 20, lineHeight: '18px' }}>
+        <Tag style={{ fontWeight: 600, margin: 0 }}>
           {code}
         </Tag>
       ),
@@ -142,7 +140,7 @@ export const RoleManagementPage: React.FC = () => {
       key: 'name',
       width: 160,
       render: (name: string) => (
-        <span style={{ color: '#0f172a', fontWeight: 400, fontSize: 11 }}>{name}</span>
+        <span style={{ color: '#0f172a' }}>{name}</span>
       ),
     },
     {
@@ -157,7 +155,7 @@ export const RoleManagementPage: React.FC = () => {
       key: 'description',
       width: 260,
       render: (desc: string) => (
-        <span style={{ color: '#64748b', fontSize: 10.5, lineHeight: 1.35, display: 'block' }}>
+        <span style={{ color: '#64748b' }}>
           {desc || '-'}
         </span>
       ),
@@ -165,26 +163,28 @@ export const RoleManagementPage: React.FC = () => {
     {
       title: 'จัดการ',
       key: 'action',
-      width: 85,
+      width: 110,
       align: 'center' as const,
       render: (_: any, record: ResponsibleRole) => (
-        <Space size={4}>
-          <Tooltip title="แก้ไข">
-            <Button
-              size="small"
-              icon={<EditOutlined style={{ color: '#1677ff', fontSize: 12 }} />}
-              onClick={() => handleOpenModal(record)}
-            />
-          </Tooltip>
+        <Space size="small">
+          <Button
+            type="text"
+            size="small"
+            icon={<EditOutlined style={{ color: '#1677ff' }} />}
+            onClick={() => handleOpenModal(record)}
+          >
+            แก้ไข
+          </Button>
           {isAdmin && (
-            <Tooltip title="ลบ">
-              <Button
-                size="small"
-                danger
-                icon={<DeleteOutlined style={{ fontSize: 12 }} />}
-                onClick={() => handleDelete(record.id, record.name)}
-              />
-            </Tooltip>
+            <Button
+              type="text"
+              danger
+              size="small"
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record.id, record.name)}
+            >
+              ลบ
+            </Button>
           )}
         </Space>
       ),
@@ -220,7 +220,7 @@ export const RoleManagementPage: React.FC = () => {
         rowKey="id"
         loading={isLoading}
         size="small"
-        scroll={{ x: 860 }}
+        scroll={{ x: 930 }}
         pagination={false}
       />
 

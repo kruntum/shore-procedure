@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Button, Space, Modal, Form, Input, Tag, Typography, message, Row, Col, Tooltip } from 'antd';
+import { Table, Button, Space, Modal, Form, Input, Tag, Typography, message, Row, Col } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import { useAgents } from '../../hooks/queries';
 import { useCreateAgent, useUpdateAgent, useDeleteAgent } from '../../hooks/mutations';
@@ -75,52 +75,40 @@ export const AgentManagementPage: React.FC = () => {
     {
       title: 'ลำดับ',
       key: 'index',
-      width: 50,
-      align: 'center' as const,
-      render: (_: any, __: any, index: number) => (
-        <span style={{ fontSize: 11, color: '#64748b' }}>{index + 1}</span>
-      ),
+      width: 70,
+      render: (_: any, __: any, index: number) => index + 1,
     },
     {
       title: 'รหัสสายเรือ (Short Name)',
       dataIndex: 'code',
       key: 'code',
       width: 160,
-      render: (code: string) => (
-        <Tag color="cyan" style={{ fontWeight: 500, fontSize: 11, height: 20, lineHeight: '18px' }}>
-          {code}
-        </Tag>
-      ),
+      render: (code: string) => <Tag color="cyan" style={{ fontWeight: 'bold' }}>{code}</Tag>,
     },
     {
       title: 'ชื่อเต็ม (Full Name)',
       dataIndex: 'name',
       key: 'name',
-      render: (name: string) => <span style={{ fontSize: 11, color: '#0f172a' }}>{name}</span>,
     },
     {
       title: 'จัดการ',
       key: 'actions',
-      width: 85,
+      width: 100,
       align: 'center' as const,
       render: (_: any, record: Agent) => (
-        <Space size={4}>
-          <Tooltip title="แก้ไข">
+        <Space size="small">
+          <Button
+            size="small"
+            icon={<EditOutlined style={{ color: '#d97706' }} />}
+            onClick={() => handleOpenModal(record)}
+          />
+          {isAdmin && (
             <Button
               size="small"
-              icon={<EditOutlined style={{ color: '#1677ff', fontSize: 12 }} />}
-              onClick={() => handleOpenModal(record)}
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record.id)}
             />
-          </Tooltip>
-          {isAdmin && (
-            <Tooltip title="ลบ">
-              <Button
-                size="small"
-                danger
-                icon={<DeleteOutlined style={{ fontSize: 12 }} />}
-                onClick={() => handleDelete(record.id)}
-              />
-            </Tooltip>
           )}
         </Space>
       ),

@@ -117,14 +117,7 @@ export const RoleTag: React.FC<RoleTagProps> = ({ role, style, bordered = true }
       icon={meta.icon}
       style={{
         margin: 0,
-        fontWeight: 400,
-        fontSize: '11px',
-        padding: '0 6px',
-        height: 20,
-        lineHeight: '18px',
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 3,
+        fontWeight: 500,
         borderRadius: 4,
         ...style,
       }}

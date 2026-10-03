@@ -149,7 +149,7 @@ export const ProcedureListPage: React.FC = () => {
       width: 100,
       align: 'center' as const,
       render: (_: any, record: Procedure) => (
-        <span style={{ fontSize: 11, color: '#475569' }}>{record.variants?.length || 0} เงื่อนไข</span>
+        <span>{record.variants?.length || 0} เงื่อนไข</span>
       ),
     },
     {
@@ -158,14 +158,7 @@ export const ProcedureListPage: React.FC = () => {
       key: 'updatedAt',
       width: 100,
       align: 'center' as const,
-      render: (val: string) =>
-        val ? (
-          <span style={{ fontSize: 11, color: '#64748b' }}>
-            {new Date(val).toLocaleDateString('th-TH')}
-          </span>
-        ) : (
-          '-'
-        ),
+      render: (val: string) => (val ? new Date(val).toLocaleDateString('th-TH') : '-'),
     },
     {
       title: 'การกระทำ',

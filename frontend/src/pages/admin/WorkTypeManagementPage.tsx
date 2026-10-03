@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Button, Space, Modal, Form, Input, Tag, Typography, message, Row, Col, Tooltip } from 'antd';
+import { Table, Button, Space, Modal, Form, Input, Tag, Typography, message, Row, Col } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useWorkTypes } from '../../hooks/queries';
 import { useCreateWorkType, useUpdateWorkType, useDeleteWorkType } from '../../hooks/mutations';
@@ -71,7 +71,7 @@ export const WorkTypeManagementPage: React.FC = () => {
       key: 'code',
       width: 180,
       render: (code: string) => (
-        <Tag color="purple" style={{ fontWeight: 500, fontSize: 11, height: 20, lineHeight: '18px' }}>
+        <Tag color="purple" style={{ fontWeight: 600 }}>
           {code}
         </Tag>
       ),
@@ -80,31 +80,32 @@ export const WorkTypeManagementPage: React.FC = () => {
       title: 'ชื่อประเภทงาน',
       dataIndex: 'name',
       key: 'name',
-      render: (name: string) => <span style={{ fontSize: 11, color: '#0f172a' }}>{name}</span>,
     },
     {
       title: 'จัดการ',
       key: 'action',
-      width: 85,
+      width: 140,
       align: 'center' as const,
       render: (_: any, record: WorkType) => (
-        <Space size={4}>
-          <Tooltip title="แก้ไข">
-            <Button
-              size="small"
-              icon={<EditOutlined style={{ color: '#1677ff', fontSize: 12 }} />}
-              onClick={() => handleOpenModal(record)}
-            />
-          </Tooltip>
+        <Space size="small">
+          <Button
+            type="text"
+            size="small"
+            icon={<EditOutlined style={{ color: '#1677ff' }} />}
+            onClick={() => handleOpenModal(record)}
+          >
+            แก้ไข
+          </Button>
           {isAdmin && (
-            <Tooltip title="ลบ">
-              <Button
-                size="small"
-                danger
-                icon={<DeleteOutlined style={{ fontSize: 12 }} />}
-                onClick={() => handleDelete(record.id)}
-              />
-            </Tooltip>
+            <Button
+              type="text"
+              danger
+              size="small"
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record.id)}
+            >
+              ลบ
+            </Button>
           )}
         </Space>
       ),

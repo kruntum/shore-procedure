@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Button, Space, Modal, Form, Input, Select, Tag, Typography, message, Row, Col, Tooltip } from 'antd';
+import { Table, Button, Space, Modal, Form, Input, Select, Tag, Typography, message, Row, Col } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { usePorts } from '../../hooks/queries';
 import { useCreatePort, useUpdatePort, useDeletePort } from '../../hooks/mutations';
@@ -72,18 +72,13 @@ export const PortManagementPage: React.FC = () => {
       key: 'code',
       width: 100,
       align: 'center' as const,
-      render: (code: string) => (
-        <Tag color="blue" style={{ fontWeight: 500, fontSize: 11, height: 20, lineHeight: '18px' }}>
-          {code}
-        </Tag>
-      ),
+      render: (code: string) => <Tag color="blue" style={{ fontWeight: 'bold' }}>{code}</Tag>,
     },
     {
       title: 'ชื่อท่าเรือ',
       dataIndex: 'name',
       key: 'name',
       width: 160,
-      render: (name: string) => <span style={{ fontSize: 11, color: '#0f172a' }}>{name}</span>,
     },
     {
       title: 'วิธีชำระเงิน',
@@ -91,10 +86,7 @@ export const PortManagementPage: React.FC = () => {
       key: 'paymentMethod',
       width: 160,
       render: (method: string) => (
-        <Tag
-          color={method === 'หน้าเคาน์เตอร์เท่านั้น' ? 'error' : 'success'}
-          style={{ fontSize: 11, height: 20, lineHeight: '18px' }}
-        >
+        <Tag color={method === 'หน้าเคาน์เตอร์เท่านั้น' ? 'error' : 'success'}>
           {method}
         </Tag>
       ),
@@ -104,38 +96,32 @@ export const PortManagementPage: React.FC = () => {
       dataIndex: 'operatingHours',
       key: 'operatingHours',
       width: 200,
-      render: (hours: string) => <span style={{ fontSize: 11, color: '#475569' }}>{hours}</span>,
     },
     {
       title: 'หมายเหตุ',
       dataIndex: 'notes',
       key: 'notes',
-      render: (notes: string) =>
-        notes ? <span style={{ color: '#d46b08', fontSize: 10.5 }}>{notes}</span> : '-',
+      render: (notes: string) => notes ? <span style={{ color: '#d46b08', fontSize: 12 }}>{notes}</span> : '-',
     },
     {
       title: 'จัดการ',
       key: 'actions',
-      width: 85,
+      width: 100,
       align: 'center' as const,
       render: (_: any, record: Port) => (
-        <Space size={4}>
-          <Tooltip title="แก้ไข">
+        <Space size="small">
+          <Button
+            size="small"
+            icon={<EditOutlined style={{ color: '#d97706' }} />}
+            onClick={() => handleOpenModal(record)}
+          />
+          {isAdmin && (
             <Button
               size="small"
-              icon={<EditOutlined style={{ color: '#1677ff', fontSize: 12 }} />}
-              onClick={() => handleOpenModal(record)}
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record.id)}
             />
-          </Tooltip>
-          {isAdmin && (
-            <Tooltip title="ลบ">
-              <Button
-                size="small"
-                danger
-                icon={<DeleteOutlined style={{ fontSize: 12 }} />}
-                onClick={() => handleDelete(record.id)}
-              />
-            </Tooltip>
           )}
         </Space>
       ),
