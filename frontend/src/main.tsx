@@ -24,20 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           token: {
             colorPrimary: '#1677ff',
             borderRadius: 4,
-            fontSize: 12,
-            fontFamily: `'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`,
-            colorBgContainer: '#ffffff',
-          },
-          components: {
-            Table: {
-              headerBg: '#f8fafc',
-              headerColor: '#1e293b',
-              rowHoverBg: '#f1f5f9',
-              fontSize: 11.5,
-            },
-            Card: {
-              borderRadiusLG: 6,
-            },
+            fontSize: 13,
           },
         }}
       >

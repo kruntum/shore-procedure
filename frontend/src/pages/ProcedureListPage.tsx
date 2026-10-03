@@ -64,18 +64,14 @@ export const ProcedureListPage: React.FC = () => {
       title: 'ท่าเรือ',
       dataIndex: ['port', 'code'],
       key: 'port',
-      width: 80,
+      width: 90,
       align: 'center' as const,
-      render: (text: string) => (
-        <Tag color="blue" style={{ fontWeight: 600, margin: 0, padding: '0 6px', fontSize: 11, height: 20, lineHeight: '18px' }}>
-          {text}
-        </Tag>
-      ),
+      render: (text: string) => <Tag color="blue">{text}</Tag>,
     },
     {
       title: 'สายเรือ / เอเย่นต์',
       key: 'agents',
-      width: 150,
+      width: 160,
       render: (_: any, record: Procedure) => {
         const agentList =
           record.agents && record.agents.length > 0
@@ -85,7 +81,7 @@ export const ProcedureListPage: React.FC = () => {
             : [];
 
         if (agentList.length === 0) {
-          return <Tag color="default" style={{ borderRadius: 4, fontSize: 11, height: 20, lineHeight: '18px' }}>ทุกสายเรือ</Tag>;
+          return <Tag color="default">ทุกสายเรือ</Tag>;
         }
 
         if (agentList.length > 3) {
@@ -94,12 +90,12 @@ export const ProcedureListPage: React.FC = () => {
           return (
             <Space size={[0, 4]} wrap>
               {visible.map((a) => (
-                <Tag key={a.id} color="cyan" style={{ margin: '1px 2px', fontWeight: 600, borderRadius: 4, fontSize: 11, height: 20, lineHeight: '18px' }}>
+                <Tag key={a.id} color="cyan" style={{ margin: '1px 2px', fontWeight: 600 }}>
                   {a.code}
                 </Tag>
               ))}
               <Tooltip title={remaining.map((a) => `${a.code} - ${a.name}`).join(', ')}>
-                <Tag color="geekblue" style={{ cursor: 'pointer', margin: '1px 2px', fontWeight: 500, borderRadius: 4, fontSize: 11, height: 20, lineHeight: '18px' }}>
+                <Tag color="geekblue" style={{ cursor: 'pointer', margin: '1px 2px', fontWeight: 500 }}>
                   +{remaining.length} สายเรือ
                 </Tag>
               </Tooltip>
@@ -110,7 +106,7 @@ export const ProcedureListPage: React.FC = () => {
         return (
           <Space size={[0, 4]} wrap>
             {agentList.map((a) => (
-              <Tag key={a.id} color="cyan" style={{ margin: '1px 2px', fontWeight: 600, borderRadius: 4, fontSize: 11, height: 20, lineHeight: '18px' }}>
+              <Tag key={a.id} color="cyan" style={{ margin: '1px 2px', fontWeight: 600 }}>
                 {a.code}
               </Tag>
             ))}
@@ -122,13 +118,9 @@ export const ProcedureListPage: React.FC = () => {
       title: 'ประเภทงาน',
       dataIndex: ['workType', 'name'],
       key: 'workType',
-      width: 95,
+      width: 110,
       align: 'center' as const,
-      render: (text: string) => (
-        <Tag color="purple" style={{ margin: 0, borderRadius: 4, fontSize: 11, height: 20, lineHeight: '18px' }}>
-          {text || 'จ่ายชอร์'}
-        </Tag>
-      ),
+      render: (text: string) => <Tag color="purple">{text}</Tag>,
     },
     {
       title: 'ชื่อคู่มือขั้นตอน',
@@ -139,12 +131,12 @@ export const ProcedureListPage: React.FC = () => {
         <div>
           <a
             onClick={() => navigate(`/procedures/${record.id}`)}
-            style={{ fontWeight: 500, fontSize: 11, color: '#1677ff' }}
+            style={{ fontWeight: 400, fontSize: 11, color: '#1677ff', lineHeight: 1.3, display: 'inline-block' }}
           >
             {text}
           </a>
           {record.description && (
-            <div style={{ fontSize: 10, color: '#8c8c8c', marginTop: 1, lineHeight: 1.3 }}>
+            <div style={{ fontSize: 10, color: '#8c8c8c', marginTop: 1, lineHeight: 1.25 }}>
               {record.description}
             </div>
           )}
@@ -157,20 +149,16 @@ export const ProcedureListPage: React.FC = () => {
       width: 100,
       align: 'center' as const,
       render: (_: any, record: Procedure) => (
-        <span style={{ fontSize: 11 }}>{record.variants?.length || 0} เงื่อนไข</span>
+        <span>{record.variants?.length || 0} เงื่อนไข</span>
       ),
     },
     {
       title: 'อัปเดตล่าสุด',
       dataIndex: 'updatedAt',
       key: 'updatedAt',
-      width: 95,
+      width: 100,
       align: 'center' as const,
-      render: (val: string) => (
-        <span style={{ fontSize: 11, color: '#64748b' }}>
-          {val ? new Date(val).toLocaleDateString('th-TH') : '-'}
-        </span>
-      ),
+      render: (val: string) => (val ? new Date(val).toLocaleDateString('th-TH') : '-'),
     },
     {
       title: 'การกระทำ',
