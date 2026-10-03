@@ -7,6 +7,7 @@ import {
   SettingOutlined,
   HomeOutlined,
   BookOutlined,
+  EllipsisOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { authService } from '../services/auth';
@@ -92,35 +93,40 @@ export const MainLayout: React.FC = () => {
             gap: 12,
           }}
         >
-          <Space size="middle" align="center" style={{ flexShrink: 0 }}>
-            <div
-              onClick={() => navigate('/')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: 15,
-                color: '#1677ff',
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
-              }}
-            >
-              <RocketOutlined style={{ fontSize: 20, marginRight: 6 }} />
-              <span className="brand-text">SHORE PROCEDURE</span>
-            </div>
+          {/* Logo */}
+          <div
+            onClick={() => navigate('/')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              fontSize: 15,
+              color: '#1677ff',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+              marginRight: 8,
+            }}
+          >
+            <RocketOutlined style={{ fontSize: 20, marginRight: 6 }} />
+            <span className="brand-text">SHORE PROCEDURE</span>
+          </div>
 
+          {/* Flexible Menu Container for Ant Design Auto-Ellipsis Overflow */}
+          <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
             <Menu
               mode="horizontal"
               selectedKeys={[location.pathname]}
               items={menuItems}
               onClick={({ key }) => navigate(key)}
-              style={{ borderBottom: 'none', minWidth: 160 }}
+              style={{ borderBottom: 'none' }}
+              overflowedIndicator={<EllipsisOutlined style={{ fontSize: 16 }} />}
             />
-          </Space>
+          </div>
 
+          {/* Right Controls */}
           <Space size="small" align="center" style={{ flexShrink: 0 }}>
-            <QuickSearch />
+            <QuickSearch style={{ width: 170 }} />
 
             {user ? (
               <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
