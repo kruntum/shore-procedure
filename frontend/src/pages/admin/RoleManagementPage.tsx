@@ -13,6 +13,7 @@ import {
   message,
   Row,
   Col,
+  Tooltip,
 } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useRoles } from '../../hooks/queries';
@@ -112,16 +113,17 @@ export const RoleManagementPage: React.FC = () => {
       title: 'ลำดับ',
       dataIndex: 'sortOrder',
       key: 'sortOrder',
-      width: 55,
+      width: 50,
       align: 'center' as const,
+      render: (order: number) => <span style={{ fontSize: 11, color: '#64748b' }}>{order}</span>,
     },
     {
       title: 'ไอคอน',
       dataIndex: 'icon',
       key: 'icon',
-      width: 55,
+      width: 50,
       align: 'center' as const,
-      render: (icon: string) => <span style={{ fontSize: 16 }}>{icon || '👤'}</span>,
+      render: (icon: string) => <span style={{ fontSize: 13 }}>{icon || '👤'}</span>,
     },
     {
       title: 'รหัสบทบาท (Code)',
@@ -129,7 +131,7 @@ export const RoleManagementPage: React.FC = () => {
       key: 'code',
       width: 130,
       render: (code: string) => (
-        <Tag style={{ fontWeight: 600, margin: 0, fontSize: 11, height: 20, lineHeight: '18px' }}>
+        <Tag color="geekblue" style={{ fontWeight: 500, margin: 0, fontSize: 11, height: 20, lineHeight: '18px' }}>
           {code}
         </Tag>
       ),
@@ -140,7 +142,7 @@ export const RoleManagementPage: React.FC = () => {
       key: 'name',
       width: 160,
       render: (name: string) => (
-        <span style={{ color: '#0f172a', fontWeight: 500, fontSize: 12 }}>{name}</span>
+        <span style={{ color: '#0f172a', fontWeight: 400, fontSize: 11 }}>{name}</span>
       ),
     },
     {
@@ -155,7 +157,7 @@ export const RoleManagementPage: React.FC = () => {
       key: 'description',
       width: 260,
       render: (desc: string) => (
-        <span style={{ color: '#64748b', fontSize: 11, lineHeight: 1.35, display: 'block' }}>
+        <span style={{ color: '#64748b', fontSize: 10.5, lineHeight: 1.35, display: 'block' }}>
           {desc || '-'}
         </span>
       ),
@@ -163,28 +165,26 @@ export const RoleManagementPage: React.FC = () => {
     {
       title: 'จัดการ',
       key: 'action',
-      width: 110,
+      width: 85,
       align: 'center' as const,
       render: (_: any, record: ResponsibleRole) => (
-        <Space size="small">
-          <Button
-            type="text"
-            size="small"
-            icon={<EditOutlined style={{ color: '#1677ff' }} />}
-            onClick={() => handleOpenModal(record)}
-          >
-            แก้ไข
-          </Button>
-          {isAdmin && (
+        <Space size={4}>
+          <Tooltip title="แก้ไข">
             <Button
-              type="text"
-              danger
               size="small"
-              icon={<DeleteOutlined />}
-              onClick={() => handleDelete(record.id, record.name)}
-            >
-              ลบ
-            </Button>
+              icon={<EditOutlined style={{ color: '#1677ff', fontSize: 12 }} />}
+              onClick={() => handleOpenModal(record)}
+            />
+          </Tooltip>
+          {isAdmin && (
+            <Tooltip title="ลบ">
+              <Button
+                size="small"
+                danger
+                icon={<DeleteOutlined style={{ fontSize: 12 }} />}
+                onClick={() => handleDelete(record.id, record.name)}
+              />
+            </Tooltip>
           )}
         </Space>
       ),
@@ -220,7 +220,7 @@ export const RoleManagementPage: React.FC = () => {
         rowKey="id"
         loading={isLoading}
         size="small"
-        scroll={{ x: 930 }}
+        scroll={{ x: 860 }}
         pagination={false}
       />
 
