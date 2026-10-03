@@ -135,7 +135,7 @@ export const UserManagementPage: React.FC = () => {
       width: 45,
       align: 'center' as const,
       render: (_: any, __: any, index: number) => (
-        <span style={{ color: '#8c8c8c', fontSize: 11.5 }}>{index + 1}</span>
+        <span style={{ color: '#8c8c8c', fontSize: 11 }}>{index + 1}</span>
       ),
     },
     {
@@ -144,17 +144,15 @@ export const UserManagementPage: React.FC = () => {
       key: 'username',
       width: 140,
       render: (uname: string, record: User) => (
-        <Space direction="vertical" size={1}>
-          <Space direction="horizontal" size={4}>
-            <Tag color="geekblue" style={{ fontWeight: 600, margin: 0, fontSize: 11.5 }}>
-              {uname}
+        <Space size={4}>
+          <Tag color="geekblue" style={{ fontWeight: 500, fontSize: 11, height: 20, lineHeight: '18px', margin: 0 }}>
+            {uname}
+          </Tag>
+          {record.id === currentUser?.id && (
+            <Tag color="purple" style={{ fontSize: 10, height: 18, lineHeight: '16px', margin: 0, padding: '0 4px' }}>
+              บัญชีคุณ
             </Tag>
-            {record.id === currentUser?.id && (
-              <Tag color="purple" style={{ fontSize: 10, margin: 0, padding: '0 4px' }}>
-                บัญชีคุณ
-              </Tag>
-            )}
-          </Space>
+          )}
         </Space>
       ),
     },
@@ -162,39 +160,33 @@ export const UserManagementPage: React.FC = () => {
       title: 'ชื่อที่แสดง (Display Name)',
       dataIndex: 'displayName',
       key: 'displayName',
-      width: 170,
+      width: 160,
       render: (name: string) => (
-        <span style={{ fontWeight: 500, color: '#0f172a', fontSize: 12.5 }}>{name}</span>
+        <span style={{ fontSize: 11, color: '#0f172a' }}>{name}</span>
       ),
     },
     {
       title: 'ชื่อ - นามสกุล เต็ม / ผู้จัดทำ SOP (Full Name)',
       dataIndex: 'fullName',
       key: 'fullName',
-      width: 220,
       render: (fullName: string, record: User) => (
-        <div>
-          <span style={{ color: '#1e293b', fontSize: 12.5 }}>
-            {fullName || record.displayName}
-          </span>
-          <div style={{ fontSize: 10.5, color: '#64748b' }}>
-            แสดงในช่อง &quot;ผู้จัดทำ SOP&quot;
-          </div>
-        </div>
+        <span style={{ fontSize: 11, color: '#1e293b' }}>
+          {fullName || record.displayName}
+        </span>
       ),
     },
     {
       title: 'บทบาท (Role)',
       dataIndex: 'role',
       key: 'role',
-      width: 130,
+      width: 140,
       render: (role: string) => {
         const isAdminRole = role === 'admin';
         return (
           <Tag
             color={isAdminRole ? 'gold' : 'blue'}
-            icon={isAdminRole ? <SafetyCertificateOutlined /> : <UserOutlined />}
-            style={{ fontWeight: 500, margin: 0, fontSize: 11 }}
+            icon={isAdminRole ? <SafetyCertificateOutlined style={{ fontSize: 11 }} /> : <UserOutlined style={{ fontSize: 11 }} />}
+            style={{ fontWeight: 500, fontSize: 11, height: 20, lineHeight: '18px', margin: 0 }}
           >
             {isAdminRole ? 'ผู้ดูแลระบบ (Admin)' : 'พนักงาน (User)'}
           </Tag>
@@ -205,10 +197,10 @@ export const UserManagementPage: React.FC = () => {
       title: 'สถานะ',
       dataIndex: 'isActive',
       key: 'isActive',
-      width: 100,
+      width: 95,
       align: 'center' as const,
       render: (active: boolean) => (
-        <Tag color={active !== false ? 'success' : 'default'} style={{ margin: 0, fontSize: 11 }}>
+        <Tag color={active !== false ? 'success' : 'default'} style={{ fontSize: 11, height: 20, lineHeight: '18px', margin: 0 }}>
           {active !== false ? 'ใช้งานอยู่' : 'ระงับการใช้งาน'}
         </Tag>
       ),
@@ -216,32 +208,28 @@ export const UserManagementPage: React.FC = () => {
     {
       title: 'จัดการ',
       key: 'action',
-      width: 120,
+      width: 85,
       align: 'center' as const,
       render: (_: any, record: User) => {
         const isSelf = record.id === currentUser?.id;
         return (
-          <Space size="small">
-            <Button
-              type="text"
-              size="small"
-              icon={<EditOutlined style={{ color: '#1677ff' }} />}
-              onClick={() => handleOpenModal(record)}
-            >
-              แก้ไข
-            </Button>
+          <Space size={4}>
+            <Tooltip title="แก้ไข">
+              <Button
+                size="small"
+                icon={<EditOutlined style={{ color: '#1677ff', fontSize: 12 }} />}
+                onClick={() => handleOpenModal(record)}
+              />
+            </Tooltip>
             {isAdmin && (
-              <Tooltip title={isSelf ? 'ไม่สามารถลบบัญชีของคุณเองได้' : 'ลบบัญชีผู้ใช้งาน'}>
+              <Tooltip title={isSelf ? 'ไม่สามารถลบบัญชีของคุณเองได้' : 'ลบ'}>
                 <Button
-                  type="text"
-                  danger
                   size="small"
+                  danger
                   disabled={isSelf}
-                  icon={<DeleteOutlined />}
+                  icon={<DeleteOutlined style={{ fontSize: 12 }} />}
                   onClick={() => handleDelete(record.id, record.username, record.displayName)}
-                >
-                  ลบ
-                </Button>
+                />
               </Tooltip>
             )}
           </Space>
@@ -306,7 +294,7 @@ export const UserManagementPage: React.FC = () => {
         rowKey="id"
         loading={isLoading}
         size="small"
-        scroll={{ x: 860 }}
+        scroll={{ x: 700 }}
         pagination={false}
       />
 
