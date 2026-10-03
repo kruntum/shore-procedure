@@ -3,7 +3,9 @@ export interface User {
   username: string;
   role: 'admin' | 'user';
   displayName: string;
-  fullName?: string;
+  fullName?: string | null;
+  isActive?: boolean;
+  createdAt?: string;
 }
 
 export interface Port {

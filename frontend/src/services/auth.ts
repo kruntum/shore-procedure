@@ -26,6 +26,14 @@ export const authService = {
     }
   },
 
+  updateCurrentUser(updated: Partial<User>) {
+    const current = this.getCurrentUser();
+    if (current) {
+      const merged = { ...current, ...updated };
+      localStorage.setItem('shore_user', JSON.stringify(merged));
+    }
+  },
+
   getToken(): string | null {
     return localStorage.getItem('shore_token');
   },

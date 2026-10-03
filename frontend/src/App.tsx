@@ -12,6 +12,7 @@ import { PortManagementPage } from './pages/admin/PortManagementPage';
 import { AgentManagementPage } from './pages/admin/AgentManagementPage';
 import { WorkTypeManagementPage } from './pages/admin/WorkTypeManagementPage';
 import { RoleManagementPage } from './pages/admin/RoleManagementPage';
+import { UserManagementPage } from './pages/admin/UserManagementPage';
 import { ProcedureBuilderPage } from './pages/admin/ProcedureBuilderPage';
 
 export default function App() {
@@ -45,6 +46,7 @@ export default function App() {
             <Route path="agents" element={<AgentManagementPage />} />
             <Route path="work-types" element={<WorkTypeManagementPage />} />
             <Route path="roles" element={<RoleManagementPage />} />
+            <Route path="users" element={<UserManagementPage />} />
           </Route>
         </Route>
 

@@ -9,8 +9,10 @@ import {
   ArrowLeftOutlined,
   UserSwitchOutlined,
   SettingOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { authService } from '../services/auth';
 
 const { Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -19,6 +21,8 @@ export const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+
+  const isAdmin = authService.isAdmin();
 
   const menuItems = [
     {
@@ -54,6 +58,15 @@ export const AdminLayout: React.FC = () => {
       icon: <UserSwitchOutlined />,
       label: 'ผู้รับผิดชอบ (Roles)',
     },
+    ...(isAdmin
+      ? [
+          {
+            key: '/admin/users',
+            icon: <UserOutlined />,
+            label: 'จัดการผู้ใช้งาน (Users)',
+          },
+        ]
+      : []),
   ];
 
   return (

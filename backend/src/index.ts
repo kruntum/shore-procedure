@@ -10,6 +10,7 @@ import proceduresRouter from './routes/procedures';
 import filesRouter from './routes/files';
 import searchRouter from './routes/search';
 import rolesRouter from './routes/roles';
+import usersRouter from './routes/users';
 import { ensureBucket } from './services/minio';
 import { runMigrations } from './db/migrate';
 import { runSeed } from './db/seed';
@@ -51,6 +52,7 @@ api.route('/procedures', proceduresRouter);
 api.route('/files', filesRouter);
 api.route('/search', searchRouter);
 api.route('/roles', rolesRouter);
+api.route('/users', usersRouter);
 
 app.route('/api', api);
 

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../services/api';
-import { Port, Agent, WorkType, Procedure, ResponsibleRole } from '../types';
+import { Port, Agent, WorkType, Procedure, ResponsibleRole, User } from '../types';
 
 export function usePorts(q?: string) {
   return useQuery<Port[]>({
@@ -104,5 +104,16 @@ export function useRoles() {
     staleTime: 5 * 60 * 1000,
   });
 }
+
+export function useUsers() {
+  return useQuery<User[]>({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const res = await api.get('/users');
+      return res.data.data;
+    },
+  });
+}
+
 
 
