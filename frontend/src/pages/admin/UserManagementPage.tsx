@@ -14,6 +14,7 @@ import {
   Col,
   Switch,
   Tooltip,
+  Alert,
 } from 'antd';
 import {
   PlusOutlined,
@@ -23,6 +24,7 @@ import {
   SafetyCertificateOutlined,
   KeyOutlined,
   InfoCircleOutlined,
+  ReloadOutlined,
 } from '@ant-design/icons';
 import { useUsers } from '../../hooks/queries';
 import { useCreateUser, useUpdateUser, useDeleteUser } from '../../hooks/mutations';
@@ -36,7 +38,7 @@ export const UserManagementPage: React.FC = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [form] = Form.useForm();
 
-  const { data: users, isLoading } = useUsers();
+  const { data: users, isLoading, isError, refetch } = useUsers();
   const createMutation = useCreateUser();
   const updateMutation = useUpdateUser();
   const deleteMutation = useDeleteUser();
@@ -260,18 +262,43 @@ export const UserManagementPage: React.FC = () => {
           </Text>
         </Col>
         <Col>
-          {isAdmin && (
+          <Space size="small">
             <Button
-              type="primary"
               size="small"
-              icon={<PlusOutlined />}
-              onClick={() => handleOpenModal()}
+              icon={<ReloadOutlined />}
+              onClick={() => refetch()}
+              loading={isLoading}
             >
-              เพิ่มผู้ใช้งานใหม่
+              รีเฟรช
             </Button>
-          )}
+            {isAdmin && (
+              <Button
+                type="primary"
+                size="small"
+                icon={<PlusOutlined />}
+                onClick={() => handleOpenModal()}
+              >
+                เพิ่มผู้ใช้งานใหม่
+              </Button>
+            )}
+          </Space>
         </Col>
       </Row>
+
+      {isError && (
+        <Alert
+          type="warning"
+          message="ไม่สามารถดึงข้อมูลผู้ใช้งานได้ในขณะนี้"
+          description="ระบบอาจกำลังเริ่มต้นการทำงาน กรุณากดปุ่มรีเฟรช หรือลองใหม่อีกครั้ง"
+          action={
+            <Button size="small" type="primary" onClick={() => refetch()}>
+              รีเฟรชข้อมูล
+            </Button>
+          }
+          style={{ marginBottom: 12 }}
+          showIcon
+        />
+      )}
 
       <Table
         columns={columns}
