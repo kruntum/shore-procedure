@@ -44,7 +44,7 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
   images = [],
   readOnly = false,
 }) => {
-  const { isDarkMode } = useTheme();
+  const { isDarkMode, primaryColor } = useTheme();
   const [editingImageId, setEditingImageId] = useState<number | null>(null);
   const [editingCaption, setEditingCaption] = useState<string>('');
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
@@ -61,15 +61,15 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
       <div
         style={{
           padding: '8px 12px',
-          background: '#fffbe6',
-          border: '1px dashed #ffe58f',
-          borderRadius: 4,
+          background: isDarkMode ? 'rgba(217, 119, 6, 0.08)' : '#fffbe6',
+          border: isDarkMode ? '1px dashed rgba(245, 158, 11, 0.35)' : '1px dashed #ffe58f',
+          borderRadius: 6,
           marginTop: 8,
         }}
       >
         <Space size="small">
-          <PictureOutlined style={{ color: '#faad14' }} />
-          <Text type="secondary" style={{ fontSize: 12 }}>
+          <PictureOutlined style={{ color: isDarkMode ? '#f59e0b' : '#faad14' }} />
+          <Text style={{ fontSize: 12, color: isDarkMode ? 'rgba(255, 255, 255, 0.75)' : undefined }} type={isDarkMode ? undefined : "secondary"}>
             กรุณาบันทึกคู่มือก่อน จึงจะสามารถอัปโหลดภาพหน้าจอประกอบขั้นตอนนี้ได้
           </Text>
         </Space>
@@ -266,6 +266,10 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
             size="small"
             type="dashed"
             icon={<PlusOutlined />}
+            style={{
+              borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.18)' : undefined,
+              color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : undefined,
+            }}
             onClick={() => {
               setFileList([]);
               setCaptionInput('');
@@ -353,15 +357,19 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
             setFileList([]);
           }}
           accept="image/png,image/jpeg,image/jpg,image/webp"
-          style={{ padding: '16px 0' }}
+          style={{
+            padding: '16px 0',
+            backgroundColor: isDarkMode ? '#1a1d21' : '#fafafa',
+            borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.15)' : '#d9d9d9',
+          }}
         >
           <p className="ant-upload-drag-icon">
-            <InboxOutlined style={{ fontSize: 36, color: '#1677ff' }} />
+            <InboxOutlined style={{ fontSize: 36, color: primaryColor || '#1677ff' }} />
           </p>
-          <p className="ant-upload-text" style={{ fontSize: 13 }}>
+          <p className="ant-upload-text" style={{ fontSize: 13, color: isDarkMode ? 'rgba(255, 255, 255, 0.88)' : undefined }}>
             ลากไฟล์ภาพหน้าจอมาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์
           </p>
-          <p className="ant-upload-hint" style={{ fontSize: 11, color: '#888' }}>
+          <p className="ant-upload-hint" style={{ fontSize: 11, color: isDarkMode ? 'rgba(255, 255, 255, 0.45)' : '#888' }}>
             รองรับไฟล์ PNG, JPG, JPEG, WebP (ขนาดสูงสุดไม่เกิน 15MB)
           </p>
         </Upload.Dragger>

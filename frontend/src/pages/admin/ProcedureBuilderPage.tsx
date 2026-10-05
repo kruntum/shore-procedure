@@ -222,9 +222,18 @@ export const ProcedureBuilderPage: React.FC = () => {
           <Alert
             type="info"
             showIcon
-            style={{ marginTop: 12, marginBottom: 16 }}
-            message="ระบบการแนบภาพหน้าจอ"
-            description="1. กรอกข้อมูลคู่มือ เงื่อนไข และขั้นตอนด้านล่างนี้  2. กดปุ่ม 'บันทึกคู่มือขั้นตอน'  3. ระบบจะพาเข้าสู่หน้าจัดการเพื่อให้อัปโหลดภาพหน้าจอประกอบแต่ละขั้นตอนได้ทันที"
+            style={{
+              marginTop: 12,
+              marginBottom: 16,
+              background: isDarkMode ? 'rgba(22, 119, 255, 0.08)' : undefined,
+              borderColor: isDarkMode ? 'rgba(22, 119, 255, 0.25)' : undefined,
+            }}
+            message={<span style={{ color: isDarkMode ? '#93c5fd' : undefined }}>ระบบการแนบภาพหน้าจอ</span>}
+            description={
+              <span style={{ color: isDarkMode ? 'rgba(255, 255, 255, 0.75)' : undefined }}>
+                1. กรอกข้อมูลคู่มือ เงื่อนไข และขั้นตอนด้านล่างนี้  2. กดปุ่ม 'บันทึกคู่มือขั้นตอน'  3. ระบบจะพาเข้าสู่หน้าจัดการเพื่อให้อัปโหลดภาพหน้าจอประกอบแต่ละขั้นตอนได้ทันที
+              </span>
+            }
           />
         )}
 
@@ -334,7 +343,7 @@ export const ProcedureBuilderPage: React.FC = () => {
                         >
                           เลือกทุกสายเรือ (All)
                         </Button>
-                        <span style={{ color: '#d9d9d9' }}>|</span>
+                        <span style={{ color: isDarkMode ? 'rgba(255, 255, 255, 0.18)' : '#d9d9d9' }}>|</span>
                         <Button
                           type="link"
                           size="small"
@@ -625,7 +634,12 @@ export const ProcedureBuilderPage: React.FC = () => {
                                 }
                                 block
                                 icon={<PlusOutlined />}
-                                style={{ marginTop: 4 }}
+                                style={{
+                                  marginTop: 4,
+                                  background: isDarkMode ? '#16191e' : undefined,
+                                  borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.15)' : undefined,
+                                  color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : undefined,
+                                }}
                               >
                                 เพิ่มขั้นตอนถัดไป (Add Step)
                               </Button>
@@ -657,7 +671,13 @@ export const ProcedureBuilderPage: React.FC = () => {
                   }
                   block
                   icon={<PlusOutlined />}
-                  style={{ marginBottom: 20, height: 38 }}
+                  style={{
+                    marginBottom: 20,
+                    height: 38,
+                    background: isDarkMode ? '#16191e' : undefined,
+                    borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.15)' : undefined,
+                    color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : undefined,
+                  }}
                 >
                   เพิ่มเงื่อนไข / กรณีใหม่ (Add Variant)
                 </Button>
