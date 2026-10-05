@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Typography } from 'antd';
+import { Layout, Menu, Typography, Button } from 'antd';
 import {
   CompassOutlined,
   TeamOutlined,
@@ -12,6 +12,8 @@ import {
   UserOutlined,
   FolderOutlined,
   BankOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { authService } from '../services/auth';
@@ -104,6 +106,7 @@ export const AdminLayout: React.FC = () => {
           collapsible
           collapsed={collapsed}
           onCollapse={setCollapsed}
+          trigger={null}
           breakpoint="lg"
           collapsedWidth={56}
           width={190}
@@ -147,6 +150,33 @@ export const AdminLayout: React.FC = () => {
             onClick={({ key }) => navigate(key)}
             style={{ borderRight: 0, background: 'transparent' }}
           />
+
+          {/* Sider Collapse Button placed directly below the menu items */}
+          <div
+            style={{
+              padding: '8px 10px',
+              borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #f0f0f0',
+              marginTop: 6,
+            }}
+          >
+            <Button
+              type="text"
+              size="small"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: collapsed ? 'center' : 'flex-start',
+                color: isDarkMode ? 'rgba(255, 255, 255, 0.65)' : '#64748b',
+                fontSize: 12,
+                borderRadius: 4,
+              }}
+            >
+              {!collapsed && <span style={{ marginLeft: 6 }}>ย่อแถบเมนู</span>}
+            </Button>
+          </div>
         </Sider>
 
         <Content

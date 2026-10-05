@@ -139,3 +139,8 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.35);
 }
+
+/* Hide default Ant Design floating sider trigger */
+.ant-layout-sider-trigger {
+  display: none !important;
+}
