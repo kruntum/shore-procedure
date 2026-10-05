@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ConfigProvider, theme } from 'antd';
+import { ConfigProvider, theme, App as AntApp } from 'antd';
 import thTH from 'antd/locale/th_TH';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
@@ -68,7 +68,9 @@ const ThemedApp: React.FC = () => {
         },
       }}
     >
-      <App />
+      <AntApp>
+        <App />
+      </AntApp>
     </ConfigProvider>
   );
 };

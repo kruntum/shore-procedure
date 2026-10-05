@@ -115,13 +115,47 @@ body {
    Modals & Popovers (Layer 3: High Elevation)
    ========================================================================== */
 .dark .ant-modal-content {
-  background-color: #262626 !important;
+  background-color: #24272c !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   box-shadow: 0 16px 36px 4px rgba(0, 0, 0, 0.75), 0 8px 20px 0 rgba(0, 0, 0, 0.6) !important;
 }
 
 .dark .ant-modal-header {
-  background-color: #262626 !important;
+  background-color: #24272c !important;
+}
+
+.dark .ant-modal-title {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+/* Modal Confirm & Dialogs (Fixed contrast and button styling) */
+.dark .ant-modal-confirm .ant-modal-content {
+  background-color: #24272c !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .ant-modal-confirm-title {
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-weight: 600 !important;
+}
+
+.dark .ant-modal-confirm-paragraph,
+.dark .ant-modal-confirm-content {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Cancel Button in Dark Mode Modal Confirm - removes jarring white button */
+.dark .ant-modal-confirm-btns .ant-btn-default {
+  background-color: #2e333a !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: rgba(255, 255, 255, 0.88) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark .ant-modal-confirm-btns .ant-btn-default:hover {
+  background-color: #3b424b !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
 }
 
 /* Custom modern scrollbars */

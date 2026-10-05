@@ -588,7 +588,29 @@ proceduresRouter.post('/:id/duplicate', requireAuth, async (c) => {
 
   if (!orig) return errorResponse(c, 'ไม่พบคู่มือต้นฉบับที่ต้องการคัดลอก', 404);
 
-  const newTitle = `${orig.title} (สำเนา)`;
+  // Strip any existing repeated (สำเนา) suffixes to find clean base title
+  const baseTitle = orig.title.replace(/(\s*\(สำเนา(\s*\d+)?\))+$/g, '').trim();
+
+  // Find all existing procedures sharing this baseTitle to find next copy number
+  const allProcs = await db.query.procedures.findMany({
+    columns: { title: true },
+  });
+
+  let maxCopyNum = 0;
+  for (const p of allProcs) {
+    if (p.title.startsWith(baseTitle)) {
+      const match = p.title.match(/^(.*?)(?:\s*\(สำเนา(?:\s*(\d+))?\))+$/);
+      if (match && match[1].trim() === baseTitle) {
+        const num = match[2] ? parseInt(match[2], 10) : 1;
+        if (num > maxCopyNum) maxCopyNum = num;
+      }
+    }
+  }
+
+  const newTitle = maxCopyNum === 0
+    ? `${baseTitle} (สำเนา)`
+    : `${baseTitle} (สำเนา ${maxCopyNum + 1})`;
+
   const [newProc] = await db.insert(procedures).values({
     categoryId: orig.categoryId,
     portId: orig.portId,
