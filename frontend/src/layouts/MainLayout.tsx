@@ -12,12 +12,15 @@ import {
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { authService } from '../services/auth';
 import { QuickSearch } from '../components/QuickSearch';
+import { ThemeToggle } from '../components/ThemeToggle';
+import { useTheme } from '../contexts/ThemeContext';
 
 const { Header, Content, Footer } = Layout;
 
 export const MainLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDarkMode, primaryColor } = useTheme();
   const user = authService.getCurrentUser();
   const isAdmin = authService.isAdmin();
 
@@ -70,15 +73,16 @@ export const MainLayout: React.FC = () => {
   ];
 
   return (
-    <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
+    <Layout style={{ minHeight: '100vh', background: isDarkMode ? '#141414' : '#f0f2f5' }}>
       <Header
         style={{
-          background: '#fff',
+          background: isDarkMode ? '#1f1f1f' : '#fff',
           padding: '0 16px',
-          boxShadow: '0 1px 4px rgba(0,21,41,0.08)',
+          boxShadow: isDarkMode ? '0 1px 4px rgba(0,0,0,0.4)' : '0 1px 4px rgba(0,21,41,0.08)',
           position: 'sticky',
           top: 0,
           zIndex: 100,
+          borderBottom: isDarkMode ? '1px solid #303030' : 'none',
         }}
       >
         <div
@@ -102,7 +106,7 @@ export const MainLayout: React.FC = () => {
               cursor: 'pointer',
               fontWeight: 'bold',
               fontSize: 15,
-              color: '#1677ff',
+              color: primaryColor,
               whiteSpace: 'nowrap',
               flexShrink: 0,
               marginRight: 8,
@@ -119,14 +123,17 @@ export const MainLayout: React.FC = () => {
               selectedKeys={[location.pathname]}
               items={menuItems}
               onClick={({ key }) => navigate(key)}
-              style={{ borderBottom: 'none' }}
+              style={{ borderBottom: 'none', background: 'transparent' }}
               overflowedIndicator={<EllipsisOutlined style={{ fontSize: 16 }} />}
             />
           </div>
 
           {/* Right Controls */}
           <Space size="small" align="center" style={{ flexShrink: 0 }}>
-            <QuickSearch style={{ width: 170 }} />
+            <QuickSearch style={{ width: 160 }} />
+
+            {/* Dark Mode & Theme Switcher */}
+            <ThemeToggle />
 
             {user ? (
               <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
@@ -155,7 +162,7 @@ export const MainLayout: React.FC = () => {
         <Outlet />
       </Content>
 
-      <Footer style={{ textAlign: 'center', color: '#8c8c8c', fontSize: 12, padding: '16px 20px' }}>
+      <Footer style={{ textAlign: 'center', color: isDarkMode ? '#666' : '#8c8c8c', fontSize: 12, padding: '16px 20px', background: 'transparent' }}>
         Asiathai Freight SOP Management System © 2026 • Single Source of Truth for Logistics & Customs Clearance
       </Footer>
     </Layout>

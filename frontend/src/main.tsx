@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { ConfigProvider, theme } from 'antd';
 import thTH from 'antd/locale/th_TH';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import App from './App';
 
 const queryClient = new QueryClient({
@@ -14,22 +15,34 @@ const queryClient = new QueryClient({
   },
 });
 
+const ThemedApp: React.FC = () => {
+  const { isDarkMode, primaryColor } = useTheme();
+
+  return (
+    <ConfigProvider
+      locale={thTH}
+      theme={{
+        algorithm: isDarkMode
+          ? [theme.darkAlgorithm, theme.compactAlgorithm]
+          : [theme.defaultAlgorithm, theme.compactAlgorithm],
+        token: {
+          colorPrimary: primaryColor,
+          borderRadius: 4,
+          fontSize: 13,
+        },
+      }}
+    >
+      <App />
+    </ConfigProvider>
+  );
+};
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ConfigProvider
-        locale={thTH}
-        theme={{
-          algorithm: theme.compactAlgorithm,
-          token: {
-            colorPrimary: '#1677ff',
-            borderRadius: 4,
-            fontSize: 13,
-          },
-        }}
-      >
-        <App />
-      </ConfigProvider>
+      <ThemeProvider>
+        <ThemedApp />
+      </ThemeProvider>
     </QueryClientProvider>
   </React.StrictMode>,
 );

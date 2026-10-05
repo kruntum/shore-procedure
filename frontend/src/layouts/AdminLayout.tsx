@@ -15,6 +15,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { authService } from '../services/auth';
+import { useTheme } from '../contexts/ThemeContext';
 
 const { Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -22,6 +23,7 @@ const { Title, Text } = Typography;
 export const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDarkMode, primaryColor } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
 
   const isAdmin = authService.isAdmin();
@@ -89,7 +91,7 @@ export const AdminLayout: React.FC = () => {
         </a>
       </div>
 
-      <Layout style={{ background: '#fff', borderRadius: 6, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+      <Layout style={{ background: isDarkMode ? '#1f1f1f' : '#fff', borderRadius: 6, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
         <Sider
           collapsible
           collapsed={collapsed}
@@ -97,12 +99,12 @@ export const AdminLayout: React.FC = () => {
           breakpoint="lg"
           collapsedWidth={56}
           width={190}
-          theme="light"
-          style={{ borderRight: '1px solid #f0f0f0' }}
+          theme={isDarkMode ? 'dark' : 'light'}
+          style={{ borderRight: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0', background: isDarkMode ? '#1f1f1f' : '#fff' }}
         >
           {!collapsed ? (
-            <div style={{ padding: '12px 14px 8px', borderBottom: '1px solid #f8fafc', whiteSpace: 'nowrap', overflow: 'hidden' }}>
-              <Title level={5} style={{ margin: 0, color: '#1677ff', fontSize: 13.5 }}>
+            <div style={{ padding: '12px 14px 8px', borderBottom: isDarkMode ? '1px solid #303030' : '1px solid #f8fafc', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+              <Title level={5} style={{ margin: 0, color: primaryColor, fontSize: 13.5 }}>
                 Admin Console
               </Title>
               <Text type="secondary" style={{ fontSize: 11 }}>
@@ -110,8 +112,8 @@ export const AdminLayout: React.FC = () => {
               </Text>
             </div>
           ) : (
-            <div style={{ padding: '14px 0', textAlign: 'center', borderBottom: '1px solid #f8fafc' }}>
-              <SettingOutlined style={{ fontSize: 18, color: '#1677ff' }} />
+            <div style={{ padding: '14px 0', textAlign: 'center', borderBottom: isDarkMode ? '1px solid #303030' : '1px solid #f8fafc' }}>
+              <SettingOutlined style={{ fontSize: 18, color: primaryColor }} />
             </div>
           )}
           <Menu
