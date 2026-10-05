@@ -2,10 +2,12 @@ import React from 'react';
 import { Card, Row, Col, Typography, Tag, Space } from 'antd';
 import { ClockCircleOutlined, InfoCircleOutlined, DollarOutlined } from '@ant-design/icons';
 import { ProcedureVariant } from '../types';
+import { useTheme } from '../contexts/ThemeContext';
 
 const { Text } = Typography;
 
 export const SummaryBanner: React.FC<{ variant?: ProcedureVariant }> = ({ variant }) => {
+  const { isDarkMode, primaryColor } = useTheme();
   if (!variant) return null;
 
   return (
@@ -13,8 +15,11 @@ export const SummaryBanner: React.FC<{ variant?: ProcedureVariant }> = ({ varian
       size="small"
       style={{
         marginBottom: 16,
-        background: '#f9f9f9',
-        borderLeft: '4px solid #1677ff',
+        background: isDarkMode ? '#16191f' : '#f8fafc',
+        border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #e2e8f0',
+        borderLeft: `4px solid ${primaryColor}`,
+        boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 2px rgba(0,0,0,0.02)',
+        borderRadius: 6,
       }}
     >
       <Row gutter={[16, 8]} align="middle">

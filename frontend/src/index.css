@@ -1,0 +1,110 @@
+/* Custom Global Styles for Asiathai Freight SOP */
+
+body {
+  font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Card Transitions & Elevations */
+.ant-card {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+/* Light mode card border and subtle shadow */
+.ant-card-bordered {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+}
+
+/* Dark mode: Thin, subtle border with soft ambient depth - exactly what the user requested */
+.dark .ant-card-bordered {
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.45), 0 2px 6px -1px rgba(0, 0, 0, 0.25) !important;
+}
+
+.dark .ant-card {
+  background-color: #1a1d21;
+}
+
+/* Dark mode inputs and dropdowns */
+.dark .ant-input,
+.dark .ant-input-affix-wrapper,
+.dark .ant-select-selector {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  background-color: #15181d !important;
+}
+
+.dark .ant-input:hover,
+.dark .ant-input-affix-wrapper:hover,
+.dark .ant-select:hover .ant-select-selector {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Dark mode Table styling */
+.dark .ant-table {
+  background: transparent !important;
+}
+
+.dark .ant-table-container {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.dark .ant-table-thead > tr > th {
+  background: #15171b !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+  color: #94a3b8 !important;
+}
+
+.dark .ant-table-tbody > tr > td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+
+.dark .ant-table-tbody > tr:hover > td {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Dark mode pagination */
+.dark .ant-pagination-item {
+  background-color: #16191e !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .ant-pagination-item a {
+  color: #cbd5e1 !important;
+}
+
+.dark .ant-pagination-prev .ant-pagination-item-link,
+.dark .ant-pagination-next .ant-pagination-item-link {
+  background-color: #16191e !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #cbd5e1 !important;
+}
+
+/* Dark mode Modal styling */
+.dark .ant-modal-content {
+  background-color: #1a1d21 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7) !important;
+}
+
+.dark .ant-modal-header {
+  background-color: #1a1d21 !important;
+}
+
+/* Custom modern scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.35);
+}

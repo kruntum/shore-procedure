@@ -15,12 +15,14 @@ import { useDuplicateProcedure } from '../hooks/mutations';
 import { VariantTabs } from '../components/VariantTabs';
 import { SOPPrintModal } from '../components/SOPPrintModal';
 import { authService } from '../services/auth';
+import { useTheme } from '../contexts/ThemeContext';
 
 const { Title, Text, Paragraph } = Typography;
 
 export const ProcedureViewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { isDarkMode, primaryColor } = useTheme();
   const procedureId = parseInt(id || '0');
 
   const { data: proc, isLoading } = useProcedure(procedureId);
@@ -99,7 +101,15 @@ export const ProcedureViewPage: React.FC = () => {
       />
 
       {/* Header Card */}
-      <Card style={{ marginBottom: 16, borderRadius: 8 }}>
+      <Card
+        style={{
+          marginBottom: 16,
+          borderRadius: 8,
+          border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #e2e8f0',
+          boxShadow: isDarkMode ? '0 4px 16px -2px rgba(0, 0, 0, 0.45)' : '0 1px 3px rgba(0, 0, 0, 0.03)',
+          background: isDarkMode ? '#1a1d21' : '#fff',
+        }}
+      >
         <div
           style={{
             display: 'flex',
@@ -162,24 +172,24 @@ export const ProcedureViewPage: React.FC = () => {
                 )}
               </Space>
 
-              <Title level={4} style={{ margin: '4px 0 6px', color: '#1f1f1f', fontSize: 18 }}>
+              <Title level={4} style={{ margin: '4px 0 6px', color: isDarkMode ? '#f1f5f9' : '#1f1f1f', fontSize: 18 }}>
                 {proc.title}
               </Title>
 
               {proc.description && (
-                <Paragraph type="secondary" style={{ margin: '4px 0', fontSize: 13, color: '#4b5563' }}>
+                <Paragraph type="secondary" style={{ margin: '4px 0', fontSize: 13, color: isDarkMode ? '#94a3b8' : '#4b5563' }}>
                   {proc.description}
                 </Paragraph>
               )}
 
               {proc.referenceDocuments && (
-                <div style={{ marginTop: 4, fontSize: 12, color: '#4b5563' }}>
+                <div style={{ marginTop: 4, fontSize: 12, color: isDarkMode ? '#94a3b8' : '#4b5563' }}>
                   <Text strong>เอกสารอ้างอิง: </Text>
                   <span>{proc.referenceDocuments}</span>
                 </div>
               )}
 
-              <div style={{ marginTop: 6, fontSize: 11, color: '#8c8c8c' }}>
+              <div style={{ marginTop: 6, fontSize: 11, color: isDarkMode ? '#71717a' : '#8c8c8c' }}>
                 อัปเดตล่าสุด: {proc.updatedAt ? new Date(proc.updatedAt).toLocaleDateString('th-TH') : '-'} โดย {proc.updatedBy || 'ผู้ดูแลระบบ'}
               </div>
             </div>
@@ -213,7 +223,14 @@ export const ProcedureViewPage: React.FC = () => {
       </Card>
 
       {/* Operating Guidelines & Steps */}
-      <Card style={{ borderRadius: 8 }}>
+      <Card
+        style={{
+          borderRadius: 8,
+          border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #e2e8f0',
+          boxShadow: isDarkMode ? '0 4px 16px -2px rgba(0, 0, 0, 0.45)' : '0 1px 3px rgba(0, 0, 0, 0.03)',
+          background: isDarkMode ? '#1a1d21' : '#fff',
+        }}
+      >
         <Title level={5} style={{ marginBottom: 12 }}>
           เงื่อนไขและลำดับขั้นตอนการปฏิบัติงาน
         </Title>

@@ -31,11 +31,13 @@ import { usePorts, useAgents, useWorkTypes, useProcedure, useProcedureRoles, use
 import { useCreateProcedure, useUpdateProcedure } from '../../hooks/mutations';
 import { StepImageUploader } from '../../components/StepImageUploader';
 import { DEFAULT_ROLES } from '../../components/RoleTag';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const { Title, Text } = Typography;
 
 export const ProcedureBuilderPage: React.FC = () => {
   const navigate = useNavigate();
+  const { isDarkMode, primaryColor } = useTheme();
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const isEditing = !!id;
@@ -201,7 +203,14 @@ export const ProcedureBuilderPage: React.FC = () => {
         )}
       </div>
 
-      <Card style={{ borderRadius: 8, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+      <Card
+        style={{
+          borderRadius: 8,
+          border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #e2e8f0',
+          boxShadow: isDarkMode ? '0 4px 16px -2px rgba(0, 0, 0, 0.45)' : '0 1px 4px rgba(0, 0, 0, 0.05)',
+          background: isDarkMode ? '#1a1d21' : '#fff',
+        }}
+      >
         <Title level={4} style={{ margin: 0 }}>
           {isEditing ? 'แก้ไขคู่มือขั้นตอนการปฏิบัติงาน & จัดการภาพ' : 'สร้างคู่มือขั้นตอนการปฏิบัติงานใหม่'}
         </Title>
@@ -391,9 +400,10 @@ export const ProcedureBuilderPage: React.FC = () => {
                       size="small"
                       style={{
                         marginBottom: 16,
-                        background: '#fafafa',
-                        border: '1px solid #d9d9d9',
-                        borderRadius: 6,
+                        background: isDarkMode ? '#16191e' : '#fafafa',
+                        border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #d9d9d9',
+                        boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.3)' : '0 1px 2px rgba(0,0,0,0.02)',
+                        borderRadius: 8,
                       }}
                       title={
                         <Space>
@@ -466,9 +476,9 @@ export const ProcedureBuilderPage: React.FC = () => {
                         style={{
                           marginTop: 12,
                           padding: '12px',
-                          background: '#fff',
-                          borderRadius: 4,
-                          border: '1px dashed #d9d9d9',
+                          background: isDarkMode ? '#121418' : '#fff',
+                          borderRadius: 6,
+                          border: isDarkMode ? '1px dashed rgba(255, 255, 255, 0.12)' : '1px dashed #d9d9d9',
                         }}
                       >
                         <Text strong style={{ fontSize: 12, display: 'block', marginBottom: 8 }}>
@@ -495,7 +505,13 @@ export const ProcedureBuilderPage: React.FC = () => {
                                   <Card
                                     key={stepField.key}
                                     size="small"
-                                    style={{ marginBottom: 10, background: '#fff' }}
+                                    style={{
+                                      marginBottom: 10,
+                                      background: isDarkMode ? '#1a1d21' : '#fff',
+                                      border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #e2e8f0',
+                                      boxShadow: isDarkMode ? '0 2px 6px rgba(0,0,0,0.25)' : '0 1px 2px rgba(0,0,0,0.02)',
+                                      borderRadius: 6,
+                                    }}
                                     bodyStyle={{ padding: 12 }}
                                   >
                                     {/* Hidden field for step id */}

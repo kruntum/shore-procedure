@@ -3,11 +3,13 @@ import { Card, Form, Input, Button, Typography, Alert } from 'antd';
 import { UserOutlined, LockOutlined, RocketOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/auth';
+import { useTheme } from '../contexts/ThemeContext';
 
 const { Title, Paragraph } = Typography;
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { isDarkMode, primaryColor } = useTheme();
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [form] = Form.useForm();
@@ -32,7 +34,9 @@ export const LoginPage: React.FC = () => {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f0f2f5 0%, #e6f7ff 100%)',
+        background: isDarkMode
+          ? 'radial-gradient(ellipse at top, #1e242c 0%, #101216 100%)'
+          : 'linear-gradient(135deg, #f0f2f5 0%, #e6f7ff 100%)',
         padding: 16,
       }}
     >
@@ -40,17 +44,19 @@ export const LoginPage: React.FC = () => {
         style={{
           maxWidth: 420,
           width: '100%',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+          border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
+          boxShadow: isDarkMode ? '0 10px 30px rgba(0,0,0,0.6)' : '0 8px 24px rgba(0,0,0,0.08)',
           borderRadius: 8,
+          background: isDarkMode ? '#1a1d21' : '#fff',
         }}
       >
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <RocketOutlined style={{ fontSize: 40, color: '#1677ff', marginBottom: 8 }} />
-          <Title level={3} style={{ margin: 0, color: '#1f1f1f' }}>
+          <RocketOutlined style={{ fontSize: 40, color: primaryColor, marginBottom: 8 }} />
+          <Title level={3} style={{ margin: 0, color: isDarkMode ? '#f1f5f9' : '#1f1f1f' }}>
             เข้าสู่ระบบ
           </Title>
-          <Paragraph type="secondary" style={{ marginTop: 4, fontSize: 13 }}>
-            Shore Procedure Management System
+          <Paragraph type="secondary" style={{ marginTop: 4, fontSize: 13, color: isDarkMode ? '#94a3b8' : undefined }}>
+            Asiathai Freight SOP Management System
           </Paragraph>
         </div>
 

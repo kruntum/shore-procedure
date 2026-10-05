@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useProcedures, usePorts, useAgents, useCategories, useGovernmentAgencies } from '../hooks/queries';
 import { useDeleteProcedure, useDuplicateProcedure } from '../hooks/mutations';
 import { authService } from '../services/auth';
+import { useTheme } from '../contexts/ThemeContext';
 import { Procedure } from '../types';
 
 const { Title, Text } = Typography;
@@ -12,6 +13,7 @@ const { Title, Text } = Typography;
 export const ProcedureListPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { isDarkMode, primaryColor } = useTheme();
 
   const [search, setSearch] = useState('');
   const [categoryId, setCategoryId] = useState<number | undefined>();
@@ -194,12 +196,12 @@ export const ProcedureListPage: React.FC = () => {
         <div>
           <a
             onClick={() => navigate(`/procedures/${record.id}`)}
-            style={{ fontWeight: 500, fontSize: 12, color: '#1677ff', lineHeight: 1.3, display: 'inline-block' }}
+            style={{ fontWeight: 500, fontSize: 12, color: primaryColor, lineHeight: 1.3, display: 'inline-block' }}
           >
             {text}
           </a>
           {record.description && (
-            <div style={{ fontSize: 10.5, color: '#8c8c8c', marginTop: 1, lineHeight: 1.25 }}>
+            <div style={{ fontSize: 10.5, color: isDarkMode ? '#a1a1aa' : '#8c8c8c', marginTop: 1, lineHeight: 1.25 }}>
               {record.description}
             </div>
           )}
@@ -212,7 +214,7 @@ export const ProcedureListPage: React.FC = () => {
       width: 80,
       align: 'center' as const,
       render: (_: any, record: Procedure) => (
-        <span style={{ fontSize: 11, color: '#475569' }}>
+        <span style={{ fontSize: 11, color: isDarkMode ? '#94a3b8' : '#475569' }}>
           {record.variants?.length || 0} แบบ
         </span>
       ),
@@ -281,9 +283,10 @@ export const ProcedureListPage: React.FC = () => {
         size="small"
         style={{
           marginBottom: 12,
-          borderRadius: 6,
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+          borderRadius: 8,
+          border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #e2e8f0',
+          boxShadow: isDarkMode ? '0 4px 16px -2px rgba(0, 0, 0, 0.45)' : '0 1px 3px rgba(0, 0, 0, 0.03)',
+          background: isDarkMode ? '#1a1d21' : '#fff',
         }}
       >
         <Row justify="space-between" align="middle" style={{ marginBottom: 10 }}>
@@ -385,8 +388,10 @@ export const ProcedureListPage: React.FC = () => {
       <Card
         size="small"
         style={{
-          borderRadius: 6,
-          border: '1px solid #e2e8f0',
+          borderRadius: 8,
+          border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #e2e8f0',
+          boxShadow: isDarkMode ? '0 4px 16px -2px rgba(0, 0, 0, 0.45)' : '0 1px 3px rgba(0, 0, 0, 0.03)',
+          background: isDarkMode ? '#1a1d21' : '#fff',
           overflow: 'hidden',
         }}
         bodyStyle={{ padding: 0 }}

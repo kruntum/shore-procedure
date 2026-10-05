@@ -146,10 +146,10 @@ export const HomePage: React.FC = () => {
                     style={{
                       height: '100%',
                       borderRadius: 8,
-                      border: isSelected ? `2px solid ${primaryColor}` : (isDarkMode ? '1px solid #303030' : '1px solid #e2e8f0'),
+                      border: isSelected ? `2px solid ${primaryColor}` : (isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #e2e8f0'),
                       borderTop: `3px solid var(--ant-${cat.color || 'blue'})`,
-                      background: isSelected ? (isDarkMode ? '#1e293b' : '#f0f7ff') : undefined,
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+                      background: isSelected ? (isDarkMode ? '#1e293b' : '#f0f7ff') : (isDarkMode ? '#1a1d21' : '#fff'),
+                      boxShadow: isDarkMode ? '0 4px 14px -2px rgba(0, 0, 0, 0.4)' : '0 1px 3px rgba(0,0,0,0.03)',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
                     }}
@@ -203,8 +203,10 @@ export const HomePage: React.FC = () => {
         size="small"
         style={{
           marginBottom: 16,
-          borderRadius: 6,
-          border: isDarkMode ? '1px solid #303030' : '1px solid #e2e8f0',
+          borderRadius: 8,
+          border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #e2e8f0',
+          boxShadow: isDarkMode ? '0 4px 14px -2px rgba(0, 0, 0, 0.4)' : '0 1px 3px rgba(0, 0, 0, 0.03)',
+          background: isDarkMode ? '#1a1d21' : '#fff',
         }}
       >
         <Row gutter={[12, 12]} align="middle">
@@ -258,8 +260,9 @@ export const HomePage: React.FC = () => {
           style={{
             textAlign: 'center',
             padding: '30px 0',
-            borderRadius: 6,
-            border: isDarkMode ? '1px solid #303030' : '1px solid #e2e8f0',
+            borderRadius: 8,
+            border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #e2e8f0',
+            background: isDarkMode ? '#1a1d21' : '#fff',
           }}
         >
           <Empty description="ไม่พบคู่มือที่ตรงกับเงื่อนไขการค้นหา" />
@@ -289,10 +292,11 @@ export const HomePage: React.FC = () => {
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
-                  borderRadius: 6,
-                  border: isDarkMode ? '1px solid #303030' : '1px solid #e2e8f0',
+                  borderRadius: 8,
+                  border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #e2e8f0',
                   borderTop: `3px solid ${proc.category?.color ? `var(--ant-${proc.category.color})` : primaryColor}`,
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+                  boxShadow: isDarkMode ? '0 4px 16px -2px rgba(0, 0, 0, 0.45)' : '0 1px 3px rgba(0, 0, 0, 0.03)',
+                  background: isDarkMode ? '#1a1d21' : '#fff',
                   transition: 'all 0.2s ease',
                 }}
                 bodyStyle={{
@@ -393,7 +397,7 @@ export const HomePage: React.FC = () => {
                 </div>
 
                 {/* Card Bottom: Variants, Steps, and Action */}
-                <div style={{ marginTop: 12, paddingTop: 8, borderTop: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0' }}>
+                <div style={{ marginTop: 12, paddingTop: 8, borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #f0f0f0' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Space size={6} style={{ fontSize: 11, color: '#64748b' }}>
                       <span>📋 {proc.variants?.length || 0} เงื่อนไข</span>

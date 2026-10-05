@@ -1,12 +1,15 @@
 import React from 'react';
 import { Image, Space, Typography } from 'antd';
 import { StepImage } from '../types';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface StepImageViewerProps {
   images?: StepImage[];
 }
 
 export const StepImageViewer: React.FC<StepImageViewerProps> = ({ images }) => {
+  const { isDarkMode } = useTheme();
+
   if (!images || images.length === 0) return null;
 
   return (
@@ -17,10 +20,11 @@ export const StepImageViewer: React.FC<StepImageViewerProps> = ({ images }) => {
             key={img.id}
             style={{
               display: 'inline-block',
-              background: '#fff',
+              background: isDarkMode ? '#1f242c' : '#fff',
               padding: 3,
               borderRadius: 4,
-              border: '1px solid #e2e8f0',
+              border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
+              boxShadow: isDarkMode ? '0 2px 6px rgba(0,0,0,0.3)' : '0 1px 2px rgba(0,0,0,0.03)',
               textAlign: 'center',
             }}
           >

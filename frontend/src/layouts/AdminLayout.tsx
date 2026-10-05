@@ -91,7 +91,15 @@ export const AdminLayout: React.FC = () => {
         </a>
       </div>
 
-      <Layout style={{ background: isDarkMode ? '#1f1f1f' : '#fff', borderRadius: 6, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+      <Layout
+        style={{
+          background: isDarkMode ? '#1a1d21' : '#fff',
+          borderRadius: 8,
+          overflow: 'hidden',
+          border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #e2e8f0',
+          boxShadow: isDarkMode ? '0 4px 20px -2px rgba(0, 0, 0, 0.45)' : '0 2px 8px rgba(0, 0, 0, 0.04)',
+        }}
+      >
         <Sider
           collapsible
           collapsed={collapsed}
@@ -100,10 +108,20 @@ export const AdminLayout: React.FC = () => {
           collapsedWidth={56}
           width={190}
           theme={isDarkMode ? 'dark' : 'light'}
-          style={{ borderRight: isDarkMode ? '1px solid #303030' : '1px solid #f0f0f0', background: isDarkMode ? '#1f1f1f' : '#fff' }}
+          style={{
+            borderRight: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #f0f0f0',
+            background: isDarkMode ? '#16181d' : '#fff',
+          }}
         >
           {!collapsed ? (
-            <div style={{ padding: '12px 14px 8px', borderBottom: isDarkMode ? '1px solid #303030' : '1px solid #f8fafc', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+            <div
+              style={{
+                padding: '12px 14px 8px',
+                borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #f8fafc',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+              }}
+            >
               <Title level={5} style={{ margin: 0, color: primaryColor, fontSize: 13.5 }}>
                 Admin Console
               </Title>
@@ -112,7 +130,13 @@ export const AdminLayout: React.FC = () => {
               </Text>
             </div>
           ) : (
-            <div style={{ padding: '14px 0', textAlign: 'center', borderBottom: isDarkMode ? '1px solid #303030' : '1px solid #f8fafc' }}>
+            <div
+              style={{
+                padding: '14px 0',
+                textAlign: 'center',
+                borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #f8fafc',
+              }}
+            >
               <SettingOutlined style={{ fontSize: 18, color: primaryColor }} />
             </div>
           )}
@@ -121,11 +145,18 @@ export const AdminLayout: React.FC = () => {
             selectedKeys={[location.pathname]}
             items={menuItems}
             onClick={({ key }) => navigate(key)}
-            style={{ borderRight: 0 }}
+            style={{ borderRight: 0, background: 'transparent' }}
           />
         </Sider>
 
-        <Content style={{ padding: '12px 14px', minHeight: 600, overflowX: 'auto' }}>
+        <Content
+          style={{
+            padding: '12px 14px',
+            minHeight: 600,
+            overflowX: 'auto',
+            background: isDarkMode ? '#131519' : '#fff',
+          }}
+        >
           <Outlet />
         </Content>
       </Layout>

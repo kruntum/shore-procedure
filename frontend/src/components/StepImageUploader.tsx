@@ -29,6 +29,7 @@ import {
   useDeleteStepImage,
   useUpdateImageCaption,
 } from '../hooks/mutations';
+import { useTheme } from '../contexts/ThemeContext';
 
 const { Text } = Typography;
 
@@ -43,6 +44,7 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
   images = [],
   readOnly = false,
 }) => {
+  const { isDarkMode } = useTheme();
   const [editingImageId, setEditingImageId] = useState<number | null>(null);
   const [editingCaption, setEditingCaption] = useState<string>('');
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
@@ -147,10 +149,11 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
                   key={img.id}
                   style={{
                     display: 'inline-block',
-                    background: '#fafafa',
+                    background: isDarkMode ? '#1a1f26' : '#fafafa',
                     padding: 4,
                     borderRadius: 4,
-                    border: '1px solid #d9d9d9',
+                    border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #d9d9d9',
+                    boxShadow: isDarkMode ? '0 2px 6px rgba(0,0,0,0.3)' : 'none',
                     position: 'relative',
                     width: 130,
                     textAlign: 'center',

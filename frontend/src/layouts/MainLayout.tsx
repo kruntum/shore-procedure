@@ -76,13 +76,13 @@ export const MainLayout: React.FC = () => {
     <Layout style={{ minHeight: '100vh', background: isDarkMode ? '#141414' : '#f0f2f5' }}>
       <Header
         style={{
-          background: isDarkMode ? '#1f1f1f' : '#fff',
+          background: isDarkMode ? '#1a1d21' : '#fff',
           padding: '0 16px',
-          boxShadow: isDarkMode ? '0 1px 4px rgba(0,0,0,0.4)' : '0 1px 4px rgba(0,21,41,0.08)',
+          boxShadow: isDarkMode ? '0 4px 16px rgba(0,0,0,0.45)' : '0 1px 4px rgba(0,21,41,0.06)',
           position: 'sticky',
           top: 0,
           zIndex: 100,
-          borderBottom: isDarkMode ? '1px solid #303030' : 'none',
+          borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid rgba(0, 0, 0, 0.06)',
         }}
       >
         <div
