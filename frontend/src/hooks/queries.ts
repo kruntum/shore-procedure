@@ -1,6 +1,28 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../services/api';
-import { Port, Agent, WorkType, Procedure, ResponsibleRole, User } from '../types';
+import { Port, Agent, WorkType, Procedure, ResponsibleRole, User, Category, GovernmentAgency } from '../types';
+
+export function useCategories() {
+  return useQuery<Category[]>({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const res = await api.get('/categories');
+      return res.data.data;
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+}
+
+export function useGovernmentAgencies(active?: boolean) {
+  return useQuery<GovernmentAgency[]>({
+    queryKey: ['governmentAgencies', active],
+    queryFn: async () => {
+      const res = await api.get('/government-agencies', { params: { active } });
+      return res.data.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
 
 export function usePorts(q?: string) {
   return useQuery<Port[]>({
@@ -46,7 +68,14 @@ export function useWorkTypes() {
   });
 }
 
-export function useProcedures(filters?: { portId?: number; agentId?: number; workTypeId?: number; search?: string }) {
+export function useProcedures(filters?: {
+  categoryId?: number;
+  portId?: number;
+  agentId?: number;
+  governmentAgencyId?: number;
+  workTypeId?: number;
+  search?: string;
+}) {
   return useQuery<Procedure[]>({
     queryKey: ['procedures', filters],
     queryFn: async () => {
@@ -114,6 +143,3 @@ export function useUsers() {
     },
   });
 }
-
-
-

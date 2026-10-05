@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Table, Tag, Input, Select, Button, Space, Typography, Row, Col, Tooltip, Modal, message } from 'antd';
-import { SearchOutlined, EyeOutlined, PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { useProcedures, usePorts, useAgents } from '../hooks/queries';
+import { SearchOutlined, EyeOutlined, PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined, BankOutlined, CompassOutlined } from '@ant-design/icons';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useProcedures, usePorts, useAgents, useCategories, useGovernmentAgencies } from '../hooks/queries';
 import { useDeleteProcedure, useDuplicateProcedure } from '../hooks/mutations';
 import { authService } from '../services/auth';
 import { Procedure } from '../types';
@@ -11,16 +11,36 @@ const { Title, Text } = Typography;
 
 export const ProcedureListPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
   const [search, setSearch] = useState('');
+  const [categoryId, setCategoryId] = useState<number | undefined>();
+  const [governmentAgencyId, setGovernmentAgencyId] = useState<number | undefined>();
   const [portId, setPortId] = useState<number | undefined>();
   const [agentId, setAgentId] = useState<number | undefined>();
 
+  useEffect(() => {
+    const catParam = searchParams.get('categoryId');
+    const portParam = searchParams.get('portId');
+    const agentParam = searchParams.get('agentId');
+    const govParam = searchParams.get('governmentAgencyId');
+
+    if (catParam) setCategoryId(parseInt(catParam));
+    if (portParam) setPortId(parseInt(portParam));
+    if (agentParam) setAgentId(parseInt(agentParam));
+    if (govParam) setGovernmentAgencyId(parseInt(govParam));
+  }, [searchParams]);
+
   const { data: procedures, isLoading } = useProcedures({
     search: search || undefined,
+    categoryId,
+    governmentAgencyId,
     portId,
     agentId,
   });
 
+  const { data: categories } = useCategories();
+  const { data: govAgencies } = useGovernmentAgencies();
   const { data: ports } = usePorts();
   const { data: agents } = useAgents();
   const deleteMutation = useDeleteProcedure();
@@ -31,7 +51,7 @@ export const ProcedureListPage: React.FC = () => {
   const handleDelete = (id: number) => {
     Modal.confirm({
       title: 'ยืนยันการลบคู่มือ?',
-      content: 'คุณแนใจหรือไม่ว่าต้องการลบคู่มือนี้? การกระทำนี้ไม่สามารถย้อนกลับได้',
+      content: 'คุณแน่ใจหรือไม่ว่าต้องการลบคู่มือนี้? การกระทำนี้ไม่สามารถย้อนกลับได้',
       okText: 'ลบคู่มือ',
       okType: 'danger',
       cancelText: 'ยกเลิก',
@@ -61,17 +81,60 @@ export const ProcedureListPage: React.FC = () => {
 
   const columns = [
     {
-      title: 'ท่าเรือ',
-      dataIndex: ['port', 'code'],
-      key: 'port',
-      width: 90,
-      align: 'center' as const,
-      render: (text: string) => <Tag color="blue">{text}</Tag>,
+      title: 'หมวดหมู่',
+      dataIndex: ['category', 'name'],
+      key: 'category',
+      width: 140,
+      render: (_: any, record: Procedure) => {
+        if (!record.category) return <Tag color="default">ทั่วไป</Tag>;
+        return (
+          <Tag color={record.category.color || 'blue'}>
+            <span style={{ marginRight: 4 }}>{record.category.icon}</span>
+            {record.category.name}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: 'สถานที่ / หน่วยงาน',
+      key: 'locationOrAgency',
+      width: 150,
+      render: (_: any, record: Procedure) => {
+        const govList =
+          record.governmentAgencies && record.governmentAgencies.length > 0
+            ? record.governmentAgencies
+            : record.governmentAgency
+            ? [record.governmentAgency]
+            : [];
+
+        if (record.port) {
+          return (
+            <Space size={2}>
+              <CompassOutlined style={{ color: '#1677ff' }} />
+              <Tag color="blue">{record.port.code}</Tag>
+            </Space>
+          );
+        }
+
+        if (govList.length > 0) {
+          return (
+            <Space size={[0, 4]} wrap>
+              {govList.map((g) => (
+                <Tag key={g.id} color="volcano" icon={<BankOutlined />}>
+                  {g.shortName || g.name}
+                </Tag>
+              ))}
+            </Space>
+          );
+        }
+
+        return <Text type="secondary" style={{ fontSize: 11 }}>-</Text>;
+      },
     },
     {
       title: 'สายเรือ / เอเย่นต์',
       key: 'agents',
-      width: 160,
+      width: 150,
       render: (_: any, record: Procedure) => {
         const agentList =
           record.agents && record.agents.length > 0
@@ -81,7 +144,7 @@ export const ProcedureListPage: React.FC = () => {
             : [];
 
         if (agentList.length === 0) {
-          return <Tag color="default">ทุกสายเรือ</Tag>;
+          return <Text type="secondary" style={{ fontSize: 11 }}>-</Text>;
         }
 
         if (agentList.length > 3) {
@@ -96,7 +159,7 @@ export const ProcedureListPage: React.FC = () => {
               ))}
               <Tooltip title={remaining.map((a) => `${a.code} - ${a.name}`).join(', ')}>
                 <Tag color="geekblue" style={{ cursor: 'pointer', margin: '1px 2px', fontWeight: 500 }}>
-                  +{remaining.length} สายเรือ
+                  +{remaining.length}
                 </Tag>
               </Tooltip>
             </Space>
@@ -118,7 +181,7 @@ export const ProcedureListPage: React.FC = () => {
       title: 'ประเภทงาน',
       dataIndex: ['workType', 'name'],
       key: 'workType',
-      width: 110,
+      width: 130,
       align: 'center' as const,
       render: (text: string) => <Tag color="purple">{text}</Tag>,
     },
@@ -131,12 +194,12 @@ export const ProcedureListPage: React.FC = () => {
         <div>
           <a
             onClick={() => navigate(`/procedures/${record.id}`)}
-            style={{ fontWeight: 400, fontSize: 11, color: '#1677ff', lineHeight: 1.3, display: 'inline-block' }}
+            style={{ fontWeight: 500, fontSize: 12, color: '#1677ff', lineHeight: 1.3, display: 'inline-block' }}
           >
             {text}
           </a>
           {record.description && (
-            <div style={{ fontSize: 10, color: '#8c8c8c', marginTop: 1, lineHeight: 1.25 }}>
+            <div style={{ fontSize: 10.5, color: '#8c8c8c', marginTop: 1, lineHeight: 1.25 }}>
               {record.description}
             </div>
           )}
@@ -144,70 +207,67 @@ export const ProcedureListPage: React.FC = () => {
       ),
     },
     {
-      title: 'จำนวนเงื่อนไข',
+      title: 'เงื่อนไข',
       key: 'variantsCount',
-      width: 100,
+      width: 80,
       align: 'center' as const,
       render: (_: any, record: Procedure) => (
-        <span>{record.variants?.length || 0} เงื่อนไข</span>
+        <span style={{ fontSize: 11, color: '#475569' }}>
+          {record.variants?.length || 0} แบบ
+        </span>
       ),
     },
     {
-      title: 'อัปเดตล่าสุด',
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
-      width: 100,
-      align: 'center' as const,
-      render: (val: string) => (val ? new Date(val).toLocaleDateString('th-TH') : '-'),
-    },
-    {
-      title: 'การกระทำ',
+      title: 'จัดการ',
       key: 'actions',
       width: isAuthenticated ? 160 : 70,
       align: 'center' as const,
+      fixed: 'right' as const,
       render: (_: any, record: Procedure) => (
-        <Space size={4}>
-          <Tooltip title="เปิดดูขั้นตอนคู่มือ">
+        <Space size={2}>
+          <Tooltip title="ดูคู่มือ">
             <Button
+              type="text"
               size="small"
-              type="primary"
-              ghost
-              icon={<EyeOutlined />}
+              icon={<EyeOutlined style={{ color: '#1677ff', fontSize: 13 }} />}
               onClick={() => navigate(`/procedures/${record.id}`)}
-              style={{ borderRadius: 4 }}
+              style={{ width: 26, height: 26, padding: 0 }}
             />
           </Tooltip>
+
           {isAuthenticated && (
             <>
-              <Tooltip title="คัดลอกคู่มือ (รวมรูปภาพ)">
+              <Tooltip title="คัดลอกสร้างคู่มือใหม่">
                 <Button
+                  type="text"
                   size="small"
-                  icon={<CopyOutlined style={{ color: '#0d9488' }} />}
-                  loading={duplicateMutation.isPending && duplicateMutation.variables === record.id}
+                  icon={<CopyOutlined style={{ color: '#52c41a', fontSize: 13 }} />}
                   onClick={() => handleDuplicate(record)}
-                  style={{ borderRadius: 4, borderColor: '#99f6e4' }}
+                  style={{ width: 26, height: 26, padding: 0 }}
                 />
               </Tooltip>
-              <Tooltip title="แก้ไขคู่มือ">
+              <Tooltip title="แก้ไข">
                 <Button
+                  type="text"
                   size="small"
-                  icon={<EditOutlined style={{ color: '#d97706' }} />}
+                  icon={<EditOutlined style={{ color: '#fa8c16', fontSize: 13 }} />}
                   onClick={() => navigate(`/admin/procedures/${record.id}/edit`)}
-                  style={{ borderRadius: 4, borderColor: '#fde68a' }}
+                  style={{ width: 26, height: 26, padding: 0 }}
                 />
               </Tooltip>
+              {isAdmin && (
+                <Tooltip title="ลบ">
+                  <Button
+                    type="text"
+                    size="small"
+                    danger
+                    icon={<DeleteOutlined style={{ fontSize: 13 }} />}
+                    onClick={() => handleDelete(record.id)}
+                    style={{ width: 26, height: 26, padding: 0 }}
+                  />
+                </Tooltip>
+              )}
             </>
-          )}
-          {isAdmin && (
-            <Tooltip title="ลบคู่มือ">
-              <Button
-                size="small"
-                danger
-                icon={<DeleteOutlined />}
-                onClick={() => handleDelete(record.id)}
-                style={{ borderRadius: 4 }}
-              />
-            </Tooltip>
           )}
         </Space>
       ),
@@ -216,26 +276,26 @@ export const ProcedureListPage: React.FC = () => {
 
   return (
     <div>
-      {/* Unified Header & Filter Card */}
+      {/* Search & Filter Header Card */}
       <Card
         size="small"
         style={{
           marginBottom: 12,
           borderRadius: 6,
           border: '1px solid #e2e8f0',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
         }}
-        bodyStyle={{ padding: '12px 14px' }}
       >
-        <Row justify="space-between" align="middle" gutter={[8, 8]} style={{ marginBottom: 10 }}>
-          <Col xs={24} sm={16}>
-            <Title level={5} style={{ margin: 0, color: '#0f172a', fontSize: 14 }}>
-              รายการคู่มือการจ่ายชอร์ทั้งหมด
+        <Row justify="space-between" align="middle" style={{ marginBottom: 10 }}>
+          <Col>
+            <Title level={5} style={{ margin: 0, fontSize: 14 }}>
+              คลังคู่มือปฏิบัติงานมาตรฐาน (SOP Procedures)
             </Title>
             <Text type="secondary" style={{ fontSize: 11.5 }}>
-              ค้นหาและจัดการขั้นตอนการปฏิบัติงานของทุกท่าและทุกสายเรือ (ทั้งหมด {procedures?.length || 0} คู่มือ)
+              ค้นหาและกรองขั้นตอนการทำงานตามหมวดหมู่ ท่าเรือ สายเรือ หรือหน่วยงานราชการ
             </Text>
           </Col>
-          <Col xs={24} sm={8} style={{ textAlign: 'right' }}>
+          <Col>
             {isAuthenticated && (
               <Button
                 type="primary"
@@ -252,7 +312,7 @@ export const ProcedureListPage: React.FC = () => {
 
         {/* Filter Controls */}
         <Row gutter={[8, 8]} align="middle">
-          <Col xs={24} sm={10} md={9}>
+          <Col xs={24} sm={12} md={6}>
             <Input
               size="small"
               placeholder="ค้นหาชื่อคู่มือ..."
@@ -262,11 +322,37 @@ export const ProcedureListPage: React.FC = () => {
               allowClear
             />
           </Col>
-          <Col xs={12} sm={7} md={7}>
+          <Col xs={12} sm={6} md={4}>
             <Select
               size="small"
               style={{ width: '100%' }}
-              placeholder="เลือกท่าเรือทั้งหมด"
+              placeholder="ทุกหมวดหมู่"
+              allowClear
+              options={categories?.map((c) => ({ value: c.id, label: `${c.icon} ${c.name}` }))}
+              onChange={setCategoryId}
+              value={categoryId}
+            />
+          </Col>
+          <Col xs={12} sm={6} md={5}>
+            <Select
+              size="small"
+              style={{ width: '100%' }}
+              placeholder="หน่วยงานราชการทั้งหมด"
+              allowClear
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+              }
+              options={govAgencies?.map((g) => ({ value: g.id, label: `${g.shortName ? `[${g.shortName}] ` : ''}${g.name}` }))}
+              onChange={setGovernmentAgencyId}
+              value={governmentAgencyId}
+            />
+          </Col>
+          <Col xs={12} sm={6} md={4}>
+            <Select
+              size="small"
+              style={{ width: '100%' }}
+              placeholder="ท่าเรือทั้งหมด"
               allowClear
               showSearch
               filterOption={(input, option) =>
@@ -277,11 +363,11 @@ export const ProcedureListPage: React.FC = () => {
               value={portId}
             />
           </Col>
-          <Col xs={12} sm={7} md={8}>
+          <Col xs={12} sm={6} md={5}>
             <Select
               size="small"
               style={{ width: '100%' }}
-              placeholder="เลือกสายเรือ / เอเย่นต์"
+              placeholder="สายเรือทั้งหมด"
               allowClear
               showSearch
               filterOption={(input, option) =>
@@ -310,7 +396,7 @@ export const ProcedureListPage: React.FC = () => {
           dataSource={procedures}
           rowKey="id"
           loading={isLoading}
-          scroll={{ x: 980 }}
+          scroll={{ x: 1000 }}
           pagination={{
             pageSize: 10,
             showSizeChanger: true,

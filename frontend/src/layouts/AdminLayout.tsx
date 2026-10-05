@@ -10,6 +10,8 @@ import {
   UserSwitchOutlined,
   SettingOutlined,
   UserOutlined,
+  FolderOutlined,
+  BankOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { authService } from '../services/auth';
@@ -37,6 +39,16 @@ export const AdminLayout: React.FC = () => {
     },
     {
       type: 'divider' as const,
+    },
+    {
+      key: '/admin/categories',
+      icon: <FolderOutlined />,
+      label: 'หมวดหมู่ (Categories)',
+    },
+    {
+      key: '/admin/gov-agencies',
+      icon: <BankOutlined />,
+      label: 'หน่วยงานราชการ (Gov Agencies)',
     },
     {
       key: '/admin/ports',

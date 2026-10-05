@@ -36,6 +36,13 @@
       "when": 1790838503791,
       "tag": "0004_complete_joshua_kane",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791196613369,
+      "tag": "0005_thin_taskmaster",
+      "breakpoints": true
     }
   ]
 }

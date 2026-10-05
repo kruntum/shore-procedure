@@ -74,20 +74,27 @@ export const ProcedureViewPage: React.FC = () => {
   const visibleAgents = agentList.slice(0, maxVisibleAgents);
   const remainingAgents = agentList.slice(maxVisibleAgents);
 
+  const govList =
+    proc.governmentAgencies && proc.governmentAgencies.length > 0
+      ? proc.governmentAgencies
+      : proc.governmentAgency
+      ? [proc.governmentAgency]
+      : [];
+
   return (
     <div>
       <Breadcrumb
         style={{ marginBottom: 16 }}
         items={[
           { title: <a onClick={() => navigate('/')}>หน้าหลัก</a> },
-          { title: <a onClick={() => navigate(`/ports/${proc.port?.id}`)}>{proc.port?.code}</a> },
-          {
-            title:
-              agentList.length > 0
-                ? agentList.map((a) => a.code).join(', ')
-                : 'ทุกสายเรือ',
-          },
-          { title: 'คู่มือขั้นตอน' },
+          { title: <a onClick={() => navigate('/procedures')}>คู่มือทั้งหมด</a> },
+          ...(proc.category
+            ? [{ title: <a onClick={() => navigate(`/procedures?categoryId=${proc.category?.id}`)}>{proc.category.name}</a> }]
+            : []),
+          ...(proc.port
+            ? [{ title: <a onClick={() => navigate(`/ports/${proc.port?.id}`)}>{proc.port?.code}</a> }]
+            : []),
+          { title: proc.title },
         ]}
       />
 
@@ -112,6 +119,17 @@ export const ProcedureViewPage: React.FC = () => {
             <div style={{ flex: 1 }}>
               {/* Category & Metadata Tags */}
               <Space wrap size={[6, 6]} style={{ marginBottom: 6 }}>
+                {proc.category && (
+                  <Tag color={proc.category.color || 'blue'} style={{ margin: 0, fontWeight: 500 }}>
+                    <span style={{ marginRight: 4 }}>{proc.category.icon}</span>
+                    {proc.category.name}
+                  </Tag>
+                )}
+                {govList.map((g) => (
+                  <Tag key={g.id} color="volcano" style={{ margin: 0 }}>
+                    🏛️ {g.shortName || g.name}
+                  </Tag>
+                ))}
                 {proc.port && (
                   <Tag color="blue" icon={<CompassOutlined />} style={{ margin: 0 }}>
                     ท่าเรือ {proc.port.code} ({proc.port.name})
@@ -120,6 +138,11 @@ export const ProcedureViewPage: React.FC = () => {
                 {proc.workType && (
                   <Tag color="purple" style={{ margin: 0 }}>
                     {proc.workType.name}
+                  </Tag>
+                )}
+                {proc.contactHotline && (
+                  <Tag color="green" style={{ margin: 0 }}>
+                    📞 {proc.contactHotline}
                   </Tag>
                 )}
                 {/* Compact Agent Tags with Full Name in Tooltip */}

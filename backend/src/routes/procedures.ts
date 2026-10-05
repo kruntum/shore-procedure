@@ -7,6 +7,9 @@ import { procedureVariants } from '../db/schema/procedureVariants';
 import { procedureSteps } from '../db/schema/procedureSteps';
 import { stepImages } from '../db/schema/stepImages';
 import { procedureAgents } from '../db/schema/procedureAgents';
+import { procedureGovAgencies } from '../db/schema/procedureGovAgencies';
+import { categories } from '../db/schema/categories';
+import { governmentAgencies } from '../db/schema/governmentAgencies';
 import { eq, and, ilike, or, inArray } from 'drizzle-orm';
 import { requireAuth, requireAdmin, AuthUser } from '../middleware/auth';
 import { successResponse, errorResponse } from '../utils/response';
@@ -14,17 +17,24 @@ import { deleteFile, copyFile } from '../services/minio';
 
 const proceduresRouter = new Hono();
 
-export function formatProcedureWithAgents(proc: any) {
+export function formatProcedureWithRelations(proc: any) {
   if (!proc) return proc;
   const directAgents = proc.procedureAgents?.map((pa: any) => pa.agent).filter(Boolean) || [];
   if (directAgents.length === 0 && proc.agent) {
     directAgents.push(proc.agent);
   }
+  const directGovAgencies = proc.procedureGovAgencies?.map((pga: any) => pga.governmentAgency).filter(Boolean) || [];
+  if (directGovAgencies.length === 0 && proc.governmentAgency) {
+    directGovAgencies.push(proc.governmentAgency);
+  }
   return {
     ...proc,
     agents: directAgents,
+    governmentAgencies: directGovAgencies,
   };
 }
+
+export const formatProcedureWithAgents = formatProcedureWithRelations;
 
 const stepCreateSchema = z.object({
   stepNumber: z.number().int().positive(),
@@ -44,25 +54,32 @@ const variantCreateSchema = z.object({
 });
 
 const procedureCreateSchema = z.object({
-  portId: z.number().int().positive(),
-  agentId: z.number().int().positive().optional(),
+  categoryId: z.number().int().positive().optional().nullable(),
+  portId: z.number().int().positive().optional().nullable(),
+  agentId: z.number().int().positive().optional().nullable(),
   agentIds: z.array(z.number().int().positive()).optional(),
+  governmentAgencyId: z.number().int().positive().optional().nullable(),
+  governmentAgencyIds: z.array(z.number().int().positive()).optional(),
   workTypeId: z.number().int().positive(),
   title: z.string().min(1, 'กรุณาระบุหัวข้อคู่มือ'),
   description: z.string().optional().default(''),
   referenceDocuments: z.string().optional().default('B/L, Booking Confirmation, ใบเสร็จชำระเงิน'),
+  contactHotline: z.string().optional().default(''),
   variants: z.array(variantCreateSchema).optional().default([]),
 });
 
 // GET /api/procedures (List & Filter)
 proceduresRouter.get('/', async (c) => {
+  const categoryId = c.req.query('categoryId');
   const portId = c.req.query('portId');
   const agentId = c.req.query('agentId');
+  const governmentAgencyId = c.req.query('governmentAgencyId');
   const workTypeId = c.req.query('workTypeId');
   const search = c.req.query('search');
 
   const conditions = [];
 
+  if (categoryId) conditions.push(eq(procedures.categoryId, parseInt(categoryId)));
   if (portId) conditions.push(eq(procedures.portId, parseInt(portId)));
   if (agentId) {
     const targetAgentId = parseInt(agentId);
@@ -74,6 +91,20 @@ proceduresRouter.get('/', async (c) => {
           db.select({ procedureId: procedureAgents.procedureId })
             .from(procedureAgents)
             .where(eq(procedureAgents.agentId, targetAgentId))
+        )
+      )
+    );
+  }
+  if (governmentAgencyId) {
+    const targetGovId = parseInt(governmentAgencyId);
+    conditions.push(
+      or(
+        eq(procedures.governmentAgencyId, targetGovId),
+        inArray(
+          procedures.id,
+          db.select({ procedureId: procedureGovAgencies.procedureId })
+            .from(procedureGovAgencies)
+            .where(eq(procedureGovAgencies.governmentAgencyId, targetGovId))
         )
       )
     );
@@ -91,11 +122,18 @@ proceduresRouter.get('/', async (c) => {
   const list = await db.query.procedures.findMany({
     where: whereClause,
     with: {
+      category: true,
       port: true,
       agent: true,
+      governmentAgency: true,
       procedureAgents: {
         with: {
           agent: true,
+        },
+      },
+      procedureGovAgencies: {
+        with: {
+          governmentAgency: true,
         },
       },
       workType: true,
@@ -116,7 +154,7 @@ proceduresRouter.get('/', async (c) => {
     orderBy: (p, { desc }) => [desc(p.updatedAt)],
   });
 
-  return successResponse(c, list.map(formatProcedureWithAgents));
+  return successResponse(c, list.map(formatProcedureWithRelations));
 });
 
 // GET /api/procedures/meta/roles (Get standard & existing roles)
@@ -126,6 +164,8 @@ proceduresRouter.get('/meta/roles', async (c) => {
     'เจ้าหน้าที่ท่าเรือ',
     'เจ้าหน้าที่สายเรือ / เอเย่นต์',
     'พนักงานออฟฟิศ / การเงิน',
+    'เจ้าหน้าที่ศุลกากร',
+    'เจ้าหน้าที่หน่วยงานราชการ',
   ];
 
   try {
@@ -152,11 +192,18 @@ proceduresRouter.get('/:id', async (c) => {
   const proc = await db.query.procedures.findFirst({
     where: eq(procedures.id, id),
     with: {
+      category: true,
       port: true,
       agent: true,
+      governmentAgency: true,
       procedureAgents: {
         with: {
           agent: true,
+        },
+      },
+      procedureGovAgencies: {
+        with: {
+          governmentAgency: true,
         },
       },
       workType: true,
@@ -177,7 +224,7 @@ proceduresRouter.get('/:id', async (c) => {
   });
 
   if (!proc) return errorResponse(c, 'ไม่พบคู่มือที่ระบุ', 404);
-  return successResponse(c, formatProcedureWithAgents(proc));
+  return successResponse(c, formatProcedureWithRelations(proc));
 });
 
 // POST /api/procedures (Add Procedure with nested variants/steps) - Both Admin & User
@@ -189,20 +236,21 @@ proceduresRouter.post('/', requireAuth, zValidator('json', procedureCreateSchema
     ? body.agentIds
     : (body.agentId ? [body.agentId] : []);
 
-  if (finalAgentIds.length === 0) {
-    return errorResponse(c, 'กรุณาเลือกสายเรืออย่างน้อย 1 สายเรือ', 400);
-  }
-
-
+  const finalGovAgencyIds = body.governmentAgencyIds && body.governmentAgencyIds.length > 0
+    ? body.governmentAgencyIds
+    : (body.governmentAgencyId ? [body.governmentAgencyId] : []);
 
   // Create procedure
   const [createdProc] = await db.insert(procedures).values({
-    portId: body.portId,
-    agentId: finalAgentIds[0],
+    categoryId: body.categoryId || null,
+    portId: body.portId || null,
+    agentId: finalAgentIds[0] || null,
+    governmentAgencyId: finalGovAgencyIds[0] || null,
     workTypeId: body.workTypeId,
     title: body.title,
     description: body.description,
     referenceDocuments: body.referenceDocuments || 'B/L, Booking Confirmation, ใบเสร็จชำระเงิน',
+    contactHotline: body.contactHotline || null,
     updatedBy: user.fullName || user.displayName || user.username,
   }).returning();
 
@@ -211,6 +259,14 @@ proceduresRouter.post('/', requireAuth, zValidator('json', procedureCreateSchema
     await db.insert(procedureAgents).values({
       procedureId: createdProc.id,
       agentId: aId,
+    });
+  }
+
+  // Insert procedureGovAgencies junction records
+  for (const gId of finalGovAgencyIds) {
+    await db.insert(procedureGovAgencies).values({
+      procedureId: createdProc.id,
+      governmentAgencyId: gId,
     });
   }
 
@@ -247,11 +303,18 @@ proceduresRouter.post('/', requireAuth, zValidator('json', procedureCreateSchema
   const fullProc = await db.query.procedures.findFirst({
     where: eq(procedures.id, createdProc.id),
     with: {
+      category: true,
       port: true,
       agent: true,
+      governmentAgency: true,
       procedureAgents: {
         with: {
           agent: true,
+        },
+      },
+      procedureGovAgencies: {
+        with: {
+          governmentAgency: true,
         },
       },
       workType: true,
@@ -267,7 +330,7 @@ proceduresRouter.post('/', requireAuth, zValidator('json', procedureCreateSchema
     },
   });
 
-  return successResponse(c, formatProcedureWithAgents(fullProc), 'สร้างคู่มือสำเร็จ', 201);
+  return successResponse(c, formatProcedureWithRelations(fullProc), 'สร้างคู่มือสำเร็จ', 201);
 });
 
 const stepUpdateItemSchema = z.object({
@@ -290,11 +353,16 @@ const variantUpdateItemSchema = z.object({
 });
 
 const procedureUpdateFullSchema = z.object({
+  categoryId: z.number().int().positive().optional().nullable(),
+  portId: z.number().int().positive().optional().nullable(),
   title: z.string().min(1).optional(),
   description: z.string().optional(),
   referenceDocuments: z.string().optional(),
-  agentId: z.number().int().positive().optional(),
+  contactHotline: z.string().optional(),
+  agentId: z.number().int().positive().optional().nullable(),
   agentIds: z.array(z.number().int().positive()).optional(),
+  governmentAgencyId: z.number().int().positive().optional().nullable(),
+  governmentAgencyIds: z.array(z.number().int().positive()).optional(),
   variants: z.array(variantUpdateItemSchema).optional(),
 });
 
@@ -329,18 +397,38 @@ proceduresRouter.put('/:id', requireAuth, zValidator('json', procedureUpdateFull
   if (body.title !== undefined) updateData.title = body.title;
   if (body.description !== undefined) updateData.description = body.description;
   if (body.referenceDocuments !== undefined) updateData.referenceDocuments = body.referenceDocuments;
+  if (body.contactHotline !== undefined) updateData.contactHotline = body.contactHotline;
+  if (body.categoryId !== undefined) updateData.categoryId = body.categoryId;
+  if (body.portId !== undefined) updateData.portId = body.portId;
 
+  // Sync agents
   const finalAgentIds = body.agentIds && body.agentIds.length > 0
     ? body.agentIds
-    : (body.agentId ? [body.agentId] : undefined);
+    : (body.agentId !== undefined ? (body.agentId ? [body.agentId] : []) : undefined);
 
-  if (finalAgentIds) {
-    updateData.agentId = finalAgentIds[0];
+  if (finalAgentIds !== undefined) {
+    updateData.agentId = finalAgentIds[0] || null;
     await db.delete(procedureAgents).where(eq(procedureAgents.procedureId, id));
     for (const aId of finalAgentIds) {
       await db.insert(procedureAgents).values({
         procedureId: id,
         agentId: aId,
+      });
+    }
+  }
+
+  // Sync government agencies
+  const finalGovAgencyIds = body.governmentAgencyIds && body.governmentAgencyIds.length > 0
+    ? body.governmentAgencyIds
+    : (body.governmentAgencyId !== undefined ? (body.governmentAgencyId ? [body.governmentAgencyId] : []) : undefined);
+
+  if (finalGovAgencyIds !== undefined) {
+    updateData.governmentAgencyId = finalGovAgencyIds[0] || null;
+    await db.delete(procedureGovAgencies).where(eq(procedureGovAgencies.procedureId, id));
+    for (const gId of finalGovAgencyIds) {
+      await db.insert(procedureGovAgencies).values({
+        procedureId: id,
+        governmentAgencyId: gId,
       });
     }
   }
@@ -442,11 +530,18 @@ proceduresRouter.put('/:id', requireAuth, zValidator('json', procedureUpdateFull
   const fullUpdated = await db.query.procedures.findFirst({
     where: eq(procedures.id, id),
     with: {
+      category: true,
       port: true,
       agent: true,
+      governmentAgency: true,
       procedureAgents: {
         with: {
           agent: true,
+        },
+      },
+      procedureGovAgencies: {
+        with: {
+          governmentAgency: true,
         },
       },
       workType: true,
@@ -466,7 +561,7 @@ proceduresRouter.put('/:id', requireAuth, zValidator('json', procedureUpdateFull
     },
   });
 
-  return successResponse(c, formatProcedureWithAgents(fullUpdated), 'แก้ไขคู่มือสำเร็จ');
+  return successResponse(c, formatProcedureWithRelations(fullUpdated), 'แก้ไขคู่มือสำเร็จ');
 });
 
 // POST /api/procedures/:id/duplicate (Duplicate procedure with variants, steps, and copy MinIO images)
@@ -478,6 +573,7 @@ proceduresRouter.post('/:id/duplicate', requireAuth, async (c) => {
     where: eq(procedures.id, id),
     with: {
       procedureAgents: true,
+      procedureGovAgencies: true,
       variants: {
         with: {
           steps: {
@@ -494,12 +590,15 @@ proceduresRouter.post('/:id/duplicate', requireAuth, async (c) => {
 
   const newTitle = `${orig.title} (สำเนา)`;
   const [newProc] = await db.insert(procedures).values({
+    categoryId: orig.categoryId,
     portId: orig.portId,
     agentId: orig.agentId,
+    governmentAgencyId: orig.governmentAgencyId,
     workTypeId: orig.workTypeId,
     title: newTitle,
     description: orig.description,
     referenceDocuments: orig.referenceDocuments,
+    contactHotline: orig.contactHotline,
     updatedBy: user.fullName || user.displayName || user.username,
   }).returning();
 
@@ -508,6 +607,15 @@ proceduresRouter.post('/:id/duplicate', requireAuth, async (c) => {
       await db.insert(procedureAgents).values({
         procedureId: newProc.id,
         agentId: pa.agentId,
+      });
+    }
+  }
+
+  if (orig.procedureGovAgencies && orig.procedureGovAgencies.length > 0) {
+    for (const pga of orig.procedureGovAgencies) {
+      await db.insert(procedureGovAgencies).values({
+        procedureId: newProc.id,
+        governmentAgencyId: pga.governmentAgencyId,
       });
     }
   }
@@ -561,11 +669,18 @@ proceduresRouter.post('/:id/duplicate', requireAuth, async (c) => {
   const fullDuplicated = await db.query.procedures.findFirst({
     where: eq(procedures.id, newProc.id),
     with: {
+      category: true,
       port: true,
       agent: true,
+      governmentAgency: true,
       procedureAgents: {
         with: {
           agent: true,
+        },
+      },
+      procedureGovAgencies: {
+        with: {
+          governmentAgency: true,
         },
       },
       workType: true,
@@ -581,7 +696,7 @@ proceduresRouter.post('/:id/duplicate', requireAuth, async (c) => {
     },
   });
 
-  return successResponse(c, formatProcedureWithAgents(fullDuplicated), 'คัดลอกคู่มือและรูปภาพสำเร็จ', 201);
+  return successResponse(c, formatProcedureWithRelations(fullDuplicated), 'คัดลอกคู่มือและรูปภาพสำเร็จ', 201);
 });
 
 // DELETE /api/procedures/:id (ADMIN ONLY - Cascade delete MinIO images & DB)
@@ -618,7 +733,7 @@ proceduresRouter.delete('/:id', requireAuth, requireAdmin, async (c) => {
     }
   }
 
-  // DB cascade deletes variants, steps, images automatically via foreign key ON DELETE CASCADE
+  // DB cascade deletes variants, steps, images, procedureGovAgencies automatically via foreign key ON DELETE CASCADE
   await db.delete(procedures).where(eq(procedures.id, id));
 
   return successResponse(c, { id }, 'ลบคู่มือและรูปภาพทั้งหมดสำเร็จ');

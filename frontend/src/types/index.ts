@@ -8,6 +8,27 @@ export interface User {
   createdAt?: string;
 }
 
+export interface Category {
+  id: number;
+  code: string;
+  name: string;
+  icon: string;
+  color: string;
+  sortOrder: number;
+  createdAt?: string;
+}
+
+export interface GovernmentAgency {
+  id: number;
+  code: string;
+  name: string;
+  shortName?: string;
+  contactInfo?: string;
+  website?: string;
+  isActive: boolean;
+  createdAt?: string;
+}
+
 export interface Port {
   id: number;
   code: string;
@@ -68,20 +89,27 @@ export interface ProcedureVariant {
 
 export interface Procedure {
   id: number;
-  portId: number;
-  agentId?: number;
+  categoryId?: number | null;
+  category?: Category | null;
+  portId?: number | null;
+  port?: Port | null;
+  agentId?: number | null;
+  agent?: Agent | null;
   agentIds?: number[];
+  agents?: Agent[];
+  governmentAgencyId?: number | null;
+  governmentAgency?: GovernmentAgency | null;
+  governmentAgencyIds?: number[];
+  governmentAgencies?: GovernmentAgency[];
   workTypeId: number;
+  workType?: WorkType;
   title: string;
   description?: string;
   referenceDocuments?: string;
+  contactHotline?: string | null;
   updatedBy?: string;
   createdAt?: string;
   updatedAt?: string;
-  port?: Port;
-  agent?: Agent;
-  agents?: Agent[];
-  workType?: WorkType;
   variants?: ProcedureVariant[];
 }
 
@@ -96,4 +124,3 @@ export interface ResponsibleRole {
   createdAt?: string;
   updatedAt?: string;
 }
-

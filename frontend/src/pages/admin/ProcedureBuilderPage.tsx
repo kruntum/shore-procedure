@@ -27,7 +27,7 @@ import {
   EyeOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { usePorts, useAgents, useWorkTypes, useProcedure, useProcedureRoles } from '../../hooks/queries';
+import { usePorts, useAgents, useWorkTypes, useProcedure, useProcedureRoles, useCategories, useGovernmentAgencies } from '../../hooks/queries';
 import { useCreateProcedure, useUpdateProcedure } from '../../hooks/mutations';
 import { StepImageUploader } from '../../components/StepImageUploader';
 import { DEFAULT_ROLES } from '../../components/RoleTag';
@@ -44,11 +44,16 @@ export const ProcedureBuilderPage: React.FC = () => {
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
 
+  const { data: categories } = useCategories();
+  const { data: govAgencies } = useGovernmentAgencies(true);
   const { data: ports } = usePorts();
   const { data: agents } = useAgents();
   const { data: workTypes } = useWorkTypes();
   const { data: existingProc, isLoading: isProcLoading } = useProcedure(procedureId);
   const { data: serverRoles } = useProcedureRoles();
+
+  const watchedCategoryId = Form.useWatch('categoryId', form);
+  const currentCategory = categories?.find((c) => c.id === watchedCategoryId);
 
   const roleOptions = Array.from(new Set([...(serverRoles || []), ...DEFAULT_ROLES])).map((r) => ({
     value: r,
@@ -67,13 +72,23 @@ export const ProcedureBuilderPage: React.FC = () => {
           ? [existingProc.agentId]
           : [];
 
+      const initialGovAgencyIds =
+        existingProc.governmentAgencies && existingProc.governmentAgencies.length > 0
+          ? existingProc.governmentAgencies.map((g) => g.id)
+          : existingProc.governmentAgencyId
+          ? [existingProc.governmentAgencyId]
+          : [];
+
       form.setFieldsValue({
+        categoryId: existingProc.categoryId,
         portId: existingProc.portId,
         agentIds: initialAgentIds,
+        governmentAgencyIds: initialGovAgencyIds,
         workTypeId: existingProc.workTypeId,
         title: existingProc.title,
         description: existingProc.description,
         referenceDocuments: existingProc.referenceDocuments || 'B/L, Booking Confirmation, ใบเสร็จชำระเงิน',
+        contactHotline: existingProc.contactHotline || '',
         variants: existingProc.variants?.map((v) => ({
           id: v.id,
           conditionName: v.conditionName,
@@ -90,11 +105,16 @@ export const ProcedureBuilderPage: React.FC = () => {
         })),
       });
     } else if (!isEditing) {
+      const defaultCategoryId = searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : (categories?.[0]?.id || 1);
       const defaultPortId = searchParams.get('portId') ? parseInt(searchParams.get('portId')!) : undefined;
       const defaultAgentId = searchParams.get('agentId') ? parseInt(searchParams.get('agentId')!) : undefined;
+      const defaultGovId = searchParams.get('governmentAgencyId') ? parseInt(searchParams.get('governmentAgencyId')!) : undefined;
+
       form.setFieldsValue({
+        categoryId: defaultCategoryId,
         portId: defaultPortId,
         agentIds: defaultAgentId ? [defaultAgentId] : [],
+        governmentAgencyIds: defaultGovId ? [defaultGovId] : [],
         workTypeId: 1, // Default to จ่ายชอร์
         referenceDocuments: 'B/L, Booking Confirmation, ใบเสร็จชำระเงิน',
         variants: [
@@ -106,7 +126,7 @@ export const ProcedureBuilderPage: React.FC = () => {
             steps: [
               {
                 stepNumber: 1,
-                title: 'เข้าสู่ระบบ e-Portal และระบุเลข Booking / BL',
+                title: 'เข้าสู่ระบบและตรวจสอบเอกสาร',
                 description: '',
                 responsibleRole: 'พนักงานหน้างาน / ชิปปิ้ง',
               },
@@ -115,7 +135,7 @@ export const ProcedureBuilderPage: React.FC = () => {
         ],
       });
     }
-  }, [isEditing, existingProc, searchParams, form]);
+  }, [isEditing, existingProc, searchParams, form, categories]);
 
   const handleSubmit = async (values: any) => {
     setSubmitting(true);
@@ -204,15 +224,82 @@ export const ProcedureBuilderPage: React.FC = () => {
         <Form form={form} layout="vertical" onFinish={handleSubmit} size="small">
           {/* Main Info */}
           <Row gutter={[16, 0]}>
-            <Col xs={24} md={6}>
+            <Col xs={24} md={8}>
               <Form.Item
-                name="portId"
-                label="ท่าเรือ (Port)"
-                rules={[{ required: true, message: 'กรุณาเลือกท่าเรือ' }]}
+                name="categoryId"
+                label="หมวดหมู่คู่มือ (Category)"
+                rules={[{ required: true, message: 'กรุณาเลือกหมวดหมู่' }]}
               >
                 <Select
-                  placeholder="เลือกท่าเรือ"
-                  disabled={isEditing}
+                  placeholder="เลือกหมวดหมู่คู่มือ"
+                  options={categories?.map((c) => ({
+                    value: c.id,
+                    label: `${c.icon} ${c.name}`,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="workTypeId"
+                label="ประเภทงาน (Work Type)"
+                rules={[{ required: true, message: 'กรุณาเลือกประเภทงาน' }]}
+              >
+                <Select
+                  placeholder="เลือกประเภทงาน"
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                  }
+                  options={workTypes?.map((w) => ({ value: w.id, label: w.name }))}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Form.Item name="contactHotline" label="สายด่วน / เบอร์ติดต่อ (ถ้ามี)">
+                <Input placeholder="เช่น สายด่วน 1164 หรือ 038-400-000" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={[16, 0]}>
+            {/* Show Gov Agency if not strictly terminal or if selected */}
+            {(!currentCategory || currentCategory.code !== 'TERMINAL_SHIPPING') && (
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="governmentAgencyIds"
+                  label="หน่วยงานราชการที่เกี่ยวข้อง (Government Agencies)"
+                  tooltip="เช่น กรมศุลกากร, กรมการค้าต่างประเทศ (DFT), ด่านตรวจพืช (DOA)"
+                >
+                  <Select
+                    mode="multiple"
+                    placeholder="เลือกหน่วยงานราชการ..."
+                    showSearch
+                    allowClear
+                    maxTagCount="responsive"
+                    filterOption={(input, option) =>
+                      (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                    }
+                    options={govAgencies?.map((g) => ({
+                      value: g.id,
+                      label: `${g.shortName ? `[${g.shortName}] ` : ''}${g.name}`,
+                    }))}
+                  />
+                </Form.Item>
+              </Col>
+            )}
+
+            <Col xs={24} md={(!currentCategory || currentCategory.code !== 'TERMINAL_SHIPPING') ? 12 : 8}>
+              <Form.Item
+                name="portId"
+                label="ท่าเรือ / ด่านตรวจ (Port / Terminal)"
+                tooltip="หากเป็นงานที่ต้องเข้าพื้นที่ท่าเรือหรือด่านตรวจหน้างาน"
+              >
+                <Select
+                  placeholder="เลือกท่าเรือ (ถ้ามี)"
+                  allowClear
                   showSearch
                   filterOption={(input, option) =>
                     (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
@@ -222,61 +309,49 @@ export const ProcedureBuilderPage: React.FC = () => {
               </Form.Item>
             </Col>
 
-            <Col xs={24} md={6}>
-              <Form.Item
-                name="workTypeId"
-                label="ประเภทงาน (Work Type)"
-                rules={[{ required: true, message: 'กรุณาเลือกประเภทงาน' }]}
-              >
-                <Select
-                  placeholder="เลือกประเภทงาน"
-                  disabled={isEditing}
-                  options={workTypes?.map((w) => ({ value: w.id, label: w.name }))}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} md={12}>
-              <Form.Item
-                name="agentIds"
-                label={
-                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                    <span>สายเรือ / เอเย่นต์ (เลือกได้หลายสายเรือ)</span>
-                    <Space size="small">
-                      <Button
-                        type="link"
-                        size="small"
-                        style={{ padding: 0, fontSize: 11 }}
-                        onClick={() => form.setFieldsValue({ agentIds: agents?.map((a) => a.id) })}
-                      >
-                        เลือกทุกสายเรือ (All)
-                      </Button>
-                      <span style={{ color: '#d9d9d9' }}>|</span>
-                      <Button
-                        type="link"
-                        size="small"
-                        style={{ padding: 0, fontSize: 11 }}
-                        onClick={() => form.setFieldsValue({ agentIds: [] })}
-                      >
-                        ล้างค่า
-                      </Button>
-                    </Space>
-                  </div>
-                }
-                rules={[{ required: true, message: 'กรุณาเลือกสายเรืออย่างน้อย 1 สายเรือ' }]}
-              >
-                <Select
-                  mode="multiple"
-                  placeholder="เลือกสายเรือที่ใช้ขั้นตอนนี้ร่วมกัน..."
-                  showSearch
-                  maxTagCount="responsive"
-                  filterOption={(input, option) =>
-                    (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+            {(!currentCategory || currentCategory.code === 'TERMINAL_SHIPPING') && (
+              <Col xs={24} md={16}>
+                <Form.Item
+                  name="agentIds"
+                  label={
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                      <span>สายเรือ / เอเย่นต์ (เลือกได้หลายสายเรือ)</span>
+                      <Space size="small">
+                        <Button
+                          type="link"
+                          size="small"
+                          style={{ padding: 0, fontSize: 11 }}
+                          onClick={() => form.setFieldsValue({ agentIds: agents?.map((a) => a.id) })}
+                        >
+                          เลือกทุกสายเรือ (All)
+                        </Button>
+                        <span style={{ color: '#d9d9d9' }}>|</span>
+                        <Button
+                          type="link"
+                          size="small"
+                          style={{ padding: 0, fontSize: 11 }}
+                          onClick={() => form.setFieldsValue({ agentIds: [] })}
+                        >
+                          ล้างค่า
+                        </Button>
+                      </Space>
+                    </div>
                   }
-                  options={agents?.map((a) => ({ value: a.id, label: `${a.code} - ${a.name}` }))}
-                />
-              </Form.Item>
-            </Col>
+                >
+                  <Select
+                    mode="multiple"
+                    placeholder="เลือกสายเรือที่ใช้ขั้นตอนนี้ร่วมกัน..."
+                    showSearch
+                    allowClear
+                    maxTagCount="responsive"
+                    filterOption={(input, option) =>
+                      (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                    }
+                    options={agents?.map((a) => ({ value: a.id, label: `${a.code} - ${a.name}` }))}
+                  />
+                </Form.Item>
+              </Col>
+            )}
           </Row>
 
           <Form.Item

@@ -1,6 +1,8 @@
 export * from './users';
 export * from './ports';
 export * from './agents';
+export * from './categories';
+export * from './governmentAgencies';
 export * from './workTypes';
 export * from './procedures';
 export * from './procedureVariants';
@@ -8,3 +10,4 @@ export * from './procedureSteps';
 export * from './stepImages';
 export * from './responsibleRoles';
 export * from './procedureAgents';
+export * from './procedureGovAgencies';

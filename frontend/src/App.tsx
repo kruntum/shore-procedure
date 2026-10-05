@@ -14,6 +14,8 @@ import { WorkTypeManagementPage } from './pages/admin/WorkTypeManagementPage';
 import { RoleManagementPage } from './pages/admin/RoleManagementPage';
 import { UserManagementPage } from './pages/admin/UserManagementPage';
 import { ProcedureBuilderPage } from './pages/admin/ProcedureBuilderPage';
+import { CategoryManagementPage } from './pages/admin/CategoryManagementPage';
+import { GovAgencyManagementPage } from './pages/admin/GovAgencyManagementPage';
 
 export default function App() {
   return (
@@ -44,6 +46,8 @@ export default function App() {
             <Route path="procedures/:id/edit" element={<ProcedureBuilderPage />} />
             <Route path="ports" element={<PortManagementPage />} />
             <Route path="agents" element={<AgentManagementPage />} />
+            <Route path="categories" element={<CategoryManagementPage />} />
+            <Route path="gov-agencies" element={<GovAgencyManagementPage />} />
             <Route path="work-types" element={<WorkTypeManagementPage />} />
             <Route path="roles" element={<RoleManagementPage />} />
             <Route path="users" element={<UserManagementPage />} />

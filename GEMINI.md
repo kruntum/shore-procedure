@@ -1,6 +1,6 @@
-# 🛡️ Shore Procedure Project Rules & Development Guidelines
+# 🛡️ Asiathai Freight SOP Project Rules & Development Guidelines
 
-เอกสารนี้กำหนดข้อตกลงและมาตรฐานการพัฒนา (Conventions & Constraints) สำหรับโปรเจกต์ **Shore Procedure Management System** ตัวแทนปัญญาประดิษฐ์ (AI Agent) และนักพัฒนาทุกคนต้องปฏิบัติตามกฎเหล่านี้อย่างเคร่งครัด
+เอกสารนี้กำหนดข้อตกลงและมาตรฐานการพัฒนา (Conventions & Constraints) สำหรับโปรเจกต์ **Asiathai Freight SOP Management System** (ระบบคู่มือปฏิบัติงานนำเข้า-ส่งออกครบวงจร) ตัวแทนปัญญาประดิษฐ์ (AI Agent) และนักพัฒนาทุกคนต้องปฏิบัติตามกฎเหล่านี้อย่างเคร่งครัด
 
 ---
 
@@ -21,7 +21,7 @@
 2. **Mobile & Tablet Friendly:** ถึงแม้จะเน้น Compact แต่หน้าจอสำหรับพนักงานหน้างาน (User Manual View) ต้องแสดงผลได้ดีบนมือถือและแท็บเล็ต (Responsive Design)
 3. **User Experience หน้างาน:**
    - ต้องมีช่อง **Quick Search (ค้นหาด่วน)** ที่พิมพ์คำค้นหาเดียวแล้วเจอขั้นตอนทันที
-   - การเลือกดูคู่มือแบบ Wizard ต้องทำได้รวดเร็ว (ไม่เกิน 3 คลิก: เลือกท่า -> เลือกเอเย่นต์ -> เลือกเงื่อนไข)
+   - การเลือกดูคู่มือตามหมวดหมู่ (Categories: ศุลกากร, ใบอนุญาตราชการ, ท่าเรือ, สายเรือ, งานภายใน) ต้องทำได้รวดเร็ว
    - รูปภาพขั้นตอนทุกรูปต้องคลิกขยายดูภาพขนาดเต็ม (Lightbox/Modal Zoom) ได้ชัดเจน
 
 ---
@@ -29,12 +29,12 @@
 ## ⚡ 3. มาตรฐาน Backend (Bun + Hono + Drizzle ORM)
 
 1. **Bun Runtime First:** ใช้ `bun` ในการรันสคริปต์ ติดตั้งแพ็กเกจ (`bun add`) และทดสอบระบบ หลีกเลี่ยงการใช้ Node.js APIs ที่ไม่รองรับใน Bun
-2. **Route Prefix Consistency:** API ทั้งหมดใน Hono ต้องมี Prefix `/api/` (เช่น `/api/procedures`, `/api/ports`, `/api/files`) เพื่อให้ตรงกับ Nginx Reverse Proxy
+2. **Route Prefix Consistency:** API ทั้งหมดใน Hono ต้องมี Prefix `/api/` (เช่น `/api/procedures`, `/api/categories`, `/api/government-agencies`, `/api/ports`, `/api/files`) เพื่อให้ตรงกับ Nginx Reverse Proxy
 3. **Database Schema & Migrations:**
    - ใช้ Drizzle ORM ในการจัดการ Schema เสมอ
    - ห้ามเขียน raw SQL drop table หรือ truncate
    - ทุกตารางต้องมี `createdAt` และตารางหลักต้องมี `updatedAt` พร้อม `updatedBy`
-   - รองรับ 1 ท่าเรือมีหลายคู่มือ (1 Port to Many Procedures) ตามกลุ่มสายเรือ, ประเภทงาน หรือเงื่อนไขการปฏิบัติงานที่แตกต่างกัน
+   - รองรับ Multi-Domain: คู่มือสามารถผูกกับหมวดหมู่ (`categoryId`), หน่วยงานราชการ (`governmentAgencyId` / `procedure_gov_agencies`), ท่าเรือ (`portId` - optional), หรือสายเรือ (`agentId` / `procedure_agents` - optional) ได้อย่างยืดหยุ่น
 
 ---
 

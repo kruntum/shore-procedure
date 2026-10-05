@@ -210,4 +210,55 @@ export function useDeleteUser() {
   });
 }
 
+// Categories Mutations
+export function useCreateCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: any) => api.post('/categories', data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
+  });
+}
+
+export function useUpdateCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) => api.put(`/categories/${id}`, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
+  });
+}
+
+export function useDeleteCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => api.delete(`/categories/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
+  });
+}
+
+// Government Agencies Mutations
+export function useCreateGovAgency() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: any) => api.post('/government-agencies', data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['governmentAgencies'] }),
+  });
+}
+
+export function useUpdateGovAgency() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) => api.put(`/government-agencies/${id}`, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['governmentAgencies'] }),
+  });
+}
+
+export function useDeleteGovAgency() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => api.delete(`/government-agencies/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['governmentAgencies'] }),
+  });
+}
+
+
 

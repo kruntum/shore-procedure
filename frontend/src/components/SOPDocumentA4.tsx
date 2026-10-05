@@ -91,10 +91,10 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
                     letterSpacing: '0.5px',
                   }}
                 >
-                  SHORE PROCEDURE
+                  ASIATHAI FREIGHT SOP
                 </div>
                 <div style={{ fontSize: '9px', color: '#64748b' }}>
-                  ระบบจัดการขั้นตอนหน้าท่า
+                  ระบบคู่มือปฏิบัติงานนำเข้า-ส่งออก
                 </div>
               </td>
 
@@ -129,7 +129,7 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
                   {procedure.title}
                 </div>
                 <div style={{ fontSize: '10px', color: '#64748b' }}>
-                  STANDARD OPERATING PROCEDURE FOR SHORE HANDLING
+                  STANDARD OPERATING PROCEDURE (FREIGHT & CUSTOMS CLEARANCE)
                 </div>
               </td>
 

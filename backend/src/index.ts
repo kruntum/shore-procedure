@@ -3,6 +3,8 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { config } from './config';
 import authRouter from './routes/auth';
+import categoriesRouter from './routes/categories';
+import governmentAgenciesRouter from './routes/governmentAgencies';
 import portsRouter from './routes/ports';
 import agentsRouter from './routes/agents';
 import workTypesRouter from './routes/workTypes';
@@ -32,19 +34,21 @@ api.get('/health', (c) => {
     status: 'ok',
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
-    service: 'shore-procedure-backend',
+    service: 'asiathai-freight-sop-backend',
   });
 });
 
 api.get('/', (c) => {
   return c.json({
-    message: 'Shore Procedure Management System API',
+    message: 'Asiathai Freight SOP Management System API',
     version: '1.0.0',
   });
 });
 
 // Mount modules
 api.route('/auth', authRouter);
+api.route('/categories', categoriesRouter);
+api.route('/government-agencies', governmentAgenciesRouter);
 api.route('/ports', portsRouter);
 api.route('/agents', agentsRouter);
 api.route('/work-types', workTypesRouter);

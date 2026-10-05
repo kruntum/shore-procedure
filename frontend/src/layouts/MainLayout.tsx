@@ -109,7 +109,7 @@ export const MainLayout: React.FC = () => {
             }}
           >
             <RocketOutlined style={{ fontSize: 20, marginRight: 6 }} />
-            <span className="brand-text">SHORE PROCEDURE</span>
+            <span className="brand-text">ASIATHAI FREIGHT SOP</span>
           </div>
 
           {/* Flexible Menu Container for Ant Design Auto-Ellipsis Overflow */}
@@ -156,7 +156,7 @@ export const MainLayout: React.FC = () => {
       </Content>
 
       <Footer style={{ textAlign: 'center', color: '#8c8c8c', fontSize: 12, padding: '16px 20px' }}>
-        Shore Procedure Management System © 2026 • Single Source of Truth for Port Logistics
+        Asiathai Freight SOP Management System © 2026 • Single Source of Truth for Logistics & Customs Clearance
       </Footer>
     </Layout>
   );

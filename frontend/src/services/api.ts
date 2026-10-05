@@ -8,7 +8,7 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('shore_token');
+  const token = localStorage.getItem('freight_token') || localStorage.getItem('shore_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -19,6 +19,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      localStorage.removeItem('freight_token');
+      localStorage.removeItem('freight_user');
       localStorage.removeItem('shore_token');
       localStorage.removeItem('shore_user');
       if (window.location.pathname.startsWith('/admin')) {
