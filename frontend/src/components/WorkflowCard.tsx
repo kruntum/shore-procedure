@@ -33,9 +33,9 @@ export const WorkflowCard: React.FC<WorkflowCardProps> = ({ workflow }) => {
       onClick={() => navigate(`/workflows/${workflow.id}`)}
       style={{
         height: '100%',
+        minHeight: 180,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
         borderRadius: 8,
         border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
         borderTop: `3px solid ${workflow.category?.color ? `var(--ant-${workflow.category.color})` : '#0284c7'}`,
@@ -48,12 +48,12 @@ export const WorkflowCard: React.FC<WorkflowCardProps> = ({ workflow }) => {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        height: '100%',
+        flex: 1,
       }}
     >
       <div>
         {/* Header Tags */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
           <Space size={4}>
             <Tag color="cyan" style={{ margin: 0, fontSize: 10.5, fontWeight: 600 }}>
               <ApartmentOutlined style={{ marginRight: 3 }} /> โฟลว์งาน
@@ -78,8 +78,9 @@ export const WorkflowCard: React.FC<WorkflowCardProps> = ({ workflow }) => {
           ellipsis={{ rows: 2 }}
           style={{
             margin: '0 0 6px',
-            fontSize: 13.5,
+            fontSize: 13,
             lineHeight: 1.35,
+            minHeight: 35,
             color: isDarkMode ? '#e2e8f0' : '#1e293b',
           }}
         >
@@ -87,27 +88,23 @@ export const WorkflowCard: React.FC<WorkflowCardProps> = ({ workflow }) => {
         </Title>
 
         {/* Description */}
-        {workflow.description && (
-          <Paragraph
-            ellipsis={{ rows: 2 }}
-            type="secondary"
-            style={{ fontSize: 11.5, margin: '0 0 10px', lineHeight: 1.35 }}
-          >
-            {workflow.description}
-          </Paragraph>
-        )}
+        <Paragraph
+          ellipsis={{ rows: 2 }}
+          type="secondary"
+          style={{ fontSize: 11, margin: '0 0 6px', minHeight: 30, lineHeight: 1.35 }}
+        >
+          {workflow.description || '-'}
+        </Paragraph>
 
         {/* Audience */}
-        {workflow.targetAudience && (
-          <div style={{ fontSize: 11, marginBottom: 8 }}>
-            <Text type="secondary">ผู้รับผิดชอบ: </Text>
-            <Text style={{ fontSize: 11 }}>{workflow.targetAudience}</Text>
-          </div>
-        )}
+        <div style={{ fontSize: 10.5, marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <Text type="secondary">ผู้รับผิดชอบ: </Text>
+          <Text style={{ fontSize: 10.5 }}>{workflow.targetAudience || 'ชิปปิ้ง / ผู้ประสานงาน'}</Text>
+        </div>
       </div>
 
       {/* Footer Progress & Action */}
-      <div style={{ marginTop: 10, paddingTop: 8, borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #f0f0f0' }}>
+      <div style={{ marginTop: 'auto', paddingTop: 8, borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #f0f0f0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
           <Space size={6} style={{ fontSize: 11 }}>
             <span style={{ fontWeight: 600 }}>👣 {totalSteps} ขั้นตอน</span>

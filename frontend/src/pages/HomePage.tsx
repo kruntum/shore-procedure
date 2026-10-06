@@ -272,7 +272,7 @@ export const HomePage: React.FC = () => {
           ) : (
             <Row gutter={[12, 12]}>
               {recentWorkflows.map((wf) => (
-                <Col key={wf.id} xs={24} sm={12}>
+                <Col key={wf.id} xs={24} sm={12} style={{ display: 'flex' }}>
                   <WorkflowCard workflow={wf} />
                 </Col>
               ))}
@@ -324,7 +324,7 @@ export const HomePage: React.FC = () => {
           ) : (
             <Row gutter={[12, 12]}>
               {recentProcedures.map((proc) => (
-                <Col key={proc.id} xs={24} sm={12}>
+                <Col key={proc.id} xs={24} sm={12} style={{ display: 'flex' }}>
                   <ProcedureCard procedure={proc} />
                 </Col>
               ))}
