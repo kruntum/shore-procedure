@@ -135,7 +135,7 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
                     letterSpacing: '0.5px',
                   }}
                 >
-                  เอกสารขั้นตอนการปฏิบัติงานมาตรฐาน {procedure.category ? `• ${procedure.category.icon} ${procedure.category.name}` : ''}
+                  เอกสารขั้นตอนการปฏิบัติงานมาตรฐาน
                 </div>
                 <div
                   style={{
@@ -147,8 +147,8 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
                 >
                   {procedure.title}
                 </div>
-                <div style={{ fontSize: '10px', color: '#64748b' }}>
-                  STANDARD OPERATING PROCEDURE ({procedure.category?.name ? procedure.category.name.toUpperCase() : 'FREIGHT & LOGISTICS'})
+                <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, letterSpacing: '0.5px' }}>
+                  IMP&EXP SOP
                 </div>
               </td>
 
