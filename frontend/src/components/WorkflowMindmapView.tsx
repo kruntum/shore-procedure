@@ -69,10 +69,10 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
         type="target"
         position={Position.Top}
         style={{
-          width: 10,
-          height: 10,
+          width: 8,
+          height: 8,
           background: '#ffffff',
-          border: `2px solid ${borderColor}`,
+          border: `1.5px solid ${borderColor}`,
           borderRadius: '50%',
           zIndex: 10,
         }}
@@ -250,10 +250,10 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
         type="source"
         position={Position.Bottom}
         style={{
-          width: 10,
-          height: 10,
+          width: 8,
+          height: 8,
           background: '#ffffff',
-          border: `2px solid ${borderColor}`,
+          border: `1.5px solid ${borderColor}`,
           borderRadius: '50%',
           zIndex: 10,
         }}
@@ -396,12 +396,12 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
         animated: false,   // Solid, crisp, non-cluttered professional line
         style: {
           stroke: strokeColor,
-          strokeWidth: 2.2,
+          strokeWidth: 1.5,
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,
-          width: 15,
-          height: 15,
+          width: 12,
+          height: 12,
           color: strokeColor,
         },
       };
