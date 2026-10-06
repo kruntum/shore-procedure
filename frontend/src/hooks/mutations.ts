@@ -295,5 +295,42 @@ export function useDeleteWorkflow() {
   });
 }
 
+// Step mutations
+export function useAddWorkflowStep() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ workflowId, data }: { workflowId: number; data: any }) =>
+      api.post(`/workflows/${workflowId}/steps`, data),
+    onSuccess: (_, { workflowId }) => {
+      queryClient.invalidateQueries({ queryKey: ['workflow', workflowId] });
+      queryClient.invalidateQueries({ queryKey: ['workflows'] });
+    },
+  });
+}
+
+export function useUpdateWorkflowStep() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ workflowId, stepId, data }: { workflowId: number; stepId: number; data: any }) =>
+      api.put(`/workflows/${workflowId}/steps/${stepId}`, data),
+    onSuccess: (_, { workflowId }) => {
+      queryClient.invalidateQueries({ queryKey: ['workflow', workflowId] });
+      queryClient.invalidateQueries({ queryKey: ['workflows'] });
+    },
+  });
+}
+
+export function useDeleteWorkflowStep() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ workflowId, stepId }: { workflowId: number; stepId: number }) =>
+      api.delete(`/workflows/${workflowId}/steps/${stepId}`),
+    onSuccess: (_, { workflowId }) => {
+      queryClient.invalidateQueries({ queryKey: ['workflow', workflowId] });
+      queryClient.invalidateQueries({ queryKey: ['workflows'] });
+    },
+  });
+}
+
 
 

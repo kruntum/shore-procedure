@@ -307,4 +307,102 @@ workflowsRouter.delete('/:id', requireAuth, requireAdmin, async (c) => {
   return successResponse(c, deleted, 'ลบสายงานปฏิบัติการสำเร็จ');
 });
 
+// Step Schema
+const stepSchema = z.object({
+  title: z.string().min(1, 'กรุณาระบุชื่อขั้นตอน'),
+  briefDescription: z.string().optional().nullable(),
+  procedureId: z.number().int().positive().optional().nullable(),
+  governmentAgencyId: z.number().int().positive().optional().nullable(),
+  portId: z.number().int().positive().optional().nullable(),
+  sortOrder: z.number().int().default(1),
+  stepType: z.string().default('standard'),
+  outputs: z.array(z.string()).default([]),
+});
+
+// POST /api/workflows/:id/steps (Add single step to workflow)
+workflowsRouter.post('/:id/steps', requireAuth, requireAdmin, zValidator('json', stepSchema), async (c) => {
+  const workflowId = parseInt(c.req.param('id'));
+  const body = c.req.valid('json');
+
+  const wf = await db.query.jobWorkflows.findFirst({
+    where: eq(jobWorkflows.id, workflowId),
+  });
+  if (!wf) return errorResponse(c, 'ไม่พบสายงานปฏิบัติการ', 404);
+
+  // If sortOrder not provided or is default, put it at the end
+  let sortOrder = body.sortOrder;
+  if (!sortOrder || sortOrder === 1) {
+    const existingSteps = await db.select({ sortOrder: jobWorkflowSteps.sortOrder })
+      .from(jobWorkflowSteps)
+      .where(eq(jobWorkflowSteps.workflowId, workflowId))
+      .orderBy(desc(jobWorkflowSteps.sortOrder))
+      .limit(1);
+    sortOrder = existingSteps.length > 0 ? (existingSteps[0].sortOrder || 0) + 1 : 1;
+  }
+
+  const [newStep] = await db.insert(jobWorkflowSteps).values({
+    workflowId,
+    title: body.title,
+    briefDescription: body.briefDescription || null,
+    procedureId: body.procedureId || null,
+    governmentAgencyId: body.governmentAgencyId || null,
+    portId: body.portId || null,
+    sortOrder,
+    stepType: body.stepType || 'standard',
+    outputs: body.outputs || [],
+  }).returning();
+
+  return successResponse(c, newStep, 'เพิ่มขั้นตอนสำเร็จ', 201);
+});
+
+// PUT /api/workflows/:id/steps/:stepId (Update single step)
+workflowsRouter.put('/:id/steps/:stepId', requireAuth, requireAdmin, zValidator('json', stepSchema), async (c) => {
+  const workflowId = parseInt(c.req.param('id'));
+  const stepId = parseInt(c.req.param('stepId'));
+  const body = c.req.valid('json');
+
+  const existing = await db.query.jobWorkflowSteps.findFirst({
+    where: eq(jobWorkflowSteps.id, stepId),
+  });
+  if (!existing || existing.workflowId !== workflowId) {
+    return errorResponse(c, 'ไม่พบขั้นตอนที่ต้องการแก้ไข', 404);
+  }
+
+  const [updated] = await db.update(jobWorkflowSteps).set({
+    title: body.title,
+    briefDescription: body.briefDescription !== undefined ? body.briefDescription : existing.briefDescription,
+    procedureId: body.procedureId !== undefined ? body.procedureId : existing.procedureId,
+    governmentAgencyId: body.governmentAgencyId !== undefined ? body.governmentAgencyId : existing.governmentAgencyId,
+    portId: body.portId !== undefined ? body.portId : existing.portId,
+    sortOrder: body.sortOrder !== undefined ? body.sortOrder : existing.sortOrder,
+    stepType: body.stepType || existing.stepType,
+    outputs: body.outputs || existing.outputs,
+    updatedAt: new Date(),
+  }).where(eq(jobWorkflowSteps.id, stepId)).returning();
+
+  return successResponse(c, updated, 'แก้ไขขั้นตอนสำเร็จ');
+});
+
+// DELETE /api/workflows/:id/steps/:stepId (Delete single step)
+workflowsRouter.delete('/:id/steps/:stepId', requireAuth, requireAdmin, async (c) => {
+  const workflowId = parseInt(c.req.param('id'));
+  const stepId = parseInt(c.req.param('stepId'));
+
+  // Delete dependencies
+  await db.delete(jobWorkflowDependencies).where(
+    or(
+      eq(jobWorkflowDependencies.stepId, stepId),
+      eq(jobWorkflowDependencies.dependsOnStepId, stepId)
+    )
+  );
+
+  const [deleted] = await db.delete(jobWorkflowSteps)
+    .where(eq(jobWorkflowSteps.id, stepId))
+    .returning();
+
+  if (!deleted) return errorResponse(c, 'ไม่พบขั้นตอนที่ต้องการลบ', 404);
+
+  return successResponse(c, deleted, 'ลบขั้นตอนสำเร็จ');
+});
+
 export default workflowsRouter;

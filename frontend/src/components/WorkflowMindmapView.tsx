@@ -30,6 +30,9 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
   const isDarkMode = data.isDarkMode;
   const onOpenSop = data.onOpenSop;
   const onCreateSop = data.onCreateSop;
+  const onEditStep = data.onEditStep;
+  const onDeleteStep = data.onDeleteStep;
+  const isAuthenticated = data.isAuthenticated;
 
   const hasSop = !!step.procedureId;
 
@@ -79,19 +82,51 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
           )}
         </Space>
 
-        {hasSop ? (
-          <Tooltip title="มีคู่มือ SOP สมบูรณ์แล้ว">
-            <Tag color="success" style={{ margin: 0, fontSize: 10, padding: '0 4px' }}>
-              <CheckCircleOutlined /> พร้อมใช้
-            </Tag>
-          </Tooltip>
-        ) : (
-          <Tooltip title="ขั้นตอนนี้ยังไม่มีคู่มือ SOP">
-            <Tag color="warning" style={{ margin: 0, fontSize: 10, padding: '0 4px' }}>
-              <ExclamationCircleOutlined /> รอคู่มือ
-            </Tag>
-          </Tooltip>
-        )}
+        <Space size={4}>
+          {hasSop ? (
+            <Tooltip title="มีคู่มือ SOP สมบูรณ์แล้ว">
+              <Tag color="success" style={{ margin: 0, fontSize: 10, padding: '0 4px' }}>
+                <CheckCircleOutlined /> พร้อมใช้
+              </Tag>
+            </Tooltip>
+          ) : (
+            <Tooltip title="ขั้นตอนนี้ยังไม่มีคู่มือ SOP">
+              <Tag color="warning" style={{ margin: 0, fontSize: 10, padding: '0 4px' }}>
+                <ExclamationCircleOutlined /> รอคู่มือ
+              </Tag>
+            </Tooltip>
+          )}
+
+          {isAuthenticated && onEditStep && (
+            <Tooltip title="แก้ไขขั้นตอนนี้">
+              <Button
+                type="text"
+                size="small"
+                icon={<span style={{ fontSize: 11, cursor: 'pointer' }}>✏️</span>}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditStep(step);
+                }}
+                style={{ width: 18, height: 18, padding: 0 }}
+              />
+            </Tooltip>
+          )}
+          {isAuthenticated && onDeleteStep && (
+            <Tooltip title="ลบขั้นตอนนี้">
+              <Button
+                type="text"
+                danger
+                size="small"
+                icon={<span style={{ fontSize: 11, cursor: 'pointer' }}>🗑️</span>}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeleteStep(step);
+                }}
+                style={{ width: 18, height: 18, padding: 0 }}
+              />
+            </Tooltip>
+          )}
+        </Space>
       </div>
 
       {/* Node Title */}
@@ -165,6 +200,9 @@ interface WorkflowMindmapViewProps {
   dependencies: { stepId: number; dependsOnStepId: number }[];
   onOpenSop: (procedureId: number) => void;
   onCreateSop: (step: JobWorkflowStep) => void;
+  onEditStep?: (step: JobWorkflowStep) => void;
+  onDeleteStep?: (step: JobWorkflowStep) => void;
+  isAuthenticated?: boolean;
 }
 
 export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
@@ -172,6 +210,9 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
   dependencies,
   onOpenSop,
   onCreateSop,
+  onEditStep,
+  onDeleteStep,
+  isAuthenticated,
 }) => {
   const { isDarkMode } = useTheme();
 
@@ -214,7 +255,6 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
     Object.keys(levelColumns).forEach((lvlStr) => {
       const lvl = parseInt(lvlStr);
       const itemsInCol = levelColumns[lvl];
-      const startY = Math.max(0, (itemsInCol.length - 1) * rowSpacing * -0.5);
 
       itemsInCol.forEach((step, idx) => {
         generatedNodes.push({
@@ -229,6 +269,9 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
             isDarkMode,
             onOpenSop,
             onCreateSop,
+            onEditStep,
+            onDeleteStep,
+            isAuthenticated,
           },
         });
       });
@@ -244,7 +287,7 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
     }));
 
     return { nodes: generatedNodes, edges: generatedEdges };
-  }, [steps, dependencies, isDarkMode, onOpenSop, onCreateSop]);
+  }, [steps, dependencies, isDarkMode, onOpenSop, onCreateSop, onEditStep, onDeleteStep, isAuthenticated]);
 
   return (
     <div

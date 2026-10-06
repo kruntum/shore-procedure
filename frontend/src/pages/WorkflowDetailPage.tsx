@@ -13,6 +13,11 @@ import {
   Table,
   Modal,
   Tooltip,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  message,
 } from 'antd';
 import {
   ApartmentOutlined,
@@ -20,19 +25,19 @@ import {
   ArrowLeftOutlined,
   BookOutlined,
   PlusOutlined,
-  PrinterOutlined,
   ClockCircleOutlined,
   BankOutlined,
   CompassOutlined,
-  CheckCircleOutlined,
-  ExclamationCircleOutlined,
+  EditOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useWorkflow, useProcedure } from '../hooks/queries';
+import { useWorkflow, useProcedure, useProcedures, useGovernmentAgencies, usePorts } from '../hooks/queries';
+import { useAddWorkflowStep, useUpdateWorkflowStep, useDeleteWorkflowStep } from '../hooks/mutations';
 import { useTheme } from '../contexts/ThemeContext';
 import { WorkflowMindmapView } from '../components/WorkflowMindmapView';
 import { JobWorkflowStep } from '../types';
-import { SOPPrintModal } from '../components/SOPPrintModal';
+import { authService } from '../services/auth';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -40,13 +45,28 @@ export const WorkflowDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isDarkMode, primaryColor } = useTheme();
+  const isAuthenticated = authService.isAuthenticated();
 
   const workflowId = id ? parseInt(id) : undefined;
   const { data: workflow, isLoading, error } = useWorkflow(workflowId);
 
+  // Queries for select dropdowns in Add/Edit Step Modal
+  const { data: allProcedures } = useProcedures();
+  const { data: govAgencies } = useGovernmentAgencies();
+  const { data: ports } = usePorts();
+
+  // Mutations
+  const addStepMutation = useAddWorkflowStep();
+  const updateStepMutation = useUpdateWorkflowStep();
+  const deleteStepMutation = useDeleteWorkflowStep();
+
   const [viewMode, setViewMode] = useState<'mindmap' | 'table'>('mindmap');
   const [selectedSopId, setSelectedSopId] = useState<number | null>(null);
-  const [printModalOpen, setPrintModalOpen] = useState(false);
+
+  // Step Modal State
+  const [stepModalOpen, setStepModalOpen] = useState(false);
+  const [editingStep, setEditingStep] = useState<JobWorkflowStep | null>(null);
+  const [stepForm] = Form.useForm();
 
   // Hook to fetch linked SOP when clicked in modal
   const { data: selectedProcedure, isLoading: isSopLoading } = useProcedure(selectedSopId || undefined);
@@ -75,13 +95,95 @@ export const WorkflowDetailPage: React.FC = () => {
   };
 
   const handleCreateSop = (step: JobWorkflowStep) => {
-    // Open procedure builder with step prefilled parameters
     const params = new URLSearchParams();
     params.set('title', step.title);
     if (workflow.categoryId) params.set('categoryId', String(workflow.categoryId));
     if (step.governmentAgencyId) params.set('governmentAgencyId', String(step.governmentAgencyId));
     if (step.portId) params.set('portId', String(step.portId));
     navigate(`/admin/procedures/new?${params.toString()}`);
+  };
+
+  const handleOpenStepModal = (step?: JobWorkflowStep) => {
+    if (step) {
+      setEditingStep(step);
+      stepForm.setFieldsValue({
+        sortOrder: step.sortOrder,
+        title: step.title,
+        briefDescription: step.briefDescription,
+        procedureId: step.procedureId || null,
+        governmentAgencyId: step.governmentAgencyId || null,
+        portId: step.portId || null,
+        outputsText: (step.outputs || []).join('\n'),
+      });
+    } else {
+      setEditingStep(null);
+      stepForm.resetFields();
+      const nextOrder = (workflow.steps?.length || 0) + 1;
+      stepForm.setFieldsValue({
+        sortOrder: nextOrder,
+        outputsText: '',
+      });
+    }
+    setStepModalOpen(true);
+  };
+
+  const handleSaveStep = async () => {
+    try {
+      const values = await stepForm.validateFields();
+      const outputs = values.outputsText
+        ? values.outputsText.split('\n').map((s: string) => s.trim()).filter((s: string) => s.length > 0)
+        : [];
+
+      const payload = {
+        title: values.title,
+        briefDescription: values.briefDescription || null,
+        procedureId: values.procedureId || null,
+        governmentAgencyId: values.governmentAgencyId || null,
+        portId: values.portId || null,
+        sortOrder: values.sortOrder || 1,
+        outputs,
+      };
+
+      if (editingStep && workflowId) {
+        await updateStepMutation.mutateAsync({
+          workflowId,
+          stepId: editingStep.id,
+          data: payload,
+        });
+        message.success('แก้ไขขั้นตอนสำเร็จ');
+      } else if (workflowId) {
+        await addStepMutation.mutateAsync({
+          workflowId,
+          data: payload,
+        });
+        message.success('เพิ่มขั้นตอนเข้าสายงานสำเร็จ');
+      }
+      setStepModalOpen(false);
+    } catch (err: any) {
+      message.error(err.response?.data?.error || 'เกิดข้อผิดพลาดในการบันทึกขั้นตอน');
+    }
+  };
+
+  const handleDeleteStep = (step: JobWorkflowStep) => {
+    if (!workflowId) return;
+    Modal.confirm({
+      title: 'ยืนยันการลบขั้นตอน',
+      content: `คุณต้องการลบขั้นตอน #${step.sortOrder} "${step.title}" ออกจากสายงานนี้ใช่หรือไม่?`,
+      okText: 'ลบขั้นตอน',
+      okType: 'danger',
+      cancelText: 'ยกเลิก',
+      onOk: async () => {
+        try {
+          await deleteStepMutation.mutateAsync({
+            workflowId,
+            stepId: step.id,
+          });
+          message.success('ลบขั้นตอนสำเร็จ');
+        } catch (err: any) {
+          message.error(err.response?.data?.error || 'ไม่สามารถลบขั้นตอนได้');
+        }
+      },
+    });
   };
 
   const tableColumns = [
@@ -129,7 +231,7 @@ export const WorkflowDetailPage: React.FC = () => {
       title: 'สิ่งที่ต้องได้ (Outputs)',
       dataIndex: 'outputs',
       key: 'outputs',
-      width: 220,
+      width: 200,
       render: (outputs?: string[]) => (
         <div>
           {outputs && outputs.length > 0 ? (
@@ -147,7 +249,7 @@ export const WorkflowDetailPage: React.FC = () => {
     {
       title: 'สถานะคู่มือ (SOP)',
       key: 'sopStatus',
-      width: 150,
+      width: 140,
       align: 'center' as const,
       render: (_: any, record: JobWorkflowStep) => {
         const hasSop = !!record.procedureId;
@@ -174,6 +276,39 @@ export const WorkflowDetailPage: React.FC = () => {
         );
       },
     },
+    {
+      title: 'จัดการ',
+      key: 'actions',
+      width: isAuthenticated ? 100 : 50,
+      align: 'center' as const,
+      render: (_: any, record: JobWorkflowStep) => (
+        <Space size={2}>
+          {isAuthenticated && (
+            <>
+              <Tooltip title="แก้ไขขั้นตอนนี้">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<EditOutlined style={{ color: '#fa8c16', fontSize: 13 }} />}
+                  onClick={() => handleOpenStepModal(record)}
+                  style={{ width: 26, height: 26, padding: 0 }}
+                />
+              </Tooltip>
+              <Tooltip title="ลบขั้นตอนนี้">
+                <Button
+                  type="text"
+                  danger
+                  size="small"
+                  icon={<DeleteOutlined style={{ fontSize: 13 }} />}
+                  onClick={() => handleDeleteStep(record)}
+                  style={{ width: 26, height: 26, padding: 0 }}
+                />
+              </Tooltip>
+            </>
+          )}
+        </Space>
+      ),
+    },
   ];
 
   return (
@@ -197,6 +332,18 @@ export const WorkflowDetailPage: React.FC = () => {
               <TableOutlined /> ตารางเช็คลิสต์ (Table)
             </Radio.Button>
           </Radio.Group>
+
+          {isAuthenticated && (
+            <Button
+              type="primary"
+              size="small"
+              icon={<PlusOutlined />}
+              onClick={() => handleOpenStepModal()}
+              style={{ borderRadius: 4, fontWeight: 500 }}
+            >
+              + เพิ่มขั้นตอน (Add Step)
+            </Button>
+          )}
         </Space>
       </div>
 
@@ -249,12 +396,43 @@ export const WorkflowDetailPage: React.FC = () => {
 
       {/* Main View Area */}
       {viewMode === 'mindmap' ? (
-        <WorkflowMindmapView
-          steps={workflow.steps || []}
-          dependencies={workflow.dependencies || []}
-          onOpenSop={handleOpenSop}
-          onCreateSop={handleCreateSop}
-        />
+        workflow.steps && workflow.steps.length > 0 ? (
+          <WorkflowMindmapView
+            steps={workflow.steps || []}
+            dependencies={workflow.dependencies || []}
+            onOpenSop={handleOpenSop}
+            onCreateSop={handleCreateSop}
+            onEditStep={handleOpenStepModal}
+            onDeleteStep={handleDeleteStep}
+            isAuthenticated={isAuthenticated}
+          />
+        ) : (
+          <Card
+            size="small"
+            style={{
+              textAlign: 'center',
+              padding: '60px 0',
+              borderRadius: 8,
+              border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
+              background: isDarkMode ? '#1a1d21' : '#fff',
+            }}
+          >
+            <ApartmentOutlined style={{ fontSize: 36, color: '#94a3b8', marginBottom: 12 }} />
+            <Title level={5} style={{ margin: '0 0 6px 0' }}>ยังไม่มีขั้นตอนในสายงานนี้</Title>
+            <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 16 }}>
+              เริ่มต้นสร้างขั้นตอนแรกในกระบวนการทำงานเพื่อแสดงแผนผัง
+            </Text>
+            {isAuthenticated && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => handleOpenStepModal()}
+              >
+                เพิ่มขั้นตอนแรกในสายงานนี้
+              </Button>
+            )}
+          </Card>
+        )
       ) : (
         <Card
           size="small"
@@ -273,6 +451,109 @@ export const WorkflowDetailPage: React.FC = () => {
           />
         </Card>
       )}
+
+      {/* Add / Edit Step Modal */}
+      <Modal
+        title={
+          <Space>
+            <ApartmentOutlined style={{ color: primaryColor }} />
+            <span>{editingStep ? `แก้ไขขั้นตอน #${editingStep.sortOrder}` : '+ เพิ่มขั้นตอนใหม่ในสายงาน'}</span>
+          </Space>
+        }
+        open={stepModalOpen}
+        onOk={handleSaveStep}
+        onCancel={() => setStepModalOpen(false)}
+        confirmLoading={addStepMutation.isPending || updateStepMutation.isPending}
+        okText="บันทึกขั้นตอน"
+        cancelText="ยกเลิก"
+        destroyOnClose
+        width={560}
+      >
+        <Form form={stepForm} layout="vertical" size="small" style={{ marginTop: 12 }}>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <Form.Item
+              name="sortOrder"
+              label="ลำดับที่ (#)"
+              rules={[{ required: true, message: 'ระบุลำดับ' }]}
+              style={{ width: 110 }}
+            >
+              <InputNumber min={1} style={{ width: '100%' }} />
+            </Form.Item>
+
+            <Form.Item
+              name="title"
+              label="ชื่อขั้นตอนการปฏิบัติงาน"
+              rules={[{ required: true, message: 'กรุณาระบุชื่อขั้นตอน' }]}
+              style={{ flex: 1 }}
+            >
+              <Input placeholder="เช่น ยื่นขอใบอนุญาต อย. (LPI) หรือ นัดหมายตรวจสอบสินค้า" />
+            </Form.Item>
+          </div>
+
+          <Form.Item name="briefDescription" label="คำอธิบายสรุปย่อขั้นตอน">
+            <Input.TextArea rows={2} placeholder="อธิบายสิ่งที่ต้องปฏิบัติในขั้นตอนนี้..." />
+          </Form.Item>
+
+          <Form.Item
+            name="procedureId"
+            label="ผูกกับคู่มือปฏิบัติงานมาตรฐาน (SOP Procedure)"
+            extra="* สามารถเลือกคู่มือที่มีอยู่ในระบบ หรือปล่อยว่างไว้เพื่อสร้างคู่มือภายหลัง"
+          >
+            <Select
+              allowClear
+              showSearch
+              placeholder="-- เลือกคู่มือ SOP ที่มีอยู่แล้ว หรือเว้นว่างไว้ --"
+              filterOption={(input, option) =>
+                (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+              }
+              options={allProcedures?.map((p) => ({
+                value: p.id,
+                label: `[#${p.id}] ${p.title} (${p.category?.name || 'ทั่วไป'})`,
+              }))}
+            />
+          </Form.Item>
+
+          <div style={{ display: 'flex', gap: 12 }}>
+            <Form.Item name="governmentAgencyId" label="หน่วยงานราชการที่เกี่ยวข้อง" style={{ flex: 1 }}>
+              <Select
+                allowClear
+                showSearch
+                placeholder="เลือกหน่วยงานราชการ"
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                }
+                options={govAgencies?.map((g) => ({
+                  value: g.id,
+                  label: `${g.shortName ? `[${g.shortName}] ` : ''}${g.name}`,
+                }))}
+              />
+            </Form.Item>
+
+            <Form.Item name="portId" label="ท่าเรือที่เกี่ยวข้อง (ถ้ามี)" style={{ flex: 1 }}>
+              <Select
+                allowClear
+                showSearch
+                placeholder="เลือกท่าเรือ"
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                }
+                options={ports?.map((p) => ({
+                  value: p.id,
+                  label: `${p.code} - ${p.name}`,
+                }))}
+              />
+            </Form.Item>
+          </div>
+
+          <Form.Item
+            name="outputsText"
+            label="ผลลัพธ์ / เอกสารที่ต้องได้รับ (Outputs)"
+            extra="* พิมพ์ 1 บรรทัดต่อ 1 รายการ เช่น ใบอนุญาตนำเข้า, ผลการเอ็กซเรย์"
+          >
+            <Input.TextArea rows={2} placeholder="ผลการเอ็กซเรย์ตู้สินค้า&#10;เลขที่ใบขนสินค้า" />
+          </Form.Item>
+        </Form>
+      </Modal>
 
       {/* Linked SOP Quick Modal */}
       <Modal
