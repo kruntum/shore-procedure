@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect } from 'react';
 import {
   ReactFlow,
   Background,
@@ -9,6 +9,8 @@ import {
   Edge,
   Node,
   MarkerType,
+  useNodesState,
+  useEdgesState,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Tag, Button, Typography, Space, Tooltip } from 'antd';
@@ -27,7 +29,7 @@ import { useTheme } from '../contexts/ThemeContext';
 
 const { Text } = Typography;
 
-// Custom Step Node Component (Vertical Layout with Top/Bottom Handles)
+// Custom Step Node Component (Vertical Layout with Top/Bottom Handles & Drag support)
 export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
   const step: JobWorkflowStep = data.step;
   const isDarkMode = data.isDarkMode;
@@ -56,7 +58,9 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
         color: isDarkMode ? 'rgba(255,255,255,0.88)' : '#1e293b',
         position: 'relative',
         fontSize: 12,
-        transition: 'all 0.2s ease',
+        cursor: 'grab',
+        userSelect: 'none',
+        transition: 'border 0.2s, box-shadow 0.2s',
       }}
     >
       {/* Target Handle at TOP */}
@@ -75,7 +79,7 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
 
       {/* Node Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-        <Space size={4}>
+        <Space size={4} wrap>
           <span
             style={{
               backgroundColor: hasSop ? '#10b981' : '#f59e0b',
@@ -88,6 +92,16 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
           >
             #{step.sortOrder}
           </span>
+          {step.stepType === 'parallel' && (
+            <Tag color="purple" style={{ margin: 0, fontSize: 9.5, padding: '0 4px', fontWeight: 600 }}>
+              ⚡ คู่ขนาน
+            </Tag>
+          )}
+          {step.stepType === 'decision' && (
+            <Tag color="orange" style={{ margin: 0, fontSize: 9.5, padding: '0 4px', fontWeight: 600 }}>
+              🔀 ทางเลือก
+            </Tag>
+          )}
           {step.agencyShortName && (
             <Tag color="volcano" style={{ margin: 0, fontSize: 10, padding: '0 4px' }}>
               <BankOutlined /> {step.agencyShortName}
@@ -272,8 +286,12 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
 }) => {
   const { isDarkMode } = useTheme();
 
-  // Generate nodes and edges layout vertically (Top to Bottom)
-  const { nodes, edges } = useMemo(() => {
+  // Controlled ReactFlow nodes and edges with drag support
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+
+  // Recalculate layout when steps, dependencies, or theme changes
+  useEffect(() => {
     // Sort steps primarily by sortOrder
     const sortedSteps = [...steps].sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
     const stepIdMap = new Map<number, JobWorkflowStep>();
@@ -381,7 +399,8 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
       };
     });
 
-    return { nodes: generatedNodes, edges: generatedEdges };
+    setNodes(generatedNodes);
+    setEdges(generatedEdges);
   }, [steps, dependencies, isDarkMode, onOpenSop, onCreateSop, onEditStep, onDeleteStep, isAuthenticated]);
 
   return (
@@ -398,9 +417,13 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{ padding: 0.2 }}
+        nodesDraggable={true}
+        nodesConnectable={false}
         attributionPosition="bottom-left"
       >
         <Background color={isDarkMode ? '#333' : '#cbd5e1'} gap={16} size={1} />

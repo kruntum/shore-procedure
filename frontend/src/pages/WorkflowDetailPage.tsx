@@ -112,6 +112,7 @@ export const WorkflowDetailPage: React.FC = () => {
 
       stepForm.setFieldsValue({
         sortOrder: step.sortOrder,
+        stepType: step.stepType || 'standard',
         title: step.title,
         briefDescription: step.briefDescription,
         procedureId: step.procedureId || null,
@@ -126,6 +127,7 @@ export const WorkflowDetailPage: React.FC = () => {
       const nextOrder = (workflow?.steps?.length || 0) + 1;
       stepForm.setFieldsValue({
         sortOrder: nextOrder,
+        stepType: 'standard',
         outputsText: '',
         dependsOnStepIds: [],
       });
@@ -176,6 +178,7 @@ export const WorkflowDetailPage: React.FC = () => {
         governmentAgencyId: values.governmentAgencyId || null,
         portId: values.portId || null,
         sortOrder: values.sortOrder || 1,
+        stepType: values.stepType || 'standard',
         outputs,
         dependsOnStepIds: values.dependsOnStepIds || [],
       };
@@ -511,9 +514,23 @@ export const WorkflowDetailPage: React.FC = () => {
               name="sortOrder"
               label="ลำดับที่ (#)"
               rules={[{ required: true, message: 'ระบุลำดับ' }]}
-              style={{ width: 110 }}
+              style={{ width: 90 }}
             >
               <InputNumber min={1} style={{ width: '100%' }} />
+            </Form.Item>
+
+            <Form.Item
+              name="stepType"
+              label="ประเภทขั้นตอน"
+              style={{ width: 150 }}
+            >
+              <Select
+                options={[
+                  { value: 'standard', label: '📌 ปกติ (ลำดับ)' },
+                  { value: 'parallel', label: '⚡ ทำงานคู่ขนาน' },
+                  { value: 'decision', label: '🔀 ทางเลือก/เงื่อนไข' },
+                ]}
+              />
             </Form.Item>
 
             <Form.Item
