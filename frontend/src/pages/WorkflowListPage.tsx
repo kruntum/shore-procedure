@@ -55,6 +55,7 @@ export const WorkflowListPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(
     searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : null
   );
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -72,13 +73,14 @@ export const WorkflowListPage: React.FC = () => {
 
   const filteredWorkflows = workflows?.filter((wf) => {
     const matchesCategory = selectedCategory ? wf.categoryId === selectedCategory : true;
+    const matchesStatus = selectedStatus ? wf.status === selectedStatus : true;
     const matchesText =
       searchText.trim() === '' ||
       wf.title.toLowerCase().includes(searchText.toLowerCase()) ||
       wf.code.toLowerCase().includes(searchText.toLowerCase()) ||
       (wf.description && wf.description.toLowerCase().includes(searchText.toLowerCase())) ||
       (wf.targetAudience && wf.targetAudience.toLowerCase().includes(searchText.toLowerCase()));
-    return matchesCategory && matchesText;
+    return matchesCategory && matchesStatus && matchesText;
   });
 
   const handleOpenModal = (item?: JobWorkflow) => {
@@ -271,6 +273,25 @@ export const WorkflowListPage: React.FC = () => {
       },
     },
     {
+      title: 'สถานะ',
+      dataIndex: 'status',
+      key: 'status',
+      width: 105,
+      align: 'center' as const,
+      render: (status: string) => {
+        if (status === 'active') {
+          return <Tag color="success" style={{ margin: 0 }}>🟢 เปิดใช้งาน</Tag>;
+        }
+        if (status === 'draft') {
+          return <Tag color="warning" style={{ margin: 0 }}>🟡 แบบร่าง</Tag>;
+        }
+        if (status === 'archived') {
+          return <Tag color="default" style={{ margin: 0 }}>⚪ เก็บถาวร</Tag>;
+        }
+        return <Tag color="default">{status || 'Active'}</Tag>;
+      },
+    },
+    {
       title: 'จัดการ',
       key: 'actions',
       width: isAuthenticated ? 130 : 65,
@@ -374,7 +395,7 @@ export const WorkflowListPage: React.FC = () => {
 
         {/* Filter Controls */}
         <Row gutter={[8, 8]} align="middle">
-          <Col xs={24} sm={14} md={16}>
+          <Col xs={24} sm={10} md={12}>
             <Input
               size="small"
               placeholder="ค้นหาชื่อสายงาน, รหัสสายงาน เช่น WF-IMP-FOOD..."
@@ -384,7 +405,7 @@ export const WorkflowListPage: React.FC = () => {
               allowClear
             />
           </Col>
-          <Col xs={24} sm={10} md={8}>
+          <Col xs={12} sm={7} md={6}>
             <Select
               size="small"
               style={{ width: '100%' }}
@@ -396,6 +417,21 @@ export const WorkflowListPage: React.FC = () => {
                 value: c.id,
                 label: `${c.icon} ${c.name}`,
               }))}
+            />
+          </Col>
+          <Col xs={12} sm={7} md={6}>
+            <Select
+              size="small"
+              style={{ width: '100%' }}
+              placeholder="ทุกสถานะ"
+              allowClear
+              value={selectedStatus}
+              onChange={setSelectedStatus}
+              options={[
+                { value: 'active', label: '🟢 เปิดใช้งาน' },
+                { value: 'draft', label: '🟡 แบบร่าง' },
+                { value: 'archived', label: '⚪ เก็บถาวร' },
+              ]}
             />
           </Col>
         </Row>

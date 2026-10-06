@@ -127,6 +127,35 @@ export const WorkflowDetailPage: React.FC = () => {
     setStepModalOpen(true);
   };
 
+  const handleProcedureSelect = (procId?: number | null) => {
+    if (!procId) return;
+    const proc = allProcedures?.find((p) => p.id === procId);
+    if (!proc) return;
+
+    const govId =
+      proc.governmentAgencyId ||
+      (proc.governmentAgencies && proc.governmentAgencies.length > 0 ? proc.governmentAgencies[0].id : null) ||
+      (proc.governmentAgencyIds && proc.governmentAgencyIds.length > 0 ? proc.governmentAgencyIds[0] : null) ||
+      null;
+
+    const patch: Record<string, any> = {
+      title: proc.title,
+    };
+
+    if (proc.description) {
+      patch.briefDescription = proc.description;
+    }
+    if (govId) {
+      patch.governmentAgencyId = govId;
+    }
+    if (proc.portId) {
+      patch.portId = proc.portId;
+    }
+
+    stepForm.setFieldsValue(patch);
+    message.success(`ดึงข้อมูลจากคู่มือ "${proc.title}" ลงในฟอร์มเรียบร้อยแล้ว`);
+  };
+
   const handleSaveStep = async () => {
     try {
       const values = await stepForm.validateFields();
@@ -481,36 +510,37 @@ export const WorkflowDetailPage: React.FC = () => {
             </Form.Item>
 
             <Form.Item
-              name="title"
-              label="ชื่อขั้นตอนการปฏิบัติงาน"
-              rules={[{ required: true, message: 'กรุณาระบุชื่อขั้นตอน' }]}
+              name="procedureId"
+              label="เลือกคู่มือปฏิบัติงานมาตรฐาน (SOP)"
+              extra="* เมื่อเลือกคู่มือ ระบบจะดึงชื่อ, คำอธิบาย, หน่วยงาน และท่าเรือให้อัตโนมัติ"
               style={{ flex: 1 }}
             >
-              <Input placeholder="เช่น ยื่นขอใบอนุญาต อย. (LPI) หรือ นัดหมายตรวจสอบสินค้า" />
+              <Select
+                allowClear
+                showSearch
+                placeholder="-- เลือกคู่มือ SOP ที่มีอยู่แล้ว หรือเว้นว่างไว้เพื่อสร้างใหม่ --"
+                onChange={handleProcedureSelect}
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                }
+                options={allProcedures?.map((p) => ({
+                  value: p.id,
+                  label: `[#${p.id}] ${p.title} (${p.category?.name || 'ทั่วไป'})`,
+                }))}
+              />
             </Form.Item>
           </div>
 
-          <Form.Item name="briefDescription" label="คำอธิบายสรุปย่อขั้นตอน">
-            <Input.TextArea rows={2} placeholder="อธิบายสิ่งที่ต้องปฏิบัติในขั้นตอนนี้..." />
+          <Form.Item
+            name="title"
+            label="ชื่อขั้นตอนการปฏิบัติงาน"
+            rules={[{ required: true, message: 'กรุณาระบุชื่อขั้นตอน' }]}
+          >
+            <Input placeholder="เช่น ยื่นขอใบอนุญาต อย. (LPI) หรือ นัดหมายตรวจสอบสินค้า" />
           </Form.Item>
 
-          <Form.Item
-            name="procedureId"
-            label="ผูกกับคู่มือปฏิบัติงานมาตรฐาน (SOP Procedure)"
-            extra="* สามารถเลือกคู่มือที่มีอยู่ในระบบ หรือปล่อยว่างไว้เพื่อสร้างคู่มือภายหลัง"
-          >
-            <Select
-              allowClear
-              showSearch
-              placeholder="-- เลือกคู่มือ SOP ที่มีอยู่แล้ว หรือเว้นว่างไว้ --"
-              filterOption={(input, option) =>
-                (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
-              }
-              options={allProcedures?.map((p) => ({
-                value: p.id,
-                label: `[#${p.id}] ${p.title} (${p.category?.name || 'ทั่วไป'})`,
-              }))}
-            />
+          <Form.Item name="briefDescription" label="คำอธิบายสรุปย่อขั้นตอน">
+            <Input.TextArea rows={2} placeholder="อธิบายสิ่งที่ต้องปฏิบัติในขั้นตอนนี้..." />
           </Form.Item>
 
           <div style={{ display: 'flex', gap: 12 }}>
