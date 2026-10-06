@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Upload,
   Button,
@@ -21,6 +21,7 @@ import {
   CheckOutlined,
   CloseOutlined,
   PlusOutlined,
+  SnippetsOutlined,
 } from '@ant-design/icons';
 import type { UploadFile } from 'antd/es/upload/interface';
 import { StepImage } from '../types';
@@ -50,6 +51,7 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const [captionInput, setCaptionInput] = useState('');
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [pastePreviewUrl, setPastePreviewUrl] = useState<string | null>(null);
 
   const uploadMutation = useUploadStepImage();
   const deleteMutation = useDeleteStepImage();
@@ -104,9 +106,81 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
     }
   };
 
+  const resetModalState = () => {
+    setUploadModalVisible(false);
+    setFileList([]);
+    setCaptionInput('');
+    if (pastePreviewUrl) {
+      URL.revokeObjectURL(pastePreviewUrl);
+      setPastePreviewUrl(null);
+    }
+  };
+
+  const processImageFile = useCallback((file: File, sourceName = 'clipboard-screenshot.png') => {
+    const isImage = file.type.startsWith('image/');
+    if (!isImage) {
+      message.error('กรุณาวางเฉพาะไฟล์รูปภาพ (JPG, PNG, WebP)!');
+      return false;
+    }
+    const isLt15M = file.size / 1024 / 1024 < 15;
+    if (!isLt15M) {
+      message.error('ขนาดไฟล์ต้องไม่เกิน 15MB!');
+      return false;
+    }
+
+    const namedFile = new File([file], file.name || sourceName, { type: file.type || 'image/png' });
+    const uploadFile: UploadFile = {
+      uid: `-paste-${Date.now()}`,
+      name: namedFile.name,
+      status: 'done',
+      originFileObj: namedFile as any,
+    };
+
+    setFileList([uploadFile]);
+    const preview = URL.createObjectURL(namedFile);
+    setPastePreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return preview;
+    });
+    message.success(`วางรูปภาพจาก Clipboard สำเร็จ (${(namedFile.size / 1024).toFixed(0)} KB)`);
+    return true;
+  }, []);
+
+  // Listen to global paste event when uploadModalVisible is open
+  useEffect(() => {
+    if (!uploadModalVisible) return;
+
+    const handlePaste = (e: ClipboardEvent) => {
+      // If user is currently typing in the caption text input, don't intercept unless it has image files
+      const target = e.target as HTMLElement;
+      const isInput = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA');
+
+      const items = e.clipboardData?.items;
+      if (!items || items.length === 0) return;
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.type.indexOf('image') !== -1) {
+          const blob = item.getAsFile();
+          if (blob) {
+            e.preventDefault();
+            const timestamp = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 14);
+            processImageFile(blob, `screenshot-${timestamp}.png`);
+            return;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('paste', handlePaste);
+    return () => {
+      window.removeEventListener('paste', handlePaste);
+    };
+  }, [uploadModalVisible, processImageFile]);
+
   const handleCustomUpload = async () => {
     if (fileList.length === 0) {
-      message.warning('กรุณาเลือกไฟล์ภาพก่อนทำการอัปโหลด');
+      message.warning('กรุณาเลือกไฟล์ภาพ หรือกด Ctrl+V เพื่อวางภาพก่อนทำการอัปโหลด');
       return;
     }
 
@@ -129,9 +203,7 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
         formData,
       });
       message.success('อัปโหลดรูปภาพลง MinIO สำเร็จ');
-      setUploadModalVisible(false);
-      setFileList([]);
-      setCaptionInput('');
+      resetModalState();
     } catch (err: any) {
       message.error(err.response?.data?.error || 'เกิดข้อผิดพลาดในการอัปโหลดภาพ');
     }
@@ -281,26 +353,27 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
         </div>
       )}
 
-      {/* Upload Modal with Drag & Drop */}
+      {/* Upload Modal with Drag & Drop and Clipboard Paste */}
       <Modal
         title={
           <Space>
             <PictureOutlined />
             <span>อัปโหลดภาพหน้าจอประกอบขั้นตอน</span>
+            <Tag color="cyan" icon={<SnippetsOutlined />}>
+              รองรับ Ctrl + V (Paste)
+            </Tag>
           </Space>
         }
         open={uploadModalVisible}
         onCancel={() => {
           if (!uploadMutation.isPending) {
-            setUploadModalVisible(false);
-            setFileList([]);
-            setCaptionInput('');
+            resetModalState();
           }
         }}
         footer={[
           <Button
             key="cancel"
-            onClick={() => setUploadModalVisible(false)}
+            onClick={resetModalState}
             disabled={uploadMutation.isPending}
           >
             ยกเลิก
@@ -317,6 +390,26 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
           </Button>,
         ]}
       >
+        <div
+          style={{
+            marginBottom: 12,
+            padding: '8px 12px',
+            backgroundColor: isDarkMode ? 'rgba(6, 182, 212, 0.08)' : '#e6fffb',
+            border: isDarkMode ? '1px solid rgba(6, 182, 212, 0.25)' : '1px solid #87e8de',
+            borderRadius: 6,
+            fontSize: 12,
+            color: isDarkMode ? '#67e8f9' : '#006d75',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
+          <SnippetsOutlined style={{ fontSize: 16 }} />
+          <span>
+            <strong>ทางลัดด่วน:</strong> สามารถกด <strong>Ctrl + V</strong> (หรือ Command + V) ในหน้านี้เพื่อวางภาพที่เพิ่งแคปหรือคัดลอกมาจาก Word / คู่มือเดิมได้ทันที
+          </span>
+        </div>
+
         <div style={{ marginBottom: 12 }}>
           <Text strong style={{ fontSize: 13, display: 'block', marginBottom: 4 }}>
             คำอธิบายภาพ (Caption / จุดสังเกตในหน้าจอ):
@@ -328,6 +421,48 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
             disabled={uploadMutation.isPending}
           />
         </div>
+
+        {pastePreviewUrl && (
+          <div
+            style={{
+              marginBottom: 12,
+              padding: 8,
+              textAlign: 'center',
+              backgroundColor: isDarkMode ? '#141414' : '#fafafa',
+              borderRadius: 6,
+              border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #f0f0f0',
+            }}
+          >
+            <div style={{ marginBottom: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Tag color="success">ภาพจาก Clipboard พร้อมอัปโหลด</Tag>
+              <Button
+                size="small"
+                type="link"
+                danger
+                onClick={() => {
+                  setFileList([]);
+                  if (pastePreviewUrl) {
+                    URL.revokeObjectURL(pastePreviewUrl);
+                    setPastePreviewUrl(null);
+                  }
+                }}
+              >
+                ล้างภาพนี้
+              </Button>
+            </div>
+            <img
+              src={pastePreviewUrl}
+              alt="Pasted Preview"
+              style={{
+                maxWidth: '100%',
+                maxHeight: 220,
+                objectFit: 'contain',
+                borderRadius: 4,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              }}
+            />
+          </div>
+        )}
 
         <Upload.Dragger
           name="file"
@@ -346,6 +481,11 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
               return Upload.LIST_IGNORE;
             }
             setFileList([file as any]);
+            const preview = URL.createObjectURL(file);
+            setPastePreviewUrl((prev) => {
+              if (prev) URL.revokeObjectURL(prev);
+              return preview;
+            });
             return false; // Prevent automatic upload, will upload via mutation
           }}
           onChange={(info) => {
@@ -355,6 +495,10 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
           }}
           onRemove={() => {
             setFileList([]);
+            if (pastePreviewUrl) {
+              URL.revokeObjectURL(pastePreviewUrl);
+              setPastePreviewUrl(null);
+            }
           }}
           accept="image/png,image/jpeg,image/jpg,image/webp"
           style={{
@@ -367,10 +511,10 @@ export const StepImageUploader: React.FC<StepImageUploaderProps> = ({
             <InboxOutlined style={{ fontSize: 36, color: primaryColor || '#1677ff' }} />
           </p>
           <p className="ant-upload-text" style={{ fontSize: 13, color: isDarkMode ? 'rgba(255, 255, 255, 0.88)' : undefined }}>
-            ลากไฟล์ภาพหน้าจอมาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์
+            ลากไฟล์ภาพหน้าจอมาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์ (หรือกด Ctrl+V)
           </p>
           <p className="ant-upload-hint" style={{ fontSize: 11, color: isDarkMode ? 'rgba(255, 255, 255, 0.45)' : '#888' }}>
-            รองรับไฟล์ PNG, JPG, JPEG, WebP (ขนาดสูงสุดไม่เกิน 15MB)
+            รองรับไฟล์ PNG, JPG, JPEG, WebP จาก Clipboard / Word / Snipping Tool
           </p>
         </Upload.Dragger>
       </Modal>
