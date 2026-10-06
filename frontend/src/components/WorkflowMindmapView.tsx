@@ -43,7 +43,7 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
   const hasSop = !!step.procedureId;
   const borderColor = hasSop
     ? '#10b981' // Emerald / Green
-    : isDarkMode ? '#f59e0b' : '#f59e0b'; // Amber
+    : (isDarkMode ? '#f59e0b' : '#f59e0b'); // Amber
 
   return (
     <div
@@ -53,10 +53,10 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
         borderRadius: 12,
         border: hasSop
           ? `1.5px solid ${borderColor}`
-          : (isDarkMode ? '1.5px dashed rgba(245, 158, 11, 0.7)' : '1.5px dashed #f59e0b'),
-        backgroundColor: isDarkMode ? '#1a1d21' : '#ffffff',
-        boxShadow: isDarkMode ? '0 4px 16px rgba(0,0,0,0.5)' : '0 2px 10px rgba(0,0,0,0.06)',
-        color: isDarkMode ? 'rgba(255,255,255,0.88)' : '#1e293b',
+          : (isDarkMode ? '1.5px dashed rgba(245, 158, 11, 0.75)' : '1.5px dashed #f59e0b'),
+        backgroundColor: isDarkMode ? '#1a1d24' : '#ffffff',
+        boxShadow: isDarkMode ? '0 4px 20px rgba(0,0,0,0.6)' : '0 2px 10px rgba(0,0,0,0.06)',
+        color: isDarkMode ? '#f8fafc' : '#1e293b',
         position: 'relative',
         fontSize: 12,
         cursor: 'grab',
@@ -71,7 +71,7 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
         style={{
           width: 8,
           height: 8,
-          background: '#ffffff',
+          background: isDarkMode ? '#1a1d24' : '#ffffff',
           border: `1.5px solid ${borderColor}`,
           borderRadius: '50%',
           zIndex: 10,
@@ -125,11 +125,11 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
                   gap: 3,
                   fontSize: 10.5,
                   fontWeight: 600,
-                  color: '#10b981',
-                  background: isDarkMode ? 'rgba(16, 185, 129, 0.15)' : '#ecfdf5',
+                  color: isDarkMode ? '#34d399' : '#10b981',
+                  background: isDarkMode ? 'rgba(16, 185, 129, 0.2)' : '#ecfdf5',
                   padding: '1px 6px',
                   borderRadius: 12,
-                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  border: isDarkMode ? '1px solid rgba(52, 211, 153, 0.35)' : '1px solid rgba(16, 185, 129, 0.3)',
                 }}
               >
                 <CheckCircleOutlined /> พร้อมใช้
@@ -144,11 +144,11 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
                   gap: 3,
                   fontSize: 10.5,
                   fontWeight: 600,
-                  color: '#d97706',
-                  background: isDarkMode ? 'rgba(245, 158, 11, 0.15)' : '#fffbeb',
+                  color: isDarkMode ? '#fbbf24' : '#d97706',
+                  background: isDarkMode ? 'rgba(245, 158, 11, 0.2)' : '#fffbeb',
                   padding: '1px 6px',
                   borderRadius: 12,
-                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  border: isDarkMode ? '1px solid rgba(251, 191, 36, 0.35)' : '1px solid rgba(245, 158, 11, 0.3)',
                 }}
               >
                 <ClockCircleOutlined /> รอคู่มือ
@@ -188,24 +188,60 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
         </Space>
       </div>
 
-      {/* Node Title */}
-      <Text strong style={{ fontSize: 13, display: 'block', lineHeight: 1.35, marginBottom: 4 }}>
+      {/* Node Title (Bright white in Dark Mode) */}
+      <div
+        style={{
+          fontSize: 13,
+          fontWeight: 600,
+          display: 'block',
+          lineHeight: 1.35,
+          marginBottom: 4,
+          color: isDarkMode ? '#f8fafc' : '#0f172a',
+        }}
+      >
         {step.title}
-      </Text>
+      </div>
 
       {/* Brief Description */}
       {step.briefDescription && (
-        <Text type="secondary" style={{ fontSize: 11, display: 'block', lineHeight: 1.3, marginBottom: 6 }}>
+        <div
+          style={{
+            fontSize: 11,
+            display: 'block',
+            lineHeight: 1.3,
+            marginBottom: 6,
+            color: isDarkMode ? '#94a3b8' : '#64748b',
+          }}
+        >
           {step.briefDescription}
-        </Text>
+        </div>
       )}
 
       {/* Outputs */}
       {step.outputs && step.outputs.length > 0 && (
-        <div style={{ marginBottom: 8, background: isDarkMode ? '#131519' : '#f8fafc', padding: '4px 6px', borderRadius: 4 }}>
-          <Text type="secondary" style={{ fontSize: 10, display: 'block', marginBottom: 2 }}>สิ่งที่ได้รับ:</Text>
+        <div
+          style={{
+            marginBottom: 8,
+            background: isDarkMode ? '#12141a' : '#f8fafc',
+            border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #f1f5f9',
+            padding: '4px 6px',
+            borderRadius: 4,
+          }}
+        >
+          <div style={{ fontSize: 10, display: 'block', marginBottom: 2, color: isDarkMode ? '#94a3b8' : '#64748b' }}>
+            สิ่งที่ได้รับ:
+          </div>
           {step.outputs.map((out, idx) => (
-            <div key={idx} style={{ fontSize: 10.5, color: hasSop ? '#10b981' : '#d97706', lineHeight: 1.3 }}>
+            <div
+              key={idx}
+              style={{
+                fontSize: 10.5,
+                color: hasSop
+                  ? (isDarkMode ? '#34d399' : '#10b981')
+                  : (isDarkMode ? '#fbbf24' : '#d97706'),
+                lineHeight: 1.3,
+              }}
+            >
               • {out}
             </div>
           ))}
@@ -234,7 +270,13 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
             size="small"
             block
             icon={<PlusOutlined />}
-            style={{ fontSize: 11, height: 24, color: '#f59e0b', borderColor: '#f59e0b' }}
+            style={{
+              fontSize: 11,
+              height: 24,
+              color: '#f59e0b',
+              borderColor: isDarkMode ? 'rgba(245, 158, 11, 0.6)' : '#f59e0b',
+              backgroundColor: isDarkMode ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
+            }}
             onClick={(e) => {
               e.stopPropagation();
               onCreateSop(step);
@@ -252,7 +294,7 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
         style={{
           width: 8,
           height: 8,
-          background: '#ffffff',
+          background: isDarkMode ? '#1a1d24' : '#ffffff',
           border: `1.5px solid ${borderColor}`,
           borderRadius: '50%',
           zIndex: 10,
@@ -342,8 +384,6 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
     const generatedNodes: Node[] = [];
     const nodeWidth = 280;
     // Generous spacing for comfortable, professional diagram layout:
-    // colSpacing: 380px gives 100px horizontal gap between parallel cards
-    // rowSpacing: 340px gives ~110px vertical gap between rows for clean arrow curves
     const colSpacing = 380;
     const rowSpacing = 330;
     const centerX = 400;
@@ -381,8 +421,8 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
       const sourceStep = stepIdMap.get(d.dependsOnStepId);
       const isSourceComplete = !!sourceStep?.procedureId;
       const strokeColor = isSourceComplete
-        ? (isDarkMode ? '#10b981' : '#10b981') // Emerald green when ready
-        : (isDarkMode ? '#38bdf8' : '#0284c7'); // Ocean blue when pending
+        ? (isDarkMode ? '#34d399' : '#10b981') // Bright Emerald green in dark mode
+        : (isDarkMode ? '#38bdf8' : '#0284c7'); // Vibrant sky blue in dark mode
 
       return {
         id: `edge-${d.dependsOnStepId}-${d.stepId}-${idx}`,
@@ -426,16 +466,50 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
 
   return (
     <div
+      className={isDarkMode ? 'dark-mindmap-canvas' : ''}
       style={{
         width: '100%',
         height: 580,
-        backgroundColor: isDarkMode ? '#141414' : '#fafafa',
+        backgroundColor: isDarkMode ? '#0e1014' : '#fafafa',
         borderRadius: 8,
         border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
         overflow: 'hidden',
         position: 'relative',
       }}
     >
+      {/* Dark mode CSS injection for React Flow Controls & attribution */}
+      <style>{`
+        .dark-mindmap-canvas .react-flow__controls {
+          background-color: #1a1d24 !important;
+          border: 1px solid rgba(255, 255, 255, 0.12) !important;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
+          border-radius: 6px !important;
+          overflow: hidden !important;
+        }
+        .dark-mindmap-canvas .react-flow__controls-button {
+          background-color: #1a1d24 !important;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+          fill: #94a3b8 !important;
+          color: #94a3b8 !important;
+        }
+        .dark-mindmap-canvas .react-flow__controls-button:hover {
+          background-color: #262b35 !important;
+        }
+        .dark-mindmap-canvas .react-flow__controls-button svg {
+          fill: #94a3b8 !important;
+        }
+        .dark-mindmap-canvas .react-flow__controls-button:hover svg {
+          fill: #f8fafc !important;
+        }
+        .dark-mindmap-canvas .react-flow__attribution {
+          background-color: rgba(14, 16, 20, 0.8) !important;
+          color: #475569 !important;
+        }
+        .dark-mindmap-canvas .react-flow__attribution a {
+          color: #64748b !important;
+        }
+      `}</style>
+
       {/* Auto-alignment reset button overlay */}
       <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 10 }}>
         <Button
@@ -444,8 +518,10 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
           onClick={handleResetLayout}
           style={{
             fontSize: 11,
-            backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+            backgroundColor: isDarkMode ? '#1a1d24' : '#ffffff',
+            borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.15)' : '#d9d9d9',
+            color: isDarkMode ? '#e2e8f0' : '#1e293b',
+            boxShadow: isDarkMode ? '0 4px 12px rgba(0,0,0,0.5)' : '0 2px 6px rgba(0,0,0,0.08)',
           }}
         >
           จัดผังอัตโนมัติ
@@ -464,7 +540,7 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
         nodesConnectable={false}
         attributionPosition="bottom-left"
       >
-        <Background color={isDarkMode ? '#333' : '#cbd5e1'} gap={16} size={1} />
+        <Background color={isDarkMode ? '#272b34' : '#cbd5e1'} gap={16} size={1} />
         <Controls />
       </ReactFlow>
     </div>
