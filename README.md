@@ -1,308 +1,191 @@
-# 🚢 Shore Procedure Management System (ระบบจัดการขั้นตอนและคู่มือการจ่ายชอร์)
+# 🌐 Asiathai Freight SOP & Workflow Management System
+### ระบบคู่มือและสายงานปฏิบัติการนำเข้า-ส่งออกครบวงจร
 
-> ระบบจัดการฐานความรู้และขั้นตอนการปฏิบัติงานการจ่ายชอร์แบบรวมศูนย์ ออกแบบมาเพื่อลดความซับซ้อน ป้องกันข้อผิดพลาดหน้างาน และทดแทนการจัดการเอกสารแบบเดิม (Word / Excel) ด้วยเว็บแอปพลิเคชันที่ค้นหาง่าย รวดเร็ว และเป็นมาตรฐานเดียวกันทั้งองค์กร
+![Asiathai Freight SOP Banner](docs/banner.png)
+
+> **ศูนย์รวมฐานความรู้และแผนผังสายงานปฏิบัติการโลจิสติกส์แบบ End-to-End**  
+> เชื่อมโยงขั้นตอนตั้งแต่การขอใบอนุญาตหน่วยงานรัฐ, พิธีการศุลกากร, การตรวจปล่อยสินค้าหน้าด่าน จนถึงการชำระค่าภาระท่าเรือและการแลกใบสั่งปล่อยสินค้า (D/O) กับสายเรือ ออกแบบมาเพื่อลดความซับซ้อน ป้องกันข้อผิดพลาดหน้างาน และเป็นมาตรฐานการปฏิบัติการเดียวกันทั้งองค์กร
 
 ---
 
 ## 📌 1. ความเป็นมาและความสำคัญ (Executive Summary)
 
-### ทำไมถึงเลือกทำเป็น Web Application แทน Excel / Word?
-ในการปฏิบัติงานจ่ายชอร์ แต่ละท่าเรือและเอเย่นต์มีขั้นตอน กฎระเบียบ เงื่อนไขเฉพาะ และข้อควรระวังที่แตกต่างกันมาก การใช้เอกสาร Word หรือไฟล์ Excel แบบเดิมพบปัญหาสำคัญดังนี้:
+ในธุรกิจการนำเข้า-ส่งออกและตัวแทนออกของ (Freight Forwarding & Customs Brokerage) แต่ละกระบวนการมีความเชื่อมโยงกับหลายหน่วยงาน ทั้งหน่วยงานราชการผู้ออกใบอนุญาต, กรมศุลกากร, ท่าเรือพาณิชย์ และตัวแทนสายเรือ การจัดการเอกสารแบบเดิม (เช่น สมุดคู่มือ Word / ตาราง Excel / โน้ตในไลน์กลุ่ม) มักทำให้ข้อมูลกระจัดกระจาย ไม่เป็นปัจจุบัน และพนักงานหน้างานมองไม่เห็นภาพรวมของสายงาน
 
-| มิติการเปรียบเทียบ | เอกสารเดิม (Word / Excel / ไลน์กลุ่ม) | ระบบเว็บแอปพลิเคชัน (Shore System) |
+ระบบ **Asiathai Freight SOP & Workflow Management System** จึงได้รับการพัฒนาขึ้นเพื่อเป็น **Single Source of Truth** ที่รวมทั้ง **"คู่มือวิธีทำทีละสเต็ป (SOPs)"** และ **"แผนผังสายงานร้อยเรียงขั้นตอน (Job Workflows)"** เข้าด้วยกันอย่างสมบูรณ์:
+
+| มิติการเปรียบเทียบ | วิธีการเดิม (Word / Excel / เอกสารกระดาษ) | ระบบ Asiathai Freight SOP System |
 | :--- | :--- | :--- |
-| **ความถูกต้องของข้อมูล (Single Source of Truth)** | มีหลายเวอร์ชัน ไฟล์กระจัดกระจาย ไม่รู้ว่าไฟล์ไหนล่าสุด | ข้อมูลรวมศูนย์ที่เดียว อัปเดตครั้งเดียวทุกคนเห็นตรงกันทันที |
-| **ความสะดวกในการค้นหาหน้างาน** | ต้องเปิดหาทีละไฟล์ หรือเลื่อนหาในชีตที่ซับซ้อน ใช้เวลามาก | กรองตาม **ท่าเรือ + เอเย่นต์ + เงื่อนไข** เจอขั้นตอนใน 3 คลิก หรือค้นหาด่วนได้ทันที |
-| **การแสดงภาพประกอบและขั้นตอน** | ใส่รูปใน Word/Excel ไฟล์จะใหญ่ ช้า รูปภาพแตกหรือหลุดกรอบ | ระบบจัดเรียง Step-by-Step พร้อมรูปภาพความละเอียดสูง คลิกซูมดูรูปตัวอย่างได้ชัดเจน |
-| **การจัดการกรณีพิเศษ (Variants)** | สับสนเมื่อมีเงื่อนไขแตกย่อย (เช่น งานปกติ / ระบบขัดข้อง / ยื่นหน้าท่า) | มีระบบเงื่อนไข (Variants) แยกชัดเจนตามสถานการณ์จริง |
-| **การควบคุมสิทธิ์ (Security & Audit)** | ใครก็สามารถแก้ไขหรือเผลอลบสูตร/ข้อความในไฟล์ได้ | แยกสิทธิ์ชัดเจน: พนักงานทั่วไปดูได้อย่างเดียว (Read-Only) / แอดมินเป็นผู้แก้ไข |
-| **การรองรับอุปกรณ์ (Mobility)** | ดูบนมือถือหรือแท็บเล็ตหน้างานลำบาก | Responsive ออกแบบรองรับการเปิดดูผ่านสมาร์ตโฟนและแท็บเล็ตหน้าท่าเรือ |
+| **ขอบเขตการทำงาน (Coverage)** | แยกเล่ม กระจัดกระจายตามแผนก ใครทำใครรู้ | ครอบคลุมครบวงจร: ใบอนุญาตราชการ, ศุลกากร, หน้าท่าเรือ, สายเรือ, งานภายใน |
+| **การมองเห็นภาพรวม (Workflow Vision)** | ไม่เห็นความต่อเนื่องระหว่างขั้นตอน พนักงานหน้างานสับสน | มี **Mindmap Flowchart** ร้อยเรียงขั้นตอน 1 $\rightarrow$ 2 $\rightarrow$ 3 พร้อมระบบงานคู่ขนาน (Parallel) และจุดรวมงาน |
+| **ความสะดวกในการค้นหาหน้างาน** | ต้องเปิดหาทีละไฟล์ ใช้เวลามากเวลาเร่งด่วน | ค้นหาด่วน (Quick Search) หรือคลิกกรองตามหมวดหมู่ พบขั้นตอนที่ต้องการภายในไม่กี่วินาที |
+| **การแสดงภาพและขั้นตอน** | รูปภาพหลุดกรอบ เอกสารบวม เปิดในมือถือช้า | Step-by-Step พร้อมรูปภาพความละเอียดสูงจาก MinIO คลิกขยายดูภาพหน้าจอจริง (Lightbox Zoom) ได้ทันที |
+| **การรองรับสถานการณ์พิเศษ (Variants)** | สับสนเมื่อมีข้อยกเว้นหรือระบบล่ม | มีระบบแยกเงื่อนไข (Variants) เช่น สภาวะปกติ (ออนไลน์) / สภาวะระบบขัดข้อง / ยื่นหน้าท่า |
+| **ความเข้ากันได้กับอุปกรณ์ (Mobility)** | ดูผ่านโทรศัพท์มือถือหน้างานยากมาก | Responsive Design พร้อม Ant Design Compact Mode แสดงผลสบายตา รองรับทั้งมือถือ แท็บเล็ต และคอมพิวเตอร์ |
 
 ---
 
-## 🎯 2. วัตถุประสงค์ของระบบ (Objectives)
+## 🗂️ 2. หมวดหมู่การปฏิบัติงานหลัก (Operation Categories)
 
-1. **เป็นคลังคู่มือปฏิบัติงานมาตรฐาน (Standard Operating Procedure - SOP):** รวบรวมวิธีจ่ายชอร์ของทุกท่าเรือและทุกเอเย่นต์ไว้ในที่เดียว
-2. **ลดความผิดพลาดและลดเวลาเทรนนิ่งพนักงานใหม่:** มีลำดับขั้นตอน 1, 2, 3 พร้อมภาพประกอบหน้าจอจริง ทำให้พนักงานใหม่ทำงานได้ถูกต้องทันที
-3. **รับมือกับสถานการณ์ไม่ปกติได้รวดเร็ว:** มีขั้นตอนรองรับกรณีระบบขัดข้อง หรือกรณีเร่งด่วน พร้อมเวลาตัดรอบ (Cut-off Time) และช่องทางติดต่อฉุกเฉิน
-4. **ความพร้อมในการตรวจสอบ (Audit-Ready):** มีบันทึกประวัติการปรับปรุงคู่มือ วันที่อัปเดตล่าสุด และผู้รับผิดชอบ
+ระบบครอบคลุม 5 เสาหลักของการปฏิบัติการโลจิสติกส์นำเข้า-ส่งออก:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                     Asiathai Freight Operations Hub (5 หมวดหมู่งานหลัก)                │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+       │                      │                      │                   │              │
+       ▼                      ▼                      ▼                   ▼              ▼
+┌──────────────┐      ┌──────────────┐      ┌────────────────┐  ┌─────────────┐  ┌─────────────┐
+│ 🚢 งานหน้าท่า  │      │ 🏛️ พิธีการ    │      │ 📜 ใบอนุญาตและ │  │ 🔍 งานตรวจ  │  │ 📑 ระเบียบ  │
+│   และสายเรือ │      │    ศุลกากร   │      │    ใบรับรอง    │  │ สินค้าหน้างาน│  │ ปฏิบัติภายใน│
+├──────────────┤      ├──────────────┤      ├────────────────┤  ├─────────────┤  ├─────────────┤
+│• จ่ายชอร์    │      │• จัดทำใบขน   │      │• ขอเลขเสมือน (U│  │• เอ็กซเรย์   │  │• การเบิกจ่าย│
+│• วางบิลมัดจำ │      │• ชำระภาษี    │      │• ใบอนุญาต อย.  │  │• เปิดตรวจร่วม│  │• ประสานงาน  │
+│• e-Portal    │      │• ตรวจปล่อย   │      │• กรมวิชาการเกษตร│ │• ด่านกักกัน   │  │• ตรวจสอบ    │
+│• แลก D/O     │      │• กรมศุลกากร  │      │• ปศุสัตว์/สมอ. │  │  พืช/สัตว์   │  │  เอกสาร     │
+└──────────────┘      └──────────────┘      └────────────────┘  └─────────────┘  └─────────────┘
+```
+
+1. **🚢 งานหน้าท่าและสายเรือ (Terminal & Shipping Lines):** การจ่ายชอร์, วางบิลมัดจำตู้, ชำระค่าภาระผ่าน e-Portal, แลกใบสั่งปล่อยสินค้า (D/O) กับสายเรือ
+2. **🏛️ พิธีการศุลกากร (Customs Procedures):** การบันทึกและส่งใบขนสินค้าขาเข้า-ขาออก, การชำระภาษีอากรศุลกากร, พิธีการเปิดตรวจ
+3. **📜 ใบอนุญาตและใบรับรอง (Government Agencies & Licenses):** การขอเลขเสมือน (U Number), การขอใบอนุญาตนำเข้า อย. (LPI), กรมวิชาการเกษตร (พ.ก.5), กรมปศุสัตว์, กรมประมง, สมอ.
+4. **🔍 งานตรวจสินค้าหน้างาน (Physical Cargo Inspection):** การเอ็กซเรย์ตู้สินค้า, การเปิดตรวจร่วมหน้าด่าน (Joint Inspection), เจ้าหน้าที่ด่านตรวจปล่อย
+5. **📑 ระเบียบปฏิบัติภายใน (Internal Operations):** มาตรฐานขั้นตอนเอกสารภายในบริษัท, การสำรองเงินจ่าย, การส่งต่องานระหว่างชิปปิ้งกับฝ่าย CS
 
 ---
 
-## 🛠️ 3. สถาปัตยกรรมและเทคโนโลยี (Technology Stack)
+## 🧩 3. สองโมดูลหลักที่ทำงานร่วมกัน (Core Integrated Modules)
 
-เลือกใช้ชุดเทคโนโลยีสมัยใหม่ที่เน้น **ความเร็วสูง (High Performance), ประหยัดทรัพยากร (Resource Efficient), และดูแลรักษาง่าย (Low Maintenance)**:
+### 🌿 โมดูลที่ 1: ผังสายงานปฏิบัติการ (Job Workflows & Interactive Mindmap)
+* **End-to-End Flowcharts:** แผนผังร้อยเรียงขั้นตอนตั้งแต่ต้นจนจบกระบวนการ (เช่น *สายงานการจัดการค่าภาระหน้าท่าและแลกใบปล่อยสินค้า D/O & จ่ายชอร์*)
+* **Multi-Branching & Join Flows:**
+  * รองรับขั้นตอนตามลำดับปกติ (Sequential: 1 $\rightarrow$ 2 $\rightarrow$ 3)
+  * รองรับขั้นตอนที่ทำพร้อมกัน (Parallel Execution: แตกกิ่งซ้าย-ขวา เช่น ทำเรื่อง e-Portal พร้อมยื่นขอใบอนุญาต)
+  * รองรับขั้นตอนที่ต้องรอให้หลายงานเสร็จก่อน (Fork & Join / Merge Flow: รวมสายงานกลับมาที่กล่องเดียว)
+* **Draggable & Auto-Layout:** สามารถคลิกลากย้ายตำแหน่งกล่องได้อย่างอิสระ หรือกดปุ่ม **"จัดผังอัตโนมัติ"** เพื่อจัดระเบียบกลับสู่ทรงสมมาตร
+* **Auto-Fill Data Linking:** เมื่อเลือกผูกขั้นตอนกับคู่มือ SOP ระบบจะดึงชื่อขั้นตอน, คำอธิบายย่อ, หน่วยงานรัฐ และท่าเรือลงฟอร์มให้อัตโนมัติทันที
+* **Dual View Mode:** สลับดูได้ทั้งมุมมอง **ผังงาน (Mindmap Flow)** และ **ตารางเช็คลิสต์ (Table Checklist)**
 
-| ส่วนของระบบ | เทคโนโลยีที่เลือกใช้ | เหตุผลความเหมาะสม |
+### 📖 โมดูลที่ 2: คู่มือปฏิบัติงานมาตรฐานรายขั้นตอน (Standard Operating Procedures - SOPs)
+* **SOP Builder & Step-by-Step Viewer:** บันทึกขั้นตอนการปฏิบัติงานละเอียด 1, 2, 3 พร้อมหัวข้อ, วิธีปฏิบัติ และผู้รับผิดชอบ
+* **Multi-Variants Handling:** แยกเงื่อนไขกรณีพิเศษในคู่มือเล่มเดียวกัน เช่น สภาวะปกติ (ออนไลน์), กรณีระบบขัดข้อง, หรือกำหนดยื่นหน้าท่า
+* **Cut-off Time & Hotline Alert:** แสดงเวลาตัดรอบงาน และเบอร์ติดต่อสายด่วนฉุกเฉินเด่นชัด
+* **High-Res Step Screenshots:** แนบภาพหน้าจอจริงพร้อมคำบรรยาย และระบบขยายภาพขนาดใหญ่ (Lightbox Zoom Modal)
+
+---
+
+## 🛠️ 4. สถาปัตยกรรมและเทคโนโลยี (Technology Stack)
+
+| ส่วนของระบบ | เทคโนโลยีที่เลือกใช้ | รายละเอียดและความเหมาะสม |
 | :--- | :--- | :--- |
-| **Frontend** | React 18/19 + TypeScript + Vite + Ant Design (Compact Mode) | แสดงผลแบบ Compact Table แน่นกระชับ เหมาะกับระบบงานเอกสาร ค้นหาข้อมูลได้ไว |
-| **Backend Runtime** | Bun | รัน TypeScript ได้ในตัว ทำงานได้เร็วกว่า Node.js ประหยัดแรมสูง |
-| **Backend Framework**| Hono | Ultra-fast Web Framework เบา ไม่ซับซ้อน และรองรับ RESTful API แบบ Type-safe |
-| **Database & ORM** | PostgreSQL 17 + Drizzle ORM | ฐานข้อมูล Relational ที่เสถียรสูง รองรับความสัมพันธ์หลายชั้น พร้อม ORM แบบ Type-safe |
-| **Object Storage** | MinIO (S3-Compatible) | สำหรับเก็บรูปภาพหน้าจอและเอกสารแนบแบบ Private แยกจาก Database ป้องกัน DB บวม |
-| **Web Server / Proxy** | Nginx Alpine | ทำ Reverse Proxy รวม Frontend, Backend API และระบบ Serving รูปภาพไว้ที่พอร์ตเดียว |
-| **Deployment** | Docker Compose | ติดตั้งและย้ายเซิร์ฟเวอร์ได้ง่ายด้วยคำสั่งเดียว ไม่ติดปัญหา Environment ไม่ตรงกัน |
+| **Frontend** | React 18 + TypeScript + Vite | พัฒนาด้วย Vite รวดเร็ว ทันสมัย โครงสร้าง Type-Safe 100% |
+| **UI Library** | Ant Design 5 (Compact Mode) | ดีไซน์สไตล์ Compact แน่นกระชับ เหมาะกับงานเอกสารและตารางข้อมูลจำนวนมาก |
+| **Mindmap Flow** | @xyflow/react (React Flow 12) | เอนจินผังงานรองรับ Drag & Drop, SmoothStep Curves, ปรับพิกัดแบบไดนามิก |
+| **Backend Runtime** | Bun 1.2 (Alpine) | รัน TypeScript ในตัว เร็วกว่า Node.js หลายเท่า และประหยัด Memory สูง |
+| **Backend Framework**| Hono Framework | Ultra-fast Web Framework เบา ประสิทธิภาพสูง Prefix `/api/` สอดคล้องกับ Nginx |
+| **Database & ORM** | PostgreSQL 17 + Drizzle ORM | ฐานข้อมูลเสถียรภาพสูง จัดการความสัมพันธ์แบบ Relational ด้วย Drizzle Type-safe ORM |
+| **Object Storage** | MinIO S3-Compatible Storage | จัดเก็บไฟล์ภาพหน้าจอและเอกสารแบบ Private Bucket ป้องกันฐานข้อมูลบวม |
+| **Web Server / Proxy** | Nginx (Alpine) | Reverse Proxy รวม Web UI, API, และ File Stream ไว้ที่พอร์ตเดียวอย่างปลอดภัย |
+| **Containerization** | Docker Compose | ติดตั้งและย้ายเซิร์ฟเวอร์ได้ด้วยคำสั่งเดียว รองรับทั้ง Windows, Linux และ macOS |
 
 ---
 
-## 🔌 4. มาตรฐานพอร์ตเครือข่าย (Port Mapping - 320X Standard)
+## 🔌 5. มาตรฐานพอร์ตเครือข่าย (Port Mapping - Strict 320X Standard)
 
-เพื่อความเป็นระเบียบและไม่ชนกับบริการอื่นบน Host Server:
+เพื่อความเป็นระเบียบและป้องกันการชนกับบริการอื่นบน Host Server:
 
-| Service | Host Port | Internal Port | วัตถุประสงค์ |
+| Service | Host Port | Internal Port | วัตถุประสงค์การใช้งาน |
 | :--- | :--- | :--- | :--- |
-| **PostgreSQL** | `3200` | `5432` | สำหรับต่อจัดการ Database ภายนอก / Drizzle Studio |
-| **MinIO API** | `3201` | `9000` | ระบบรับ-ส่งไฟล์ภายใน (Backend Service) |
-| **Nginx (Web UI)** | **`3202`** | `80` | **พอร์ตหลักสำหรับผู้ใช้งานและแอดมินเข้าใช้งานระบบ** |
+| **PostgreSQL** | `3200` | `5432` | พอร์ตจัดการ Database ภายนอก / Drizzle Studio / Backup |
+| **MinIO API** | `3201` | `9000` | ระบบรับ-ส่งไฟล์ภายใน (S3 Backend Service) |
+| **Nginx (Web UI)** | **`3202`** | `80` | **พอร์ตหลักสำหรับผู้ใช้งานและแอดมินเข้าใช้งานระบบ (Web Dashboard & API)** |
 | **MinIO Console** | `3203` | `9001` | หน้าจอ Web GUI สำหรับ Admin จัดการ Storage Bucket |
 
 ---
 
-## 🔄 5. ขั้นตอนการทำงานของระบบ (Workflow)
-
-```mermaid
-flowchart TD
-    subgraph UserFlow["🧑‍💻 Flow การใช้งานของพนักงานหน้างาน (User)"]
-        A([เข้าสู่ระบบ http://localhost:3202]) --> B[ค้นหาด่วน หรือ เลือก ท่าเรือ + เอเย่นต์]
-        B --> C[เลือกลักษณะงาน / เงื่อนไข เช่น ปกติ, ระบบขัดข้อง]
-        C --> D[แสดงผลข้อมูลแบบ Compact Card / Table]
-        D --> D1[ข้อมูลสำคัญ: วิธีจ่าย / เวลาตัดรอบ / ข้อควรระวัง]
-        D --> D2[ขั้นตอนทีละ Step 1, 2, 3 พร้อมภาพประกอบความละเอียดสูง]
-        D2 --> E([คลิกขยายดูภาพหน้าจอขนาดใหญ่])
-    end
-
-    subgraph AdminFlow["⚙️ Flow การจัดการของแอดมิน (Admin / Supervisor)"]
-        F([เข้าสู่ระบบ Admin Console]) --> G[จัดการ Master Data: ท่าเรือ, เอเย่นต์, ประเภทงาน]
-        G --> H[สร้าง/แก้ไขคู่มือ Procedure Builder]
-        H --> H1[เลือก ท่าเรือ + เอเย่นต์ + งาน]
-        H1 --> H2[กำหนดเงื่อนไข Variants เช่น สภาวะปกติ / สภาวะฉุกเฉิน]
-        H2 --> H3[เพิ่มขั้นตอน Steps & เรียงลำดับ]
-        H3 --> H4[อัปโหลดรูปภาพหน้าจอลง MinIO อัตโนมัติ]
-        H4 --> I([บันทึกและ Publish คู่มือให้พนักงานใช้งานทันที])
-    end
-```
-
----
-
-## 🗄️ 6. โครงสร้างฐานข้อมูล (Database Schema)
-
-โครงสร้างฐานข้อมูลออกแบบตามหลัก Normalized และรองรับกรณีความหลากหลายของหน้างานจริง:
-- **1 ท่าเรือ** รองรับได้หลายเอเย่นต์
-- **1 คู่มือ (Procedure)** สามารถแตกได้หลายเงื่อนไข (**Variants**) เช่น สภาวะปกติ, เซิร์ฟเวอร์ล่ม, ต้องใช้เอกสารจริง
-- **1 เงื่อนไข** ประกอบด้วยขั้นตอนตามลำดับ (**Steps**)
-- **1 ขั้นตอน** สามารถแนบรูปภาพได้หลายรูป (**Step Images**)
-
-```typescript
-import { pgTable, serial, text, integer, timestamp, boolean, uniqueIndex, index } from 'drizzle-orm/pg-core';
-
-// 1. ตารางรายชื่อท่าเรือ (Ports)
-export const ports = pgTable('ports', {
-  id: serial('id').primaryKey(),
-  code: text('code').notNull().unique(), // เช่น 'C1C2', 'B3'
-  name: text('name').notNull(),          // เช่น 'ท่าเรือแหลมฉบัง C1C2'
-  isActive: boolean('is_active').default(true).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
-
-// 2. ตารางรายชื่อเอเย่นต์เรือ (Agents)
-export const agents = pgTable('agents', {
-  id: serial('id').primaryKey(),
-  code: text('code').notNull().unique(), // เช่น 'WHL', 'ONE', 'MSC'
-  name: text('name').notNull(),          // เช่น 'Wan Hai Lines'
-  isActive: boolean('is_active').default(true).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
-
-// 3. ตารางประเภทงาน (Work Types)
-export const workTypes = pgTable('work_types', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),          // เช่น 'จ่ายชอร์', 'วางบิล/มัดจำตู้'
-  code: text('code').notNull().unique(),
-});
-
-// 4. ตารางคู่มือหลัก (Procedures) เชื่อม ท่าเรือ + เอเย่นต์ + ประเภทงาน
-export const procedures = pgTable('procedures', {
-  id: serial('id').primaryKey(),
-  portId: integer('port_id').references(() => ports.id, { onDelete: 'restrict' }).notNull(),
-  agentId: integer('agent_id').references(() => agents.id, { onDelete: 'restrict' }).notNull(),
-  workTypeId: integer('work_type_id').references(() => workTypes.id, { onDelete: 'restrict' }).notNull(),
-  title: text('title').notNull(),         // เช่น 'คู่มือจ่ายชอร์ C1C2 สำหรับสายเรือ WHL'
-  description: text('description'),
-  updatedBy: text('updated_by'),          // ผู้แก้ไขล่าสุด
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-}, (table) => [
-  uniqueIndex('port_agent_work_type_idx').on(table.portId, table.agentId, table.workTypeId),
-]);
-
-// 5. เงื่อนไขหรือกรณีต่างๆ ภายใต้คู่มือ (Procedure Variants)
-export const procedureVariants = pgTable('procedure_variants', {
-  id: serial('id').primaryKey(),
-  procedureId: integer('procedure_id').references(() => procedures.id, { onDelete: 'cascade' }).notNull(),
-  conditionName: text('condition_name').notNull(),     // เช่น 'กรณีปกติ (ออนไลน์)', 'กรณีระบบขัดข้อง'
-  executionMethod: text('execution_method').notNull(), // เช่น 'Web Portal', 'LINE Official', 'ยื่นหน้าท่า'
-  cutoffTime: text('cutoff_time'),                     // เช่น 'ก่อน 15:30 น.'
-  notes: text('notes'),                                // ข้อควรระวังพิเศษ
-  sortOrder: integer('sort_order').default(0).notNull(),
-}, (table) => [
-  index('variant_procedure_idx').on(table.procedureId),
-]);
-
-// 6. ลำดับขั้นตอนการปฏิบัติงาน (Procedure Steps)
-export const procedureSteps = pgTable('procedure_steps', {
-  id: serial('id').primaryKey(),
-  variantId: integer('variant_id').references(() => procedureVariants.id, { onDelete: 'cascade' }).notNull(),
-  stepNumber: integer('step_number').notNull(),
-  title: text('title').notNull(),                      // เช่น 'เข้าสู่ระบบ e-Shore Portal'
-  description: text('description'),                   // รายละเอียดวิธีทำ
-  sortOrder: integer('sort_order').default(0).notNull(),
-}, (table) => [
-  index('step_variant_idx').on(table.variantId),
-]);
-
-// 7. ภาพประกอบในแต่ละขั้นตอน (Step Images - เชื่อมโยงกับ MinIO)
-export const stepImages = pgTable('step_images', {
-  id: serial('id').primaryKey(),
-  stepId: integer('step_id').references(() => procedureSteps.id, { onDelete: 'cascade' }).notNull(),
-  bucketName: text('bucket_name').notNull(),
-  objectKey: text('object_key').notNull(),             // path ใน MinIO เช่น 'steps/2026/09/uuid.webp'
-  originalFilename: text('original_filename').notNull(),
-  caption: text('caption'),                            // คำอธิบายภาพ เช่น 'จุดที่ต้องกดติ๊กถูกเพื่อยืนยัน'
-  sortOrder: integer('sort_order').default(0).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-}, (table) => [
-  index('image_step_idx').on(table.stepId),
-]);
-```
-
----
-
-## 🏗️ 7. โครงสร้างโปรเจกต์ (Project Structure)
+## 🏗️ 6. โครงสร้างโปรเจกต์ (Project Structure)
 
 ```text
-shore-system/
-├── docker-compose.yml
-├── .env.example
-├── README.md
+shore-procedure/
+├── docker-compose.yml       # Docker Compose Orchestration (5 บริการ)
+├── .env.example             # ตัวแปรสภาพแวดล้อมตัวอย่าง
+├── README.md                # เอกสารคู่มือระบบฉบับสมบูรณ์
+├── docs/
+│   └── banner.png           # ภาพแบนเนอร์ระบบสำหรับเอกสาร
 ├── nginx/
-│   └── conf.d/
-│       └── default.conf
+│   └── conf.d/default.conf  # Nginx Reverse Proxy Route Configuration
 ├── frontend/
 │   ├── Dockerfile
 │   ├── package.json
 │   ├── vite.config.ts
+│   ├── public/              # Static Assets (banner, favicon)
 │   └── src/
-│       ├── components/    # Reusable UI เช่น StepViewer, ImageModal, QuickFilter
-│       ├── pages/         # User Manual View, Admin Builder, Master Management
-│       ├── services/      # Axios / Fetch API client
-│       └── types/         # TypeScript Interfaces
+│       ├── components/      # WorkflowMindmapView, ProcedureCard, StepViewer, etc.
+│       ├── contexts/        # ThemeContext (Dark/Light Mode & Primary Color)
+│       ├── pages/           # HomePage, WorkflowListPage, WorkflowDetailPage, ProcedureDetailPage
+│       ├── services/        # Axios API Client, AuthService
+│       └── types/           # TypeScript Types & Interfaces
 └── backend/
     ├── Dockerfile
     ├── package.json
     ├── drizzle.config.ts
-    ├── drizzle/           # Migration SQL files
+    ├── drizzle/             # Database Migration SQL files
     └── src/
-        ├── index.ts       # Hono App Entrypoint
-        ├── db/            # Schema, Relations & Connection
-        ├── routes/        # /ports, /agents, /procedures, /files
-        └── services/      # MinIO S3 Client, Image Streamer
+        ├── index.ts         # Hono Application Entrypoint
+        ├── db/              # Drizzle Schema, Connections, Seeders (seed.ts, seedWorkflows.ts)
+        ├── middleware/      # Auth & RBAC Middleware
+        ├── routes/          # /api/workflows, /api/procedures, /api/categories, /api/files
+        └── services/        # MinIO S3 Service & Stream Helpers
 ```
 
 ---
 
-## ⚙️ 8. การตั้งค่าระบบและการติดตั้ง (Deployment & Configuration)
+## ⚙️ 7. การติดตั้งและเริ่มต้นใช้งาน (Installation & Setup)
 
-### 1) การตั้งค่าตัวแปรสภาพแวดล้อม (.env)
-```env
-# Database Settings
-POSTGRES_DB=shore_db
-POSTGRES_USER=shore_app
-POSTGRES_PASSWORD=change_this_to_strong_password
-
-# MinIO Object Storage
-MINIO_ROOT_USER=shore_admin
-MINIO_ROOT_PASSWORD=change_this_to_strong_minio_password
-MINIO_BUCKET=shore-procedures
-
-# Backend Secrets
-PORT=3000
-JWT_SECRET=your_jwt_secret_key_for_admin
-```
-
-### 2) การตั้งค่า Nginx (nginx/conf.d/default.conf)
-```nginx
-server {
-    listen 80;
-    server_name localhost;
-
-    client_max_body_size 25M;
-
-    # 1. Backend RESTful API
-    location /api/ {
-        proxy_pass http://backend:3000/api/;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    # 2. Frontend React Web App
-    location / {
-        proxy_pass http://frontend:80;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
-
-### 3) เริ่มต้นรันระบบด้วย Docker Compose
+### 1) การเตรียมไฟล์ Environment
 ```bash
-# 1. ทำสำเนาไฟล์ environment
+# คัดลอกไฟล์ .env จากตัวอย่าง
 cp .env.example .env
+```
 
-# 2. สั่ง build และ start คอนเทนเนอร์ทั้งหมด
+### 2) สั่งรันระบบผ่าน Docker Compose
+```bash
+# 1. สั่ง build และ start คอนเทนเนอร์ทั้งหมด
 docker compose up -d --build
 
-# 3. รัน Database Migration & Seed ข้อมูลเริ่มต้น
+# 2. รัน Database Migration & Seed ข้อมูลเริ่มต้น
 docker compose exec backend bun run db:migrate
 docker compose exec backend bun run db:seed
 docker compose exec backend bun run src/db/seedWorkflows.ts
 
-# 4. ตรวจสอบสถานะการทำงาน
+# 3. ตรวจสอบสถานะการทำงาน
 docker compose ps
 ```
-เมื่อรันเสร็จสิ้น สามารถเปิดใช้งานผ่านเบราว์เซอร์ได้ที่: **`http://localhost:3202`**
+เมื่อรันเสร็จสิ้น สามารถเปิดใช้งานผ่านเว็บเบราว์เซอร์ได้ทันทีที่: **`http://localhost:3202`**
 
 ---
 
-## 🔄 9. คู่มือการอัปเดตระบบและการจัดการฐานข้อมูล (Local Server Maintenance & Database Management)
+## 🔄 8. คู่มือการอัปเดตระบบและการจัดการฐานข้อมูล (Maintenance & Database Guide)
 
-บันทึกคำสั่งที่จำเป็นสำหรับการนำโปรเจกต์ไปรันบน Local Server อื่น หรือการกลับมาดูแลรักษาระบบในอนาคต:
-
-### 1) การอัปเดตโค้ดและระบบล่าสุด (Update Code & Services)
-เมื่อมีการเปลี่ยนแปลงหรือเพิ่มฟีเจอร์ใหม่จาก Git Repository ให้รันตามลำดับดังนี้:
+### 1) การอัปเดตโค้ดและระบบล่าสุด (Update Code from Git)
+เมื่อมีการเพิ่มฟีเจอร์หรือแก้ไขโค้ดจาก Git Repository ให้รันตามลำดับดังนี้:
 ```bash
 # 1. ดึงโค้ดล่าสุดจาก GitHub
 git pull origin main
 
-# 2. สั่ง Rebuild คอนเทนเนอร์ (ข้อมูลใน Postgres และ MinIO จะไม่หาย)
+# 2. สั่ง Rebuild คอนเทนเนอร์ (ข้อมูลใน Postgres และ MinIO ปลอดภัย ไม่สูญหาย)
 docker compose up -d --build
 
-# 3. อัปเดตโครงสร้างฐานข้อมูลล่าสุด (Database Migration)
+# 3. อัปเดตโครงสร้างฐานข้อมูลล่าสุด
 docker compose exec backend bun run db:migrate
 
-# 4. รีสตาร์ท Nginx เพื่อรีเฟรชการตั้งค่าและเคลียร์แคช
+# 4. รีสตาร์ท Nginx เพื่อเคลียร์แคชและรีเฟรชการตั้งค่า
 docker restart shore-nginx
 ```
 
 ---
 
 ### 2) การสำรองข้อมูล (Backup) และกู้คืนข้อมูล (Restore) ฐานข้อมูล PostgreSQL
-สำหรับการย้ายฐานข้อมูลไปเครื่อง Local Server อื่น หรือทำสำเนาข้อมูลประจำงวด:
 
 #### 📤 คำสั่ง Backup (สร้างไฟล์ `.sql` จากเซิร์ฟเวอร์ต้นทาง):
 ```bash
@@ -323,9 +206,8 @@ docker exec -t shore-postgres pg_dump -U shore_app shore_db > backup_shore.sql
 ---
 
 ### 3) การเติมข้อมูลตัวอย่างเริ่มต้น (Data Seeding)
-กรณีติดตั้งเซิร์ฟเวอร์ใหม่เอี่ยม และต้องการใส่ชุดข้อมูลตัวอย่าง:
 ```bash
-# เติม Master Data (ท่าเรือ, เอเย่นต์, ประเภทงาน, คู่มือ SOP)
+# เติม Master Data (ท่าเรือ, เอเย่นต์, หมวดหมู่, หน่วยงานรัฐ, คู่มือ SOP)
 docker compose exec backend bun run db:seed
 
 # เติมสายงานปฏิบัติการและขั้นตอน Flowchart (Job Workflows & Steps)
@@ -334,12 +216,12 @@ docker compose exec backend bun run src/db/seedWorkflows.ts
 
 ---
 
-### 4) คำสั่งตรวจสอบและแก้ไขปัญหาทั่วไป (Troubleshooting)
+### 4) คำสั่งตรวจสอบและดูแลรักษาระบบ (Troubleshooting Commands)
 ```bash
 # ตรวจสอบสถานะคอนเทนเนอร์ทั้งหมด
 docker compose ps
 
-# ดู Log การทำงานของ Backend แบบเรียลไทม์
+# ดู Log ของ Backend แบบ Real-time
 docker compose logs -f backend
 
 # ดู Log ของ Frontend และ Nginx
@@ -353,25 +235,25 @@ docker compose down
 ```
 
 > [!NOTE]
-> **ความปลอดภัยของข้อมูล (Data Persistence):**  
-> ข้อมูลใน PostgreSQL และรูปภาพใน MinIO ถูกผูกไว้กับ Named Volumes (`postgres_data`, `minio_data`) ใน `docker-compose.yml` ข้อมูลจะไม่สูญหายเมื่อสั่ง `docker compose down` หรือ `docker compose up -d --build`
+> **ความปลอดภัยของข้อมูล (Data Persistence Guarantee):**  
+> ข้อมูลทั้งหมดใน PostgreSQL และไฟล์ภาพใน MinIO ถูกผูกไว้กับ Named Volumes (`postgres_data`, `minio_data`) ใน `docker-compose.yml` ข้อมูลจะไม่สูญหายเมื่อสั่ง `docker compose down` หรือ `docker compose up -d --build`
 
 ---
 
-## 🔒 10. แนวทางการจัดการรูปภาพอย่างปลอดภัย (Image Delivery Strategy)
+## 🔒 9. ความปลอดภัยและการจัดการไฟล์ (Security & File Storage)
 
-เนื่องจากรูปภาพในระบบอาจมีข้อมูลเอกสารหรือหน้าจอระบบภายใน การจัดเก็บและเข้าถึงภาพจึงใช้กลยุทธ์:
-1. **จัดเก็บเป็น Private ใน MinIO:** บักเก็ต `shore-procedures` ถูกตั้งค่า `mc anonymous set none` บุคคลภายนอกไม่สามารถเดา URL เข้าถึงตรงๆ ได้
-2. **ดึงภาพผ่าน Backend Proxy หรือ Presigned URL:**
-   - **ทางเลือกที่ 1 (แนะนำ - Stream via Backend):** เรียกผ่าน API `/api/files/steps/:imageId` โดย Backend จะดึงภาพจาก MinIO มาส่งให้ Frontend เพื่อซ่อน MinIO Endpoint
-   - **ทางเลือกที่ 2 (Presigned URL):** Backend สร้าง Link ชั่วคราวที่มีอายุใช้งาน (เช่น 15 นาที) สำหรับแสดงผลบนหน้าเว็บ
+1. **Private Storage by Default:** บักเก็ต MinIO `shore-procedures` ถูกกำหนดเป็น Private (`anonymous set none`) บุคคลภายนอกไม่สามารถเข้าถึงไฟล์โดยตรงได้
+2. **Backend Streaming Endpoint:** Frontend ดึงรูปภาพผ่าน `/api/files/steps/:imageId` โดย Backend จะทำการตรวจสอบสิทธิ์และสตรีมไฟล์จาก MinIO ให้ เพื่อซ่อนระบบจัดเก็บไฟล์จริง
+3. **Role-Based Access Control (RBAC):**
+   * **พนักงานทั่วไป (User):** เข้าดูคู่มือและผังสายงานได้ทุกคน (Read-Only)
+   * **ผู้ดูแลระบบ (Admin / Supervisor):** สามารถเพิ่ม ลบ แก้ไขคู่มือ, สร้างผังงาน, และจัดการ Master Data ได้
 
 ---
 
-## 📋 11. แผนการพัฒนาต่อยอด (Future Roadmap)
+## 📋 10. แผนการพัฒนาต่อยอด (Future Roadmap)
 
-- [ ] **Quick Search / Command Palette:** กด `Ctrl + K` เพื่อพิมพ์ค้นหาชื่อท่าหรือสายเรือแบบ Instant Search
-- [ ] **Export Mindmap as Image (PNG):** ปุ่มบันทึกภาพผังงานสายงานปฏิบัติการความละเอียดสูง สำหรับแชร์เข้ากลุ่มชิปปิ้ง
-- [ ] **PDF Export / Print View:** ปุ่มดาวน์โหลดขั้นตอนออกเป็นเอกสาร PDF ในรูปแบบมาตรฐานสำหรับปริ้นท์ติดบอร์ดหน้างาน
-- [ ] **Audit Trail & Changelog:** บันทึกประวัติการแก้ไข ว่าใครแก้เงื่อนไขใด เมื่อใด เพื่อความโปร่งใส
-- [ ] **Offline / PWA Support:** แคชขั้นตอนงานที่ใช้บ่อยไว้ในเบราว์เซอร์ สำหรับเปิดดูยามเน็ตหน้าท่าเรือช้าหรือขัดข้อง
+- [ ] **Export Mindmap as Image (PNG / PDF):** ปุ่มดาวน์โหลดรูปภาพผังสายงานความละเอียดสูง สำหรับแชร์เข้าไลน์กลุ่มชิปปิ้ง
+- [ ] **Step SLA & Duration:** ระบุเวลาโดยประมาณและผู้รับผิดชอบเจาะจงในแต่ละขั้นตอน
+- [ ] **Job Checklist Execution Mode:** โหมดติ๊กถูกบันทึกสถานะการดำเนินงานจริงรายตู้สินค้า
+- [ ] **Command Palette (Ctrl + K):** ค้นหาด่วนข้ามหมวดหมู่แบบ Instant Search
+- [ ] **Offline / PWA Support:** แคชขั้นตอนและคู่มือที่เปิดบ่อยไว้ดูยามสัญญาณเน็ตหน้าท่าเรือขัดข้อง
