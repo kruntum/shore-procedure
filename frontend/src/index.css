@@ -104,12 +104,49 @@ body {
   color: rgba(255, 255, 255, 0.75) !important;
 }
 
+.dark .ant-pagination-item:hover {
+  border-color: #1677ff !important;
+}
+
+.dark .ant-pagination-item:hover a {
+  color: #1677ff !important;
+}
+
+.dark .ant-pagination-item-active {
+  background-color: rgba(22, 119, 255, 0.18) !important;
+  border-color: #1677ff !important;
+}
+
+.dark .ant-pagination-item-active a {
+  color: #69b1ff !important;
+  font-weight: 600 !important;
+}
+
 .dark .ant-pagination-prev .ant-pagination-item-link,
 .dark .ant-pagination-next .ant-pagination-item-link {
   background-color: #191919 !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: rgba(255, 255, 255, 0.75) !important;
 }
+
+.dark .ant-pagination-prev:not(.ant-pagination-disabled):hover .ant-pagination-item-link,
+.dark .ant-pagination-next:not(.ant-pagination-disabled):hover .ant-pagination-item-link {
+  border-color: #1677ff !important;
+  color: #1677ff !important;
+}
+
+.dark .ant-pagination-disabled .ant-pagination-item-link,
+.dark .ant-pagination-disabled:hover .ant-pagination-item-link {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.2) !important;
+  cursor: not-allowed !important;
+}
+
+.dark .ant-pagination-total-text {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
 
 /* ==========================================================================
    Modals & Popovers (Layer 3: High Elevation)

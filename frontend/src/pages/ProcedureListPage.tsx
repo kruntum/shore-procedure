@@ -20,6 +20,8 @@ export const ProcedureListPage: React.FC = () => {
   const [governmentAgencyId, setGovernmentAgencyId] = useState<number | undefined>();
   const [portId, setPortId] = useState<number | undefined>();
   const [agentId, setAgentId] = useState<number | undefined>();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     const catParam = searchParams.get('categoryId');
@@ -32,6 +34,11 @@ export const ProcedureListPage: React.FC = () => {
     if (agentParam) setAgentId(parseInt(agentParam));
     if (govParam) setGovernmentAgencyId(parseInt(govParam));
   }, [searchParams]);
+
+  // Reset pagination to page 1 whenever any filter or search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, categoryId, governmentAgencyId, portId, agentId]);
 
   const { data: procedures, isLoading } = useProcedures({
     search: search || undefined,
@@ -82,6 +89,38 @@ export const ProcedureListPage: React.FC = () => {
   };
 
   const columns = [
+    {
+      title: 'ลำดับ',
+      key: 'index',
+      width: 55,
+      align: 'center' as const,
+      render: (_: any, __: any, index: number) => (
+        <span style={{ fontSize: 11.5, color: isDarkMode ? '#94a3b8' : '#64748b', fontWeight: 600 }}>
+          {(currentPage - 1) * pageSize + index + 1}
+        </span>
+      ),
+    },
+    {
+      title: 'ชื่อคู่มือขั้นตอน',
+      dataIndex: 'title',
+      key: 'title',
+      width: 300,
+      render: (text: string, record: Procedure) => (
+        <div>
+          <a
+            onClick={() => navigate(`/procedures/${record.id}`)}
+            style={{ fontWeight: 600, fontSize: 12.5, color: primaryColor, lineHeight: 1.35, display: 'inline-block' }}
+          >
+            {text}
+          </a>
+          {record.description && (
+            <div style={{ fontSize: 11, color: isDarkMode ? '#a1a1aa' : '#8c8c8c', marginTop: 2, lineHeight: 1.25 }}>
+              {record.description}
+            </div>
+          )}
+        </div>
+      ),
+    },
     {
       title: 'หมวดหมู่',
       dataIndex: ['category', 'name'],
@@ -183,30 +222,9 @@ export const ProcedureListPage: React.FC = () => {
       title: 'ประเภทงาน',
       dataIndex: ['workType', 'name'],
       key: 'workType',
-      width: 130,
+      width: 120,
       align: 'center' as const,
       render: (text: string) => <Tag color="purple">{text}</Tag>,
-    },
-    {
-      title: 'ชื่อคู่มือขั้นตอน',
-      dataIndex: 'title',
-      key: 'title',
-      width: 280,
-      render: (text: string, record: Procedure) => (
-        <div>
-          <a
-            onClick={() => navigate(`/procedures/${record.id}`)}
-            style={{ fontWeight: 500, fontSize: 12, color: primaryColor, lineHeight: 1.3, display: 'inline-block' }}
-          >
-            {text}
-          </a>
-          {record.description && (
-            <div style={{ fontSize: 10.5, color: isDarkMode ? '#a1a1aa' : '#8c8c8c', marginTop: 1, lineHeight: 1.25 }}>
-              {record.description}
-            </div>
-          )}
-        </div>
-      ),
     },
     {
       title: 'เงื่อนไข',
@@ -401,12 +419,20 @@ export const ProcedureListPage: React.FC = () => {
           dataSource={procedures}
           rowKey="id"
           loading={isLoading}
-          scroll={{ x: 1000 }}
+          scroll={{ x: 1050 }}
           pagination={{
-            pageSize: 10,
+            current: currentPage,
+            pageSize: pageSize,
+            total: procedures?.length || 0,
             showSizeChanger: true,
-            pageSizeOptions: ['10', '20', '50'],
+            pageSizeOptions: ['5', '10', '20', '50'],
             showTotal: (total, range) => `แสดง ${range[0]}-${range[1]} จาก ${total} คู่มือ`,
+            onChange: (page, newPageSize) => {
+              setCurrentPage(page);
+              if (newPageSize && newPageSize !== pageSize) {
+                setPageSize(newPageSize);
+              }
+            },
             style: { padding: '8px 12px', margin: 0 },
             size: 'small',
           }}
