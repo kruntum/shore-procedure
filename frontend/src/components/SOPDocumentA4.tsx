@@ -40,6 +40,25 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
       ? procedure.variants || []
       : (procedure.variants || []).filter((v) => v.id === selectedVariantId);
 
+  const govList =
+    procedure.governmentAgencies && procedure.governmentAgencies.length > 0
+      ? procedure.governmentAgencies
+      : procedure.governmentAgency
+      ? [procedure.governmentAgency]
+      : [];
+
+  const agentList =
+    procedure.agents && procedure.agents.length > 0
+      ? procedure.agents
+      : procedure.agent
+      ? [procedure.agent]
+      : [];
+
+  const hasGov = govList.length > 0;
+  const hasPort = !!procedure.port;
+  const hasAgents = agentList.length > 0;
+  const hasHotline = !!procedure.contactHotline;
+
   return (
     <div
       className="a4-page-sheet"
@@ -116,7 +135,7 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
                     letterSpacing: '0.5px',
                   }}
                 >
-                  เอกสารขั้นตอนการปฏิบัติงานมาตรฐาน
+                  เอกสารขั้นตอนการปฏิบัติงานมาตรฐาน {procedure.category ? `• ${procedure.category.icon} ${procedure.category.name}` : ''}
                 </div>
                 <div
                   style={{
@@ -129,7 +148,7 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
                   {procedure.title}
                 </div>
                 <div style={{ fontSize: '10px', color: '#64748b' }}>
-                  STANDARD OPERATING PROCEDURE (FREIGHT & CUSTOMS CLEARANCE)
+                  STANDARD OPERATING PROCEDURE ({procedure.category?.name ? procedure.category.name.toUpperCase() : 'FREIGHT & LOGISTICS'})
                 </div>
               </td>
 
@@ -148,6 +167,9 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
                   <span style={{ fontWeight: 600 }}>รหัสเอกสาร:</span> {docCode}
                 </div>
                 <div>
+                  <span style={{ fontWeight: 600 }}>หมวดหมู่:</span> {procedure.category ? `${procedure.category.icon} ${procedure.category.name}` : 'ทั่วไป'}
+                </div>
+                <div>
                   <span style={{ fontWeight: 600 }}>วันที่อัปเดต:</span> {updatedDate}
                 </div>
                 <div>
@@ -162,7 +184,7 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
         </table>
       </div>
 
-      {/* 2. Metadata Grid */}
+      {/* 2. Metadata Grid (Dynamic Multi-Domain Adapter) */}
       <table
         className="sop-metadata-grid"
         style={{
@@ -176,57 +198,11 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
         }}
       >
         <tbody>
-          <tr style={{ backgroundColor: '#f1f5f9' }}>
-            <th
-              style={{
-                width: '15%',
-                padding: '5px 8px',
-                border: '1px solid #cbd5e1',
-                textAlign: 'left',
-                color: '#334155',
-              }}
-            >
-              ท่าเรือ (Port)
-            </th>
-            <td
-              style={{
-                width: '35%',
-                padding: '5px 8px',
-                border: '1px solid #cbd5e1',
-                fontWeight: 600,
-              }}
-            >
-              {procedure.port ? `${procedure.port.code} - ${procedure.port.name}` : '-'}
-            </td>
-            <th
-              style={{
-                width: '15%',
-                padding: '5px 8px',
-                border: '1px solid #cbd5e1',
-                textAlign: 'left',
-                color: '#334155',
-              }}
-            >
-              สายเรือ (Agent)
-            </th>
-            <td
-              style={{
-                width: '35%',
-                padding: '5px 8px',
-                border: '1px solid #cbd5e1',
-                fontWeight: 600,
-              }}
-            >
-              {procedure.agents && procedure.agents.length > 0
-                ? procedure.agents.map((a) => `${a.code} - ${a.name}`).join(', ')
-                : procedure.agent
-                ? `${procedure.agent.code} - ${procedure.agent.name}`
-                : '-'}
-            </td>
-          </tr>
+          {/* Row 1: หมวดหมู่ & ประเภทงาน */}
           <tr>
             <th
               style={{
+                width: '18%',
                 padding: '5px 8px',
                 border: '1px solid #cbd5e1',
                 textAlign: 'left',
@@ -234,18 +210,173 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
                 backgroundColor: '#f1f5f9',
               }}
             >
-              ประเภทงาน
+              หมวดหมู่ (Category)
             </th>
             <td
               style={{
+                width: '32%',
+                padding: '5px 8px',
+                border: '1px solid #cbd5e1',
+                fontWeight: 600,
+              }}
+            >
+              {procedure.category ? `${procedure.category.icon} ${procedure.category.name}` : 'คู่มือทั่วไป'}
+            </td>
+            <th
+              style={{
+                width: '18%',
+                padding: '5px 8px',
+                border: '1px solid #cbd5e1',
+                textAlign: 'left',
+                color: '#334155',
+                backgroundColor: '#f1f5f9',
+              }}
+            >
+              ประเภทงาน (Work Type)
+            </th>
+            <td
+              style={{
+                width: '32%',
                 padding: '5px 8px',
                 border: '1px solid #cbd5e1',
                 fontWeight: 600,
                 color: '#2563eb',
               }}
             >
-              {procedure.workType?.name || 'จ่ายชอร์'}
+              {procedure.workType?.name || 'ขั้นตอนปฏิบัติงาน'}
             </td>
+          </tr>
+
+          {/* Row 2: หน่วยงานราชการ (ถ้ามี) */}
+          {hasGov && (
+            <tr>
+              <th
+                style={{
+                  padding: '5px 8px',
+                  border: '1px solid #cbd5e1',
+                  textAlign: 'left',
+                  color: '#334155',
+                  backgroundColor: '#f1f5f9',
+                }}
+              >
+                หน่วยงานราชการที่เกี่ยวข้อง
+              </th>
+              <td
+                colSpan={hasPort || hasAgents ? 1 : 3}
+                style={{
+                  padding: '5px 8px',
+                  border: '1px solid #cbd5e1',
+                  fontWeight: 600,
+                  color: '#c2410c',
+                }}
+              >
+                {govList.map((g) => (g.shortName ? `[${g.shortName}] ${g.name}` : g.name)).join(', ')}
+              </td>
+              {hasPort ? (
+                <>
+                  <th
+                    style={{
+                      padding: '5px 8px',
+                      border: '1px solid #cbd5e1',
+                      textAlign: 'left',
+                      color: '#334155',
+                      backgroundColor: '#f1f5f9',
+                    }}
+                  >
+                    ท่าเรือ / ด่านตรวจ
+                  </th>
+                  <td
+                    style={{
+                      padding: '5px 8px',
+                      border: '1px solid #cbd5e1',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {procedure.port ? `${procedure.port.code} - ${procedure.port.name}` : '-'}
+                  </td>
+                </>
+              ) : hasAgents ? (
+                <>
+                  <th
+                    style={{
+                      padding: '5px 8px',
+                      border: '1px solid #cbd5e1',
+                      textAlign: 'left',
+                      color: '#334155',
+                      backgroundColor: '#f1f5f9',
+                    }}
+                  >
+                    สายเรือ (Agent)
+                  </th>
+                  <td
+                    style={{
+                      padding: '5px 8px',
+                      border: '1px solid #cbd5e1',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {agentList.map((a) => `${a.code} - ${a.name}`).join(', ')}
+                  </td>
+                </>
+              ) : null}
+            </tr>
+          )}
+
+          {/* Row 3: ท่าเรือ / สายเรือ (ถ้ามี และยังไม่ได้แสดงคู่กับ Gov ด้านบน) */}
+          {((hasPort && !hasGov) || (hasAgents && (!hasGov || hasPort))) && (
+            <tr>
+              <th
+                style={{
+                  padding: '5px 8px',
+                  border: '1px solid #cbd5e1',
+                  textAlign: 'left',
+                  color: '#334155',
+                  backgroundColor: '#f1f5f9',
+                }}
+              >
+                {hasPort && !hasGov ? 'ท่าเรือ / ด่านตรวจ (Port)' : 'สายเรือ / เอเย่นต์ (Agent)'}
+              </th>
+              <td
+                colSpan={hasPort && !hasGov && hasAgents ? 1 : 3}
+                style={{
+                  padding: '5px 8px',
+                  border: '1px solid #cbd5e1',
+                  fontWeight: 600,
+                }}
+              >
+                {hasPort && !hasGov
+                  ? `${procedure.port?.code} - ${procedure.port?.name}`
+                  : agentList.map((a) => `${a.code} - ${a.name}`).join(', ')}
+              </td>
+              {hasPort && !hasGov && hasAgents && (
+                <>
+                  <th
+                    style={{
+                      padding: '5px 8px',
+                      border: '1px solid #cbd5e1',
+                      textAlign: 'left',
+                      color: '#334155',
+                      backgroundColor: '#f1f5f9',
+                    }}
+                  >
+                    สายเรือ (Agent)
+                  </th>
+                  <td
+                    style={{
+                      padding: '5px 8px',
+                      border: '1px solid #cbd5e1',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {agentList.map((a) => `${a.code} - ${a.name}`).join(', ')}
+                  </td>
+                </>
+              )}
+            </tr>
+          )}
+
+          {/* Row 4: เอกสารอ้างอิง & สายด่วนติดต่อ */}
+          <tr>
             <th
               style={{
                 padding: '5px 8px',
@@ -257,9 +388,40 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
             >
               เอกสารอ้างอิง
             </th>
-            <td style={{ padding: '5px 8px', border: '1px solid #cbd5e1' }}>
+            <td
+              colSpan={hasHotline ? 1 : 3}
+              style={{
+                padding: '5px 8px',
+                border: '1px solid #cbd5e1',
+              }}
+            >
               {procedure.referenceDocuments || 'B/L, Booking Confirmation, ใบเสร็จชำระเงิน'}
             </td>
+            {hasHotline && (
+              <>
+                <th
+                  style={{
+                    padding: '5px 8px',
+                    border: '1px solid #cbd5e1',
+                    textAlign: 'left',
+                    color: '#334155',
+                    backgroundColor: '#f1f5f9',
+                  }}
+                >
+                  สายด่วน / ติดต่อ
+                </th>
+                <td
+                  style={{
+                    padding: '5px 8px',
+                    border: '1px solid #cbd5e1',
+                    fontWeight: 600,
+                    color: '#dc2626',
+                  }}
+                >
+                  📞 {procedure.contactHotline}
+                </td>
+              </>
+            )}
           </tr>
         </tbody>
       </table>
@@ -701,9 +863,9 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
         }}
       >
         <span>
-          Shore Procedure Management System • เอกสารควบคุมภายในเพื่อการปฏิบัติงาน (Internal Controlled SOP)
+          Asiathai Freight SOP Management System • เอกสารขั้นตอนการปฏิบัติงานมาตรฐาน ({procedure.category ? procedure.category.name : 'SOP'})
         </span>
-        <span>เอกสาร SOP ฉบับควบคุม</span>
+        <span>เอกสาร SOP ฉบับควบคุม (Internal Controlled Copy)</span>
       </div>
     </div>
   );

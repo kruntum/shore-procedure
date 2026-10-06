@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Button, Space, Select, Switch, Typography, message } from 'antd';
+import { Modal, Button, Space, Select, Switch, Typography, Tag, message } from 'antd';
 import {
   PrinterOutlined,
   FilePdfOutlined,
@@ -204,11 +204,16 @@ export const SOPPrintModal: React.FC<SOPPrintModalProps> = ({
   return (
     <Modal
       title={
-        <Space>
+        <Space wrap align="center">
           <FilePdfOutlined style={{ color: '#dc2626', fontSize: 18 }} />
           <span style={{ fontWeight: 600 }}>
             พิมพ์คู่มือขั้นตอนมาตรฐาน A4 (Standard Operating Procedure)
           </span>
+          {procedure.category && (
+            <Tag color={procedure.category.color || 'blue'} style={{ margin: 0, fontWeight: 500 }}>
+              {procedure.category.icon} {procedure.category.name}
+            </Tag>
+          )}
         </Space>
       }
       open={open}
