@@ -15,8 +15,58 @@ export interface Category {
   icon: string;
   color: string;
   sortOrder: number;
+  procedureCount?: number;
+  workflowCount?: number;
   createdAt?: string;
 }
+
+export interface JobWorkflowStep {
+  id: number;
+  workflowId: number;
+  title: string;
+  briefDescription?: string | null;
+  procedureId?: number | null;
+  procedureTitle?: string | null;
+  governmentAgencyId?: number | null;
+  agencyName?: string | null;
+  agencyShortName?: string | null;
+  portId?: number | null;
+  portCode?: string | null;
+  portName?: string | null;
+  sortOrder: number;
+  stepType: string;
+  outputs?: string[];
+  createdAt?: string;
+}
+
+export interface JobWorkflowDependency {
+  id: number;
+  workflowId: number;
+  stepId: number;
+  dependsOnStepId: number;
+  createdAt?: string;
+}
+
+export interface JobWorkflow {
+  id: number;
+  code: string;
+  title: string;
+  description?: string | null;
+  categoryId?: number | null;
+  category?: Category | null;
+  status: 'active' | 'draft' | 'archived';
+  estimatedDuration?: string | null;
+  targetAudience?: string | null;
+  createdBy?: string | null;
+  stepCount?: number;
+  sopReadyCount?: number;
+  completionRate?: number;
+  steps?: JobWorkflowStep[];
+  dependencies?: JobWorkflowDependency[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 
 export interface GovernmentAgency {
   id: number;

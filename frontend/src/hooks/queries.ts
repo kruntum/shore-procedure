@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../services/api';
-import { Port, Agent, WorkType, Procedure, ResponsibleRole, User, Category, GovernmentAgency } from '../types';
+import { Port, Agent, WorkType, Procedure, ResponsibleRole, User, Category, GovernmentAgency, JobWorkflow } from '../types';
 
 export function useCategories() {
   return useQuery<Category[]>({
@@ -143,3 +143,26 @@ export function useUsers() {
     },
   });
 }
+
+export function useWorkflows(params?: { categoryId?: number; search?: string; limit?: number }) {
+  return useQuery<JobWorkflow[]>({
+    queryKey: ['workflows', params],
+    queryFn: async () => {
+      const res = await api.get('/workflows', { params });
+      return res.data.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useWorkflow(id?: number) {
+  return useQuery<JobWorkflow>({
+    queryKey: ['workflow', id],
+    queryFn: async () => {
+      const res = await api.get(`/workflows/${id}`);
+      return res.data.data;
+    },
+    enabled: !!id,
+  });
+}
+

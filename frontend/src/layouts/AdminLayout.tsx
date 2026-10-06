@@ -5,6 +5,7 @@ import {
   TeamOutlined,
   AppstoreOutlined,
   BookOutlined,
+  ApartmentOutlined,
   PlusCircleOutlined,
   ArrowLeftOutlined,
   UserSwitchOutlined,
@@ -32,9 +33,14 @@ export const AdminLayout: React.FC = () => {
 
   const menuItems = [
     {
+      key: '/admin/workflows',
+      icon: <ApartmentOutlined />,
+      label: 'จัดการสายงาน (Workflows)',
+    },
+    {
       key: '/admin/procedures',
       icon: <BookOutlined />,
-      label: 'จัดการคู่มือทั้งหมด',
+      label: 'จัดการคู่มือทั้งหมด (SOPs)',
     },
     {
       key: '/admin/procedures/new',

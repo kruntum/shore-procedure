@@ -11,3 +11,4 @@ export * from './stepImages';
 export * from './responsibleRoles';
 export * from './procedureAgents';
 export * from './procedureGovAgencies';
+export * from './jobWorkflows';

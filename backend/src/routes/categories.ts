@@ -2,8 +2,8 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
 import { db } from '../db';
-import { categories } from '../db/schema/categories';
-import { eq } from 'drizzle-orm';
+import { categories, procedures, jobWorkflows } from '../db/schema';
+import { eq, count } from 'drizzle-orm';
 import { requireAuth, requireAdmin } from '../middleware/auth';
 import { successResponse, errorResponse } from '../utils/response';
 
@@ -17,12 +17,44 @@ const categorySchema = z.object({
   sortOrder: z.number().int().optional().default(0),
 });
 
-// GET /api/categories (Public)
+// GET /api/categories (Public with procedureCount & workflowCount)
 categoriesRouter.get('/', async (c) => {
   const list = await db.query.categories.findMany({
     orderBy: (cat, { asc }) => [asc(cat.sortOrder), asc(cat.id)],
   });
-  return successResponse(c, list);
+
+  // Calculate procedure count and workflow count per category
+  const procCounts = await db.select({
+    categoryId: procedures.categoryId,
+    count: count(),
+  })
+  .from(procedures)
+  .groupBy(procedures.categoryId);
+
+  const wfCounts = await db.select({
+    categoryId: jobWorkflows.categoryId,
+    count: count(),
+  })
+  .from(jobWorkflows)
+  .groupBy(jobWorkflows.categoryId);
+
+  const procMap: Record<number, number> = {};
+  procCounts.forEach((p) => {
+    if (p.categoryId) procMap[p.categoryId] = p.count;
+  });
+
+  const wfMap: Record<number, number> = {};
+  wfCounts.forEach((w) => {
+    if (w.categoryId) wfMap[w.categoryId] = w.count;
+  });
+
+  const enriched = list.map((cat) => ({
+    ...cat,
+    procedureCount: procMap[cat.id] || 0,
+    workflowCount: wfMap[cat.id] || 0,
+  }));
+
+  return successResponse(c, enriched);
 });
 
 // GET /api/categories/:id (Public)

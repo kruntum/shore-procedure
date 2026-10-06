@@ -8,6 +8,8 @@ import { HomePage } from './pages/HomePage';
 import { PortDetailPage } from './pages/PortDetailPage';
 import { ProcedureListPage } from './pages/ProcedureListPage';
 import { ProcedureViewPage } from './pages/ProcedureViewPage';
+import { WorkflowListPage } from './pages/WorkflowListPage';
+import { WorkflowDetailPage } from './pages/WorkflowDetailPage';
 import { PortManagementPage } from './pages/admin/PortManagementPage';
 import { AgentManagementPage } from './pages/admin/AgentManagementPage';
 import { WorkTypeManagementPage } from './pages/admin/WorkTypeManagementPage';
@@ -28,6 +30,8 @@ export default function App() {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<HomePage />} />
           <Route path="ports/:portId" element={<PortDetailPage />} />
+          <Route path="workflows" element={<WorkflowListPage />} />
+          <Route path="workflows/:id" element={<WorkflowDetailPage />} />
           <Route path="procedures" element={<ProcedureListPage />} />
           <Route path="procedures/:id" element={<ProcedureViewPage />} />
 

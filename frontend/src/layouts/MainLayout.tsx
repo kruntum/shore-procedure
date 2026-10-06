@@ -7,6 +7,7 @@ import {
   SettingOutlined,
   HomeOutlined,
   BookOutlined,
+  ApartmentOutlined,
   EllipsisOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
@@ -35,9 +36,14 @@ export const MainLayout: React.FC = () => {
       label: 'หน้าหลัก',
     },
     {
+      key: '/workflows',
+      icon: <ApartmentOutlined />,
+      label: 'สายงานปฏิบัติการ (Workflows)',
+    },
+    {
       key: '/procedures',
       icon: <BookOutlined />,
-      label: 'คู่มือทั้งหมด',
+      label: 'คู่มือทั้งหมด (SOPs)',
     },
   ];
 
