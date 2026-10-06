@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Row, Col, Typography, Tag, Space, Input, Spin, Alert, Button, Select, Divider, Empty } from 'antd';
+import { Card, Row, Col, Typography, Tag, Space, Input, Spin, Alert, Button, Select, Divider, Empty, Tabs } from 'antd';
 import {
   RightOutlined,
   AppstoreOutlined,
@@ -21,6 +21,7 @@ export const HomePage: React.FC = () => {
   const { isDarkMode, primaryColor } = useTheme();
   const [filterText, setFilterText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState('workflows');
 
   const { data: categories, isLoading: isCategoriesLoading } = useCategories();
   const { data: procedures, isLoading: isProceduresLoading, error: proceduresError } = useProcedures();
@@ -226,112 +227,128 @@ export const HomePage: React.FC = () => {
 
       <Divider style={{ margin: '20px 0' }} />
 
-      {/* 4. Dual-Column Operations Dashboard: 4 Workflows vs 4 Procedures */}
-      <Row gutter={[20, 20]}>
-        {/* Left Column: 🗺️ Recent Workflows */}
-        <Col xs={24} lg={12}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <div>
-              <Title level={5} style={{ margin: 0, fontSize: 15, display: 'flex', alignItems: 'center', gap: 6 }}>
+      {/* 4. Operations Dashboard with Tabs Switcher */}
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        type="card"
+        size="middle"
+        tabBarExtraContent={
+          <Button
+            type="link"
+            size="small"
+            onClick={() => navigate(activeTab === 'workflows' ? '/workflows' : '/procedures')}
+            style={{ fontSize: 13, padding: 0 }}
+          >
+            {activeTab === 'workflows'
+              ? `ดูผังสายงานทั้งหมด (${filteredWorkflows?.length || 0})`
+              : `ดูคู่มือปฏิบัติงานทั้งหมด (${filteredProcedures?.length || 0})`}{' '}
+            <RightOutlined style={{ fontSize: 11 }} />
+          </Button>
+        }
+        items={[
+          {
+            key: 'workflows',
+            label: (
+              <span style={{ fontSize: 13.5, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <ApartmentOutlined style={{ color: '#0284c7' }} />
-                สายงานปฏิบัติการล่าสุด (Job Workflows)
-              </Title>
-              <Text type="secondary" style={{ fontSize: 11.5 }}>
-                แผนผังกระบวนการแบบ End-to-End ร้อยเรียงขั้นตอนทั้งหมด
-              </Text>
-            </div>
-            <Button
-              type="link"
-              size="small"
-              onClick={() => navigate('/workflows')}
-              style={{ fontSize: 12, padding: 0 }}
-            >
-              ดูทั้งหมด ({filteredWorkflows?.length || 0}) <RightOutlined style={{ fontSize: 10 }} />
-            </Button>
-          </div>
+                ผังสายงานปฏิบัติการ (Job Workflows)
+                <Tag color="cyan" style={{ borderRadius: 10, margin: '0 0 0 4px', fontSize: 11 }}>
+                  {filteredWorkflows?.length || 0}
+                </Tag>
+              </span>
+            ),
+            children: (
+              <div style={{ marginTop: 8 }}>
+                <div style={{ marginBottom: 14 }}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    🗺️ แผนผังกระบวนการแบบภาพรวม (End-to-End) ร้อยเรียงขั้นตอนและคู่มือที่เกี่ยวข้องเป็นลำดับการทำงาน
+                  </Text>
+                </div>
 
-          {isWorkflowsLoading ? (
-            <div style={{ textAlign: 'center', padding: '40px 0' }}>
-              <Spin size="small" tip="กำลังโหลดสายงาน..." />
-            </div>
-          ) : workflowsError ? (
-            <Alert type="warning" message="ไม่สามารถดึงข้อมูลสายงานได้" showIcon />
-          ) : recentWorkflows.length === 0 ? (
-            <Card
-              size="small"
-              style={{
-                textAlign: 'center',
-                padding: '24px 0',
-                borderRadius: 8,
-                background: isDarkMode ? '#1a1d21' : '#fff',
-                border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
-              }}
-            >
-              <Empty description="ไม่พบสายงานที่ตรงกับเงื่อนไข" />
-            </Card>
-          ) : (
-            <Row gutter={[12, 12]}>
-              {recentWorkflows.map((wf) => (
-                <Col key={wf.id} xs={24} sm={12}>
-                  <WorkflowCard workflow={wf} />
-                </Col>
-              ))}
-            </Row>
-          )}
-        </Col>
-
-        {/* Right Column: 📖 Recent Procedures */}
-        <Col xs={24} lg={12}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <div>
-              <Title level={5} style={{ margin: 0, fontSize: 15, display: 'flex', alignItems: 'center', gap: 6 }}>
+                {isWorkflowsLoading ? (
+                  <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                    <Spin size="small" tip="กำลังโหลดสายงาน..." />
+                  </div>
+                ) : workflowsError ? (
+                  <Alert type="warning" message="ไม่สามารถดึงข้อมูลสายงานได้" showIcon />
+                ) : filteredWorkflows?.length === 0 ? (
+                  <Card
+                    size="small"
+                    style={{
+                      textAlign: 'center',
+                      padding: '32px 0',
+                      borderRadius: 8,
+                      background: isDarkMode ? '#1a1d21' : '#fff',
+                      border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
+                    }}
+                  >
+                    <Empty description="ไม่พบสายงานที่ตรงกับเงื่อนไขการค้นหา" />
+                  </Card>
+                ) : (
+                  <Row gutter={[16, 16]}>
+                    {filteredWorkflows?.map((wf) => (
+                      <Col key={wf.id} xs={24} sm={12} md={8} lg={6} style={{ display: 'flex' }}>
+                        <WorkflowCard workflow={wf} />
+                      </Col>
+                    ))}
+                  </Row>
+                )}
+              </div>
+            ),
+          },
+          {
+            key: 'procedures',
+            label: (
+              <span style={{ fontSize: 13.5, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <BookOutlined style={{ color: '#1677ff' }} />
-                คู่มือปฏิบัติงานล่าสุด (Operating Procedures)
-              </Title>
-              <Text type="secondary" style={{ fontSize: 11.5 }}>
-                วิธีปฏิบัติงานรายขั้นตอนและภาพหน้าจอจริงประกอบการทำงาน
-              </Text>
-            </div>
-            <Button
-              type="link"
-              size="small"
-              onClick={() => navigate('/procedures')}
-              style={{ fontSize: 12, padding: 0 }}
-            >
-              ดูทั้งหมด ({filteredProcedures?.length || 0}) <RightOutlined style={{ fontSize: 10 }} />
-            </Button>
-          </div>
+                คู่มือปฏิบัติงาน (Standard Procedures)
+                <Tag color="blue" style={{ borderRadius: 10, margin: '0 0 0 4px', fontSize: 11 }}>
+                  {filteredProcedures?.length || 0}
+                </Tag>
+              </span>
+            ),
+            children: (
+              <div style={{ marginTop: 8 }}>
+                <div style={{ marginBottom: 14 }}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    📖 คู่มือการปฏิบัติงานรายขั้นตอน (SOP) ข้อมูลเงื่อนไข ท่าเรือ หน่วยงานรัฐ และภาพหน้าจอประกอบจริง
+                  </Text>
+                </div>
 
-          {isProceduresLoading ? (
-            <div style={{ textAlign: 'center', padding: '40px 0' }}>
-              <Spin size="small" tip="กำลังโหลดคู่มือ..." />
-            </div>
-          ) : proceduresError ? (
-            <Alert type="warning" message="ไม่สามารถดึงข้อมูลคู่มือได้" showIcon />
-          ) : recentProcedures.length === 0 ? (
-            <Card
-              size="small"
-              style={{
-                textAlign: 'center',
-                padding: '24px 0',
-                borderRadius: 8,
-                background: isDarkMode ? '#1a1d21' : '#fff',
-                border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
-              }}
-            >
-              <Empty description="ไม่พบคู่มือที่ตรงกับเงื่อนไข" />
-            </Card>
-          ) : (
-            <Row gutter={[12, 12]}>
-              {recentProcedures.map((proc) => (
-                <Col key={proc.id} xs={24} sm={12}>
-                  <ProcedureCard procedure={proc} />
-                </Col>
-              ))}
-            </Row>
-          )}
-        </Col>
-      </Row>
+                {isProceduresLoading ? (
+                  <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                    <Spin size="small" tip="กำลังโหลดคู่มือ..." />
+                  </div>
+                ) : proceduresError ? (
+                  <Alert type="warning" message="ไม่สามารถดึงข้อมูลคู่มือได้" showIcon />
+                ) : filteredProcedures?.length === 0 ? (
+                  <Card
+                    size="small"
+                    style={{
+                      textAlign: 'center',
+                      padding: '32px 0',
+                      borderRadius: 8,
+                      background: isDarkMode ? '#1a1d21' : '#fff',
+                      border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
+                    }}
+                  >
+                    <Empty description="ไม่พบคู่มือที่ตรงกับเงื่อนไขการค้นหา" />
+                  </Card>
+                ) : (
+                  <Row gutter={[16, 16]}>
+                    {filteredProcedures?.map((proc) => (
+                      <Col key={proc.id} xs={24} sm={12} md={8} lg={6} style={{ display: 'flex' }}>
+                        <ProcedureCard procedure={proc} />
+                      </Col>
+                    ))}
+                  </Row>
+                )}
+              </div>
+            ),
+          },
+        ]}
+      />
     </div>
   );
 };
