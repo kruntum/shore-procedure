@@ -155,6 +155,12 @@ export const ProcedureBuilderPage: React.FC = () => {
 
       const payload = {
         ...values,
+        categoryId: Number(values.categoryId),
+        workTypeId: values.workTypeId ? Number(values.workTypeId) : 1,
+        portId: values.portId ? Number(values.portId) : null,
+        agentIds: Array.isArray(values.agentIds) ? values.agentIds : [],
+        governmentAgencyIds: Array.isArray(values.governmentAgencyIds) ? values.governmentAgencyIds : [],
+        contactHotline: values.contactHotline?.trim() || null,
         variants: formattedVariants,
       };
 
@@ -283,36 +289,57 @@ export const ProcedureBuilderPage: React.FC = () => {
           </Row>
 
           <Row gutter={[16, 0]}>
-            {/* Show Gov Agency if not strictly terminal or if selected */}
-            {(!currentCategory || currentCategory.code !== 'TERMINAL_SHIPPING') && (
-              <Col xs={24} md={12}>
-                <Form.Item
-                  name="governmentAgencyIds"
-                  label="หน่วยงานราชการที่เกี่ยวข้อง (Government Agencies)"
-                  tooltip="เช่น กรมศุลกากร, กรมการค้าต่างประเทศ (DFT), ด่านตรวจพืช (DOA)"
-                >
-                  <Select
-                    mode="multiple"
-                    placeholder="เลือกหน่วยงานราชการ..."
-                    showSearch
-                    allowClear
-                    maxTagCount="responsive"
-                    filterOption={(input, option) =>
-                      (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
-                    }
-                    options={govAgencies?.map((g) => ({
-                      value: g.id,
-                      label: `${g.shortName ? `[${g.shortName}] ` : ''}${g.name}`,
-                    }))}
-                  />
-                </Form.Item>
-              </Col>
-            )}
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="governmentAgencyIds"
+                label={
+                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                    <span>หน่วยงานราชการที่เกี่ยวข้อง</span>
+                    <Button
+                      type="link"
+                      size="small"
+                      style={{ padding: 0, fontSize: 11 }}
+                      onClick={() => form.setFieldsValue({ governmentAgencyIds: [] })}
+                    >
+                      ล้างค่า
+                    </Button>
+                  </div>
+                }
+                tooltip="เช่น กรมศุลกากร, กรมการค้าต่างประเทศ (DFT), ด่านตรวจพืช (DOA)"
+              >
+                <Select
+                  mode="multiple"
+                  placeholder="เลือกหน่วยงานราชการ (ถ้ามี)..."
+                  showSearch
+                  allowClear
+                  maxTagCount="responsive"
+                  filterOption={(input, option) =>
+                    (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                  }
+                  options={govAgencies?.map((g) => ({
+                    value: g.id,
+                    label: `${g.shortName ? `[${g.shortName}] ` : ''}${g.name}`,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
 
-            <Col xs={24} md={(!currentCategory || currentCategory.code !== 'TERMINAL_SHIPPING') ? 12 : 8}>
+            <Col xs={24} md={8}>
               <Form.Item
                 name="portId"
-                label="ท่าเรือ / ด่านตรวจ (Port / Terminal)"
+                label={
+                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                    <span>ท่าเรือ / ด่านตรวจ (Port / Terminal)</span>
+                    <Button
+                      type="link"
+                      size="small"
+                      style={{ padding: 0, fontSize: 11 }}
+                      onClick={() => form.setFieldsValue({ portId: null })}
+                    >
+                      ล้างค่า
+                    </Button>
+                  </div>
+                }
                 tooltip="หากเป็นงานที่ต้องเข้าพื้นที่ท่าเรือหรือด่านตรวจหน้างาน"
               >
                 <Select
@@ -327,49 +354,48 @@ export const ProcedureBuilderPage: React.FC = () => {
               </Form.Item>
             </Col>
 
-            {(!currentCategory || currentCategory.code === 'TERMINAL_SHIPPING') && (
-              <Col xs={24} md={16}>
-                <Form.Item
-                  name="agentIds"
-                  label={
-                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                      <span>สายเรือ / เอเย่นต์ (เลือกได้หลายสายเรือ)</span>
-                      <Space size="small">
-                        <Button
-                          type="link"
-                          size="small"
-                          style={{ padding: 0, fontSize: 11 }}
-                          onClick={() => form.setFieldsValue({ agentIds: agents?.map((a) => a.id) })}
-                        >
-                          เลือกทุกสายเรือ (All)
-                        </Button>
-                        <span style={{ color: isDarkMode ? 'rgba(255, 255, 255, 0.18)' : '#d9d9d9' }}>|</span>
-                        <Button
-                          type="link"
-                          size="small"
-                          style={{ padding: 0, fontSize: 11 }}
-                          onClick={() => form.setFieldsValue({ agentIds: [] })}
-                        >
-                          ล้างค่า
-                        </Button>
-                      </Space>
-                    </div>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="agentIds"
+                label={
+                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                    <span>สายเรือ / เอเย่นต์ (Agents)</span>
+                    <Space size="small">
+                      <Button
+                        type="link"
+                        size="small"
+                        style={{ padding: 0, fontSize: 11 }}
+                        onClick={() => form.setFieldsValue({ agentIds: agents?.map((a) => a.id) })}
+                      >
+                        All
+                      </Button>
+                      <span style={{ color: isDarkMode ? 'rgba(255, 255, 255, 0.18)' : '#d9d9d9' }}>|</span>
+                      <Button
+                        type="link"
+                        size="small"
+                        style={{ padding: 0, fontSize: 11 }}
+                        onClick={() => form.setFieldsValue({ agentIds: [] })}
+                      >
+                        ล้างค่า
+                      </Button>
+                    </Space>
+                  </div>
+                }
+                tooltip="หากเป็นงานที่ผูกกับสายเรือหรือตัวแทนเรือ"
+              >
+                <Select
+                  mode="multiple"
+                  placeholder="เลือกสายเรือ (ถ้ามี)..."
+                  showSearch
+                  allowClear
+                  maxTagCount="responsive"
+                  filterOption={(input, option) =>
+                    (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
                   }
-                >
-                  <Select
-                    mode="multiple"
-                    placeholder="เลือกสายเรือที่ใช้ขั้นตอนนี้ร่วมกัน..."
-                    showSearch
-                    allowClear
-                    maxTagCount="responsive"
-                    filterOption={(input, option) =>
-                      (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
-                    }
-                    options={agents?.map((a) => ({ value: a.id, label: `${a.code} - ${a.name}` }))}
-                  />
-                </Form.Item>
-              </Col>
-            )}
+                  options={agents?.map((a) => ({ value: a.id, label: `${a.code} - ${a.name}` }))}
+                />
+              </Form.Item>
+            </Col>
           </Row>
 
           <Form.Item

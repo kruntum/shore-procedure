@@ -355,10 +355,11 @@ const variantUpdateItemSchema = z.object({
 const procedureUpdateFullSchema = z.object({
   categoryId: z.number().int().positive().optional().nullable(),
   portId: z.number().int().positive().optional().nullable(),
+  workTypeId: z.number().int().positive().optional(),
   title: z.string().min(1).optional(),
   description: z.string().optional(),
   referenceDocuments: z.string().optional(),
-  contactHotline: z.string().optional(),
+  contactHotline: z.string().optional().nullable(),
   agentId: z.number().int().positive().optional().nullable(),
   agentIds: z.array(z.number().int().positive()).optional(),
   governmentAgencyId: z.number().int().positive().optional().nullable(),
@@ -397,17 +398,15 @@ proceduresRouter.put('/:id', requireAuth, zValidator('json', procedureUpdateFull
   if (body.title !== undefined) updateData.title = body.title;
   if (body.description !== undefined) updateData.description = body.description;
   if (body.referenceDocuments !== undefined) updateData.referenceDocuments = body.referenceDocuments;
-  if (body.contactHotline !== undefined) updateData.contactHotline = body.contactHotline;
+  if (body.contactHotline !== undefined) updateData.contactHotline = body.contactHotline || null;
   if (body.categoryId !== undefined) updateData.categoryId = body.categoryId;
-  if (body.portId !== undefined) updateData.portId = body.portId;
+  if (body.portId !== undefined) updateData.portId = body.portId || null;
+  if (body.workTypeId !== undefined) updateData.workTypeId = body.workTypeId;
 
-  // Sync agents
-  const finalAgentIds = body.agentIds && body.agentIds.length > 0
-    ? body.agentIds
-    : (body.agentId !== undefined ? (body.agentId ? [body.agentId] : []) : undefined);
-
-  if (finalAgentIds !== undefined) {
-    updateData.agentId = finalAgentIds[0] || null;
+  // Sync agents (handles clearing when empty array [] is passed)
+  if (body.agentIds !== undefined) {
+    const finalAgentIds = body.agentIds;
+    updateData.agentId = finalAgentIds.length > 0 ? finalAgentIds[0] : null;
     await db.delete(procedureAgents).where(eq(procedureAgents.procedureId, id));
     for (const aId of finalAgentIds) {
       await db.insert(procedureAgents).values({
@@ -415,20 +414,35 @@ proceduresRouter.put('/:id', requireAuth, zValidator('json', procedureUpdateFull
         agentId: aId,
       });
     }
+  } else if (body.agentId !== undefined) {
+    updateData.agentId = body.agentId || null;
+    await db.delete(procedureAgents).where(eq(procedureAgents.procedureId, id));
+    if (body.agentId) {
+      await db.insert(procedureAgents).values({
+        procedureId: id,
+        agentId: body.agentId,
+      });
+    }
   }
 
-  // Sync government agencies
-  const finalGovAgencyIds = body.governmentAgencyIds && body.governmentAgencyIds.length > 0
-    ? body.governmentAgencyIds
-    : (body.governmentAgencyId !== undefined ? (body.governmentAgencyId ? [body.governmentAgencyId] : []) : undefined);
-
-  if (finalGovAgencyIds !== undefined) {
-    updateData.governmentAgencyId = finalGovAgencyIds[0] || null;
+  // Sync government agencies (handles clearing when empty array [] is passed)
+  if (body.governmentAgencyIds !== undefined) {
+    const finalGovAgencyIds = body.governmentAgencyIds;
+    updateData.governmentAgencyId = finalGovAgencyIds.length > 0 ? finalGovAgencyIds[0] : null;
     await db.delete(procedureGovAgencies).where(eq(procedureGovAgencies.procedureId, id));
     for (const gId of finalGovAgencyIds) {
       await db.insert(procedureGovAgencies).values({
         procedureId: id,
         governmentAgencyId: gId,
+      });
+    }
+  } else if (body.governmentAgencyId !== undefined) {
+    updateData.governmentAgencyId = body.governmentAgencyId || null;
+    await db.delete(procedureGovAgencies).where(eq(procedureGovAgencies.procedureId, id));
+    if (body.governmentAgencyId) {
+      await db.insert(procedureGovAgencies).values({
+        procedureId: id,
+        governmentAgencyId: body.governmentAgencyId,
       });
     }
   }
