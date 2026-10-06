@@ -139,9 +139,6 @@ export const RoleManagementPage: React.FC = () => {
       dataIndex: 'name',
       key: 'name',
       width: 160,
-      render: (name: string) => (
-        <span style={{ color: '#0f172a' }}>{name}</span>
-      ),
     },
     {
       title: 'ตัวอย่างป้ายกำกับ',
@@ -155,9 +152,9 @@ export const RoleManagementPage: React.FC = () => {
       key: 'description',
       width: 260,
       render: (desc: string) => (
-        <span style={{ color: '#64748b' }}>
+        <Text type="secondary" style={{ fontSize: 12 }}>
           {desc || '-'}
-        </span>
+        </Text>
       ),
     },
     {

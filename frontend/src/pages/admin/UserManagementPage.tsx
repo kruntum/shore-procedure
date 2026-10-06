@@ -162,7 +162,7 @@ export const UserManagementPage: React.FC = () => {
       key: 'displayName',
       width: 160,
       render: (name: string) => (
-        <span style={{ fontSize: 11, color: '#0f172a' }}>{name}</span>
+        <span style={{ fontSize: 11 }}>{name}</span>
       ),
     },
     {
@@ -170,7 +170,7 @@ export const UserManagementPage: React.FC = () => {
       dataIndex: 'fullName',
       key: 'fullName',
       render: (fullName: string, record: User) => (
-        <span style={{ fontSize: 11, color: '#1e293b' }}>
+        <span style={{ fontSize: 11 }}>
           {fullName || record.displayName}
         </span>
       ),

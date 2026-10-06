@@ -89,9 +89,11 @@ export const GovAgencyManagementPage: React.FC = () => {
             {record.shortName && <Tag color="blue">{record.shortName}</Tag>}
           </Space>
           {record.contactInfo && (
-            <div style={{ fontSize: 11.5, color: '#888', marginTop: 2 }}>
-              <PhoneOutlined style={{ marginRight: 4 }} />
-              {record.contactInfo}
+            <div style={{ marginTop: 2 }}>
+              <Text type="secondary" style={{ fontSize: 11.5 }}>
+                <PhoneOutlined style={{ marginRight: 4 }} />
+                {record.contactInfo}
+              </Text>
             </div>
           )}
         </div>

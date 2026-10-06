@@ -375,14 +375,14 @@ export const HomePage: React.FC = () => {
                     {proc.agents && proc.agents.length > 0 && (
                       <div style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
                         <TeamOutlined style={{ color: '#13c2c2' }} />
-                        <span style={{ color: '#64748b' }}>สายเรือ:</span>
+                        <span style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>สายเรือ:</span>
                         {proc.agents.slice(0, 3).map((ag) => (
                           <Tag key={ag.id} color="cyan" style={{ margin: 0, fontSize: 9.5 }}>
                             {ag.code}
                           </Tag>
                         ))}
                         {proc.agents.length > 3 && (
-                          <span style={{ fontSize: 10, color: '#94a3b8' }}>+{proc.agents.length - 3}</span>
+                          <span style={{ fontSize: 10, color: isDarkMode ? '#a1a1aa' : '#94a3b8' }}>+{proc.agents.length - 3}</span>
                         )}
                       </div>
                     )}
@@ -399,7 +399,7 @@ export const HomePage: React.FC = () => {
                 {/* Card Bottom: Variants, Steps, and Action */}
                 <div style={{ marginTop: 12, paddingTop: 8, borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #f0f0f0' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Space size={6} style={{ fontSize: 11, color: '#64748b' }}>
+                    <Space size={6} style={{ fontSize: 11, color: isDarkMode ? '#94a3b8' : '#64748b' }}>
                       <span>📋 {proc.variants?.length || 0} เงื่อนไข</span>
                       <span>•</span>
                       <span>👣 {totalSteps} ขั้นตอน</span>
