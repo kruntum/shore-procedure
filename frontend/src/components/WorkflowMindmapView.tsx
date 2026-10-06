@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import {
   ReactFlow,
   Background,
@@ -23,6 +23,7 @@ import {
   CompassOutlined,
   EditOutlined,
   DeleteOutlined,
+  ReloadOutlined,
 } from '@ant-design/icons';
 import { JobWorkflowStep } from '../types';
 import { useTheme } from '../contexts/ThemeContext';
@@ -63,7 +64,7 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
         transition: 'border 0.2s, box-shadow 0.2s',
       }}
     >
-      {/* Target Handle at TOP */}
+      {/* Target Handle at TOP (Center) */}
       <Handle
         type="target"
         position={Position.Top}
@@ -73,7 +74,7 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
           background: '#ffffff',
           border: `2px solid ${borderColor}`,
           borderRadius: '50%',
-          top: -6,
+          zIndex: 10,
         }}
       />
 
@@ -244,7 +245,7 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
         )}
       </div>
 
-      {/* Source Handle at BOTTOM */}
+      {/* Source Handle at BOTTOM (Center) */}
       <Handle
         type="source"
         position={Position.Bottom}
@@ -254,7 +255,7 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
           background: '#ffffff',
           border: `2px solid ${borderColor}`,
           borderRadius: '50%',
-          bottom: -6,
+          zIndex: 10,
         }}
       />
     </div>
@@ -290,8 +291,8 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-  // Recalculate layout when steps, dependencies, or theme changes
-  useEffect(() => {
+  // Function to build clean, nicely spaced layout
+  const buildLayout = useCallback(() => {
     // Sort steps primarily by sortOrder
     const sortedSteps = [...steps].sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
     const stepIdMap = new Map<number, JobWorkflowStep>();
@@ -340,9 +341,12 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
 
     const generatedNodes: Node[] = [];
     const nodeWidth = 280;
-    const colSpacing = 320;
-    const rowSpacing = 220;
-    const centerX = 360;
+    // Generous spacing for comfortable, professional diagram layout:
+    // colSpacing: 380px gives 100px horizontal gap between parallel cards
+    // rowSpacing: 340px gives ~110px vertical gap between rows for clean arrow curves
+    const colSpacing = 380;
+    const rowSpacing = 330;
+    const centerX = 400;
 
     Object.keys(levelRows).forEach((lvlStr) => {
       const lvl = parseInt(lvlStr);
@@ -372,48 +376,82 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
       });
     });
 
-    // Generate edges with SmoothStep and Arrowhead Marker (just like in the example!)
+    // Generate edges with clean SmoothStep curve and crisp Arrowhead
     const generatedEdges: Edge[] = effectiveDeps.map((d, idx) => {
       const sourceStep = stepIdMap.get(d.dependsOnStepId);
       const isSourceComplete = !!sourceStep?.procedureId;
       const strokeColor = isSourceComplete
-        ? (isDarkMode ? '#34d399' : '#10b981') // Green when ready
-        : (isDarkMode ? '#94a3b8' : '#94a3b8'); // Slate when pending
+        ? (isDarkMode ? '#10b981' : '#10b981') // Emerald green when ready
+        : (isDarkMode ? '#38bdf8' : '#0284c7'); // Ocean blue when pending
 
       return {
         id: `edge-${d.dependsOnStepId}-${d.stepId}-${idx}`,
         source: `step-${d.dependsOnStepId}`,
         target: `step-${d.stepId}`,
         type: 'smoothstep',
-        animated: !isSourceComplete,
+        pathOptions: {
+          borderRadius: 20, // Gentle, elegant 20px rounded corner
+          offset: 35,       // Travels 35px straight down before branching
+        },
+        animated: false,   // Solid, crisp, non-cluttered professional line
         style: {
           stroke: strokeColor,
-          strokeWidth: 2,
+          strokeWidth: 2.2,
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,
-          width: 16,
-          height: 16,
+          width: 15,
+          height: 15,
           color: strokeColor,
         },
       };
     });
 
+    return { generatedNodes, generatedEdges };
+  }, [steps, dependencies, isDarkMode, onOpenSop, onCreateSop, onEditStep, onDeleteStep, isAuthenticated]);
+
+  // Recalculate layout when steps, dependencies, or theme changes
+  useEffect(() => {
+    const { generatedNodes, generatedEdges } = buildLayout();
     setNodes(generatedNodes);
     setEdges(generatedEdges);
-  }, [steps, dependencies, isDarkMode, onOpenSop, onCreateSop, onEditStep, onDeleteStep, isAuthenticated]);
+  }, [buildLayout, setNodes, setEdges]);
+
+  // Handler to reset layout back to auto-alignment
+  const handleResetLayout = () => {
+    const { generatedNodes, generatedEdges } = buildLayout();
+    setNodes(generatedNodes);
+    setEdges(generatedEdges);
+  };
 
   return (
     <div
       style={{
         width: '100%',
-        height: 560,
+        height: 580,
         backgroundColor: isDarkMode ? '#141414' : '#fafafa',
         borderRadius: 8,
         border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
         overflow: 'hidden',
+        position: 'relative',
       }}
     >
+      {/* Auto-alignment reset button overlay */}
+      <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 10 }}>
+        <Button
+          size="small"
+          icon={<ReloadOutlined />}
+          onClick={handleResetLayout}
+          style={{
+            fontSize: 11,
+            backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+          }}
+        >
+          จัดผังอัตโนมัติ
+        </Button>
+      </div>
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
