@@ -110,7 +110,7 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
                     letterSpacing: '0.5px',
                   }}
                 >
-                  ASIATHAI FREIGHT SOP
+                  IMP&EXP SOP
                 </div>
                 <div style={{ fontSize: '9px', color: '#64748b' }}>
                   ระบบคู่มือปฏิบัติงานนำเข้า-ส่งออก
@@ -147,8 +147,8 @@ export const SOPDocumentA4: React.FC<SOPDocumentA4Props> = ({
                 >
                   {procedure.title}
                 </div>
-                <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, letterSpacing: '0.5px' }}>
-                  IMP&EXP SOP
+                <div style={{ fontSize: '10px', color: '#64748b' }}>
+                  STANDARD OPERATING PROCEDURE
                 </div>
               </td>
 
