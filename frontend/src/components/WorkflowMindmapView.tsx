@@ -8,23 +8,26 @@ import {
   NodeProps,
   Edge,
   Node,
+  MarkerType,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Tag, Button, Typography, Space, Tooltip } from 'antd';
 import {
   CheckCircleOutlined,
-  ExclamationCircleOutlined,
+  ClockCircleOutlined,
   BookOutlined,
   PlusOutlined,
   BankOutlined,
   CompassOutlined,
+  EditOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import { JobWorkflowStep } from '../types';
 import { useTheme } from '../contexts/ThemeContext';
 
 const { Text } = Typography;
 
-// Custom Step Node Component
+// Custom Step Node Component (Vertical Layout with Top/Bottom Handles)
 export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
   const step: JobWorkflowStep = data.step;
   const isDarkMode = data.isDarkMode;
@@ -35,36 +38,51 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
   const isAuthenticated = data.isAuthenticated;
 
   const hasSop = !!step.procedureId;
+  const borderColor = hasSop
+    ? '#10b981' // Emerald / Green
+    : isDarkMode ? '#f59e0b' : '#f59e0b'; // Amber
 
   return (
     <div
       style={{
-        width: 250,
-        padding: '10px 12px',
-        borderRadius: 8,
+        width: 280,
+        padding: '12px 14px',
+        borderRadius: 12,
         border: hasSop
-          ? '2px solid #52c41a'
-          : (isDarkMode ? '2px dashed rgba(245, 158, 11, 0.6)' : '2px dashed #faad14'),
+          ? `1.5px solid ${borderColor}`
+          : (isDarkMode ? '1.5px dashed rgba(245, 158, 11, 0.7)' : '1.5px dashed #f59e0b'),
         backgroundColor: isDarkMode ? '#1a1d21' : '#ffffff',
-        boxShadow: isDarkMode ? '0 4px 16px rgba(0,0,0,0.5)' : '0 2px 8px rgba(0,0,0,0.08)',
+        boxShadow: isDarkMode ? '0 4px 16px rgba(0,0,0,0.5)' : '0 2px 10px rgba(0,0,0,0.06)',
         color: isDarkMode ? 'rgba(255,255,255,0.88)' : '#1e293b',
         position: 'relative',
         fontSize: 12,
-        transition: 'all 0.2s',
+        transition: 'all 0.2s ease',
       }}
     >
-      <Handle type="target" position={Position.Left} style={{ background: '#555', width: 8, height: 8 }} />
+      {/* Target Handle at TOP */}
+      <Handle
+        type="target"
+        position={Position.Top}
+        style={{
+          width: 10,
+          height: 10,
+          background: '#ffffff',
+          border: `2px solid ${borderColor}`,
+          borderRadius: '50%',
+          top: -6,
+        }}
+      />
 
       {/* Node Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
         <Space size={4}>
           <span
             style={{
-              backgroundColor: hasSop ? '#52c41a' : '#faad14',
+              backgroundColor: hasSop ? '#10b981' : '#f59e0b',
               color: '#fff',
-              fontSize: 10,
+              fontSize: 10.5,
               fontWeight: 700,
-              padding: '1px 6px',
+              padding: '1px 7px',
               borderRadius: 10,
             }}
           >
@@ -85,15 +103,41 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
         <Space size={4}>
           {hasSop ? (
             <Tooltip title="มีคู่มือ SOP สมบูรณ์แล้ว">
-              <Tag color="success" style={{ margin: 0, fontSize: 10, padding: '0 4px' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  fontSize: 10.5,
+                  fontWeight: 600,
+                  color: '#10b981',
+                  background: isDarkMode ? 'rgba(16, 185, 129, 0.15)' : '#ecfdf5',
+                  padding: '1px 6px',
+                  borderRadius: 12,
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                }}
+              >
                 <CheckCircleOutlined /> พร้อมใช้
-              </Tag>
+              </span>
             </Tooltip>
           ) : (
             <Tooltip title="ขั้นตอนนี้ยังไม่มีคู่มือ SOP">
-              <Tag color="warning" style={{ margin: 0, fontSize: 10, padding: '0 4px' }}>
-                <ExclamationCircleOutlined /> รอคู่มือ
-              </Tag>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  fontSize: 10.5,
+                  fontWeight: 600,
+                  color: '#d97706',
+                  background: isDarkMode ? 'rgba(245, 158, 11, 0.15)' : '#fffbeb',
+                  padding: '1px 6px',
+                  borderRadius: 12,
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                }}
+              >
+                <ClockCircleOutlined /> รอคู่มือ
+              </span>
             </Tooltip>
           )}
 
@@ -102,12 +146,12 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
               <Button
                 type="text"
                 size="small"
-                icon={<span style={{ fontSize: 11, cursor: 'pointer' }}>✏️</span>}
+                icon={<EditOutlined style={{ fontSize: 11, color: '#fa8c16' }} />}
                 onClick={(e) => {
                   e.stopPropagation();
                   onEditStep(step);
                 }}
-                style={{ width: 18, height: 18, padding: 0 }}
+                style={{ width: 20, height: 20, padding: 0 }}
               />
             </Tooltip>
           )}
@@ -117,12 +161,12 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
                 type="text"
                 danger
                 size="small"
-                icon={<span style={{ fontSize: 11, cursor: 'pointer' }}>🗑️</span>}
+                icon={<DeleteOutlined style={{ fontSize: 11 }} />}
                 onClick={(e) => {
                   e.stopPropagation();
                   onDeleteStep(step);
                 }}
-                style={{ width: 18, height: 18, padding: 0 }}
+                style={{ width: 20, height: 20, padding: 0 }}
               />
             </Tooltip>
           )}
@@ -130,7 +174,7 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
       </div>
 
       {/* Node Title */}
-      <Text strong style={{ fontSize: 12.5, display: 'block', lineHeight: 1.35, marginBottom: 4 }}>
+      <Text strong style={{ fontSize: 13, display: 'block', lineHeight: 1.35, marginBottom: 4 }}>
         {step.title}
       </Text>
 
@@ -143,10 +187,10 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
 
       {/* Outputs */}
       {step.outputs && step.outputs.length > 0 && (
-        <div style={{ marginBottom: 8, background: isDarkMode ? '#131519' : '#f8fafc', padding: '3px 6px', borderRadius: 4 }}>
-          <Text type="secondary" style={{ fontSize: 10, display: 'block' }}>สิ่งที่ได้รับ:</Text>
+        <div style={{ marginBottom: 8, background: isDarkMode ? '#131519' : '#f8fafc', padding: '4px 6px', borderRadius: 4 }}>
+          <Text type="secondary" style={{ fontSize: 10, display: 'block', marginBottom: 2 }}>สิ่งที่ได้รับ:</Text>
           {step.outputs.map((out, idx) => (
-            <div key={idx} style={{ fontSize: 10.5, color: hasSop ? '#52c41a' : '#d97706' }}>
+            <div key={idx} style={{ fontSize: 10.5, color: hasSop ? '#10b981' : '#d97706', lineHeight: 1.3 }}>
               • {out}
             </div>
           ))}
@@ -161,7 +205,7 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
             size="small"
             block
             icon={<BookOutlined />}
-            style={{ fontSize: 11, height: 24, backgroundColor: '#52c41a' }}
+            style={{ fontSize: 11, height: 24, backgroundColor: '#10b981', borderColor: '#10b981' }}
             onClick={(e) => {
               e.stopPropagation();
               onOpenSop(step.procedureId);
@@ -175,7 +219,7 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
             size="small"
             block
             icon={<PlusOutlined />}
-            style={{ fontSize: 11, height: 24, color: '#faad14', borderColor: '#faad14' }}
+            style={{ fontSize: 11, height: 24, color: '#f59e0b', borderColor: '#f59e0b' }}
             onClick={(e) => {
               e.stopPropagation();
               onCreateSop(step);
@@ -186,7 +230,19 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
         )}
       </div>
 
-      <Handle type="source" position={Position.Right} style={{ background: '#555', width: 8, height: 8 }} />
+      {/* Source Handle at BOTTOM */}
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        style={{
+          width: 10,
+          height: 10,
+          background: '#ffffff',
+          border: `2px solid ${borderColor}`,
+          borderRadius: '50%',
+          bottom: -6,
+        }}
+      />
     </div>
   );
 };
@@ -216,19 +272,35 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
 }) => {
   const { isDarkMode } = useTheme();
 
-  // Generate nodes and edges layout horizontally
+  // Generate nodes and edges layout vertically (Top to Bottom)
   const { nodes, edges } = useMemo(() => {
-    const stepIdToStepMap = new Map<number, JobWorkflowStep>();
-    steps.forEach((s) => stepIdToStepMap.set(s.id, s));
+    // Sort steps primarily by sortOrder
+    const sortedSteps = [...steps].sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
+    const stepIdMap = new Map<number, JobWorkflowStep>();
+    sortedSteps.forEach((s) => stepIdMap.set(s.id, s));
 
-    // Calculate levels based on dependencies
+    // Determine effective dependencies:
+    // If explicit dependencies provided, use them.
+    // Otherwise, connect steps sequentially: 1 -> 2 -> 3
+    let effectiveDeps = dependencies && dependencies.length > 0 ? [...dependencies] : [];
+
+    if (effectiveDeps.length === 0 && sortedSteps.length > 1) {
+      for (let i = 0; i < sortedSteps.length - 1; i++) {
+        effectiveDeps.push({
+          dependsOnStepId: sortedSteps[i].id,
+          stepId: sortedSteps[i + 1].id,
+        });
+      }
+    }
+
+    // Calculate topological levels (Rows: top to bottom)
     const stepLevels: Record<number, number> = {};
     const calculateLevel = (stepId: number, visited = new Set<number>()): number => {
       if (visited.has(stepId)) return 0;
       if (stepLevels[stepId] !== undefined) return stepLevels[stepId];
       visited.add(stepId);
 
-      const prereqs = dependencies.filter((d) => d.stepId === stepId);
+      const prereqs = effectiveDeps.filter((d) => d.stepId === stepId);
       if (prereqs.length === 0) {
         stepLevels[stepId] = 0;
         return 0;
@@ -238,31 +310,36 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
       return stepLevels[stepId];
     };
 
-    steps.forEach((s) => calculateLevel(s.id));
+    sortedSteps.forEach((s) => calculateLevel(s.id));
 
-    // Group steps by level for horizontal column placement
-    const levelColumns: Record<number, JobWorkflowStep[]> = {};
-    steps.forEach((s) => {
+    // Group steps by level (row)
+    const levelRows: Record<number, JobWorkflowStep[]> = {};
+    sortedSteps.forEach((s) => {
       const lvl = stepLevels[s.id] || 0;
-      if (!levelColumns[lvl]) levelColumns[lvl] = [];
-      levelColumns[lvl].push(s);
+      if (!levelRows[lvl]) levelRows[lvl] = [];
+      levelRows[lvl].push(s);
     });
 
     const generatedNodes: Node[] = [];
+    const nodeWidth = 280;
     const colSpacing = 320;
-    const rowSpacing = 200;
+    const rowSpacing = 220;
+    const centerX = 360;
 
-    Object.keys(levelColumns).forEach((lvlStr) => {
+    Object.keys(levelRows).forEach((lvlStr) => {
       const lvl = parseInt(lvlStr);
-      const itemsInCol = levelColumns[lvl];
+      const itemsInRow = levelRows[lvl];
+      const count = itemsInRow.length;
 
-      itemsInCol.forEach((step, idx) => {
+      itemsInRow.forEach((step, idx) => {
+        // Center items symmetrically in this level row
+        const xOffset = (idx - (count - 1) / 2) * colSpacing;
         generatedNodes.push({
           id: `step-${step.id}`,
           type: 'stepNode',
           position: {
-            x: 50 + lvl * colSpacing,
-            y: 80 + idx * rowSpacing,
+            x: centerX + xOffset - nodeWidth / 2,
+            y: 40 + lvl * rowSpacing,
           },
           data: {
             step,
@@ -277,14 +354,32 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
       });
     });
 
-    // Generate edges
-    const generatedEdges: Edge[] = dependencies.map((d, idx) => ({
-      id: `edge-${d.dependsOnStepId}-${d.stepId}-${idx}`,
-      source: `step-${d.dependsOnStepId}`,
-      target: `step-${d.stepId}`,
-      animated: true,
-      style: { stroke: isDarkMode ? '#60a5fa' : '#2563eb', strokeWidth: 2 },
-    }));
+    // Generate edges with SmoothStep and Arrowhead Marker (just like in the example!)
+    const generatedEdges: Edge[] = effectiveDeps.map((d, idx) => {
+      const sourceStep = stepIdMap.get(d.dependsOnStepId);
+      const isSourceComplete = !!sourceStep?.procedureId;
+      const strokeColor = isSourceComplete
+        ? (isDarkMode ? '#34d399' : '#10b981') // Green when ready
+        : (isDarkMode ? '#94a3b8' : '#94a3b8'); // Slate when pending
+
+      return {
+        id: `edge-${d.dependsOnStepId}-${d.stepId}-${idx}`,
+        source: `step-${d.dependsOnStepId}`,
+        target: `step-${d.stepId}`,
+        type: 'smoothstep',
+        animated: !isSourceComplete,
+        style: {
+          stroke: strokeColor,
+          strokeWidth: 2,
+        },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          width: 16,
+          height: 16,
+          color: strokeColor,
+        },
+      };
+    });
 
     return { nodes: generatedNodes, edges: generatedEdges };
   }, [steps, dependencies, isDarkMode, onOpenSop, onCreateSop, onEditStep, onDeleteStep, isAuthenticated]);
@@ -293,8 +388,8 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
     <div
       style={{
         width: '100%',
-        height: 520,
-        backgroundColor: isDarkMode ? '#141414' : '#f8fafc',
+        height: 560,
+        backgroundColor: isDarkMode ? '#141414' : '#fafafa',
         borderRadius: 8,
         border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
         overflow: 'hidden',
@@ -305,6 +400,7 @@ export const WorkflowMindmapView: React.FC<WorkflowMindmapViewProps> = ({
         edges={edges}
         nodeTypes={nodeTypes}
         fitView
+        fitViewOptions={{ padding: 0.2 }}
         attributionPosition="bottom-left"
       >
         <Background color={isDarkMode ? '#333' : '#cbd5e1'} gap={16} size={1} />

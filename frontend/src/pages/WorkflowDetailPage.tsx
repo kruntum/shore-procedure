@@ -106,6 +106,10 @@ export const WorkflowDetailPage: React.FC = () => {
   const handleOpenStepModal = (step?: JobWorkflowStep) => {
     if (step) {
       setEditingStep(step);
+      const currentDeps = (workflow?.dependencies || [])
+        .filter((d) => d.stepId === step.id)
+        .map((d) => d.dependsOnStepId);
+
       stepForm.setFieldsValue({
         sortOrder: step.sortOrder,
         title: step.title,
@@ -113,15 +117,17 @@ export const WorkflowDetailPage: React.FC = () => {
         procedureId: step.procedureId || null,
         governmentAgencyId: step.governmentAgencyId || null,
         portId: step.portId || null,
+        dependsOnStepIds: currentDeps,
         outputsText: (step.outputs || []).join('\n'),
       });
     } else {
       setEditingStep(null);
       stepForm.resetFields();
-      const nextOrder = (workflow.steps?.length || 0) + 1;
+      const nextOrder = (workflow?.steps?.length || 0) + 1;
       stepForm.setFieldsValue({
         sortOrder: nextOrder,
         outputsText: '',
+        dependsOnStepIds: [],
       });
     }
     setStepModalOpen(true);
@@ -171,6 +177,7 @@ export const WorkflowDetailPage: React.FC = () => {
         portId: values.portId || null,
         sortOrder: values.sortOrder || 1,
         outputs,
+        dependsOnStepIds: values.dependsOnStepIds || [],
       };
 
       if (editingStep && workflowId) {
@@ -574,6 +581,24 @@ export const WorkflowDetailPage: React.FC = () => {
               />
             </Form.Item>
           </div>
+
+          <Form.Item
+            name="dependsOnStepIds"
+            label="ขั้นตอนก่อนหน้า (Prerequisites / Depends On)"
+            extra="* ปล่อยว่างไว้เพื่อเชื่อมต่อตามลำดับ 1 -> 2 -> 3 อัตโนมัติ หรือเลือกขั้นตอนก่อนหน้าเพื่อสร้างสายงานแยก/คู่ขนาน (Branching Flow)"
+          >
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="-- ปล่อยว่างไว้ (เชื่อมตามลำดับอัตโนมัติ) หรือเลือกขั้นตอนก่อนหน้า --"
+              options={workflow?.steps
+                ?.filter((s) => !editingStep || s.id !== editingStep.id)
+                .map((s) => ({
+                  value: s.id,
+                  label: `#${s.sortOrder} - ${s.title}`,
+                }))}
+            />
+          </Form.Item>
 
           <Form.Item
             name="outputsText"

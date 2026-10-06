@@ -317,6 +317,7 @@ const stepSchema = z.object({
   sortOrder: z.number().int().default(1),
   stepType: z.string().default('standard'),
   outputs: z.array(z.string()).default([]),
+  dependsOnStepIds: z.array(z.number().int()).optional(),
 });
 
 // POST /api/workflows/:id/steps (Add single step to workflow)
@@ -352,6 +353,18 @@ workflowsRouter.post('/:id/steps', requireAuth, requireAdmin, zValidator('json',
     outputs: body.outputs || [],
   }).returning();
 
+  if (body.dependsOnStepIds && body.dependsOnStepIds.length > 0) {
+    for (const depId of body.dependsOnStepIds) {
+      if (depId && depId !== newStep.id) {
+        await db.insert(jobWorkflowDependencies).values({
+          workflowId,
+          stepId: newStep.id,
+          dependsOnStepId: depId,
+        });
+      }
+    }
+  }
+
   return successResponse(c, newStep, 'เพิ่มขั้นตอนสำเร็จ', 201);
 });
 
@@ -377,8 +390,20 @@ workflowsRouter.put('/:id/steps/:stepId', requireAuth, requireAdmin, zValidator(
     sortOrder: body.sortOrder !== undefined ? body.sortOrder : existing.sortOrder,
     stepType: body.stepType || existing.stepType,
     outputs: body.outputs || existing.outputs,
-    updatedAt: new Date(),
   }).where(eq(jobWorkflowSteps.id, stepId)).returning();
+
+  if (body.dependsOnStepIds !== undefined) {
+    await db.delete(jobWorkflowDependencies).where(eq(jobWorkflowDependencies.stepId, stepId));
+    for (const depId of body.dependsOnStepIds) {
+      if (depId && depId !== stepId) {
+        await db.insert(jobWorkflowDependencies).values({
+          workflowId,
+          stepId,
+          dependsOnStepId: depId,
+        });
+      }
+    }
+  }
 
   return successResponse(c, updated, 'แก้ไขขั้นตอนสำเร็จ');
 });
