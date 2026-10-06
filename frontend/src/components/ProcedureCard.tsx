@@ -32,6 +32,7 @@ export const ProcedureCard: React.FC<ProcedureCardProps> = ({ procedure }) => {
       size="small"
       onClick={() => navigate(`/procedures/${procedure.id}`)}
       style={{
+        width: '100%',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
