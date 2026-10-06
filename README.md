@@ -267,14 +267,98 @@ cp .env.example .env
 # 2. สั่ง build และ start คอนเทนเนอร์ทั้งหมด
 docker compose up -d --build
 
-# 3. ตรวจสอบสถานะการทำงาน
+# 3. รัน Database Migration & Seed ข้อมูลเริ่มต้น
+docker compose exec backend bun run db:migrate
+docker compose exec backend bun run db:seed
+docker compose exec backend bun run src/db/seedWorkflows.ts
+
+# 4. ตรวจสอบสถานะการทำงาน
 docker compose ps
 ```
 เมื่อรันเสร็จสิ้น สามารถเปิดใช้งานผ่านเบราว์เซอร์ได้ที่: **`http://localhost:3202`**
 
 ---
 
-## 🔒 9. แนวทางการจัดการรูปภาพอย่างปลอดภัย (Image Delivery Strategy)
+## 🔄 9. คู่มือการอัปเดตระบบและการจัดการฐานข้อมูล (Local Server Maintenance & Database Management)
+
+บันทึกคำสั่งที่จำเป็นสำหรับการนำโปรเจกต์ไปรันบน Local Server อื่น หรือการกลับมาดูแลรักษาระบบในอนาคต:
+
+### 1) การอัปเดตโค้ดและระบบล่าสุด (Update Code & Services)
+เมื่อมีการเปลี่ยนแปลงหรือเพิ่มฟีเจอร์ใหม่จาก Git Repository ให้รันตามลำดับดังนี้:
+```bash
+# 1. ดึงโค้ดล่าสุดจาก GitHub
+git pull origin main
+
+# 2. สั่ง Rebuild คอนเทนเนอร์ (ข้อมูลใน Postgres และ MinIO จะไม่หาย)
+docker compose up -d --build
+
+# 3. อัปเดตโครงสร้างฐานข้อมูลล่าสุด (Database Migration)
+docker compose exec backend bun run db:migrate
+
+# 4. รีสตาร์ท Nginx เพื่อรีเฟรชการตั้งค่าและเคลียร์แคช
+docker restart shore-nginx
+```
+
+---
+
+### 2) การสำรองข้อมูล (Backup) และกู้คืนข้อมูล (Restore) ฐานข้อมูล PostgreSQL
+สำหรับการย้ายฐานข้อมูลไปเครื่อง Local Server อื่น หรือทำสำเนาข้อมูลประจำงวด:
+
+#### 📤 คำสั่ง Backup (สร้างไฟล์ `.sql` จากเซิร์ฟเวอร์ต้นทาง):
+```bash
+docker exec -t shore-postgres pg_dump -U shore_app shore_db > backup_shore.sql
+```
+*(จะได้ไฟล์ `backup_shore.sql` ในโฟลเดอร์โปรเจกต์)*
+
+#### 📥 คำสั่ง Restore (นำเข้าไฟล์ `.sql` สู่เซิร์ฟเวอร์ปลายทาง):
+* **สำหรับ Windows PowerShell:**
+  ```powershell
+  Get-Content backup_shore.sql | docker exec -i shore-postgres psql -U shore_app -d shore_db
+  ```
+* **สำหรับ Linux / Mac / Git Bash:**
+  ```bash
+  cat backup_shore.sql | docker exec -i shore-postgres psql -U shore_app -d shore_db
+  ```
+
+---
+
+### 3) การเติมข้อมูลตัวอย่างเริ่มต้น (Data Seeding)
+กรณีติดตั้งเซิร์ฟเวอร์ใหม่เอี่ยม และต้องการใส่ชุดข้อมูลตัวอย่าง:
+```bash
+# เติม Master Data (ท่าเรือ, เอเย่นต์, ประเภทงาน, คู่มือ SOP)
+docker compose exec backend bun run db:seed
+
+# เติมสายงานปฏิบัติการและขั้นตอน Flowchart (Job Workflows & Steps)
+docker compose exec backend bun run src/db/seedWorkflows.ts
+```
+
+---
+
+### 4) คำสั่งตรวจสอบและแก้ไขปัญหาทั่วไป (Troubleshooting)
+```bash
+# ตรวจสอบสถานะคอนเทนเนอร์ทั้งหมด
+docker compose ps
+
+# ดู Log การทำงานของ Backend แบบเรียลไทม์
+docker compose logs -f backend
+
+# ดู Log ของ Frontend และ Nginx
+docker compose logs -f frontend nginx
+
+# รีสตาร์ทเฉพาะบริการที่มีปัญหา
+docker compose restart backend frontend shore-nginx
+
+# ปิดระบบทั้งหมด (ข้อมูลยังคงปลอดภัยใน Docker Named Volumes)
+docker compose down
+```
+
+> [!NOTE]
+> **ความปลอดภัยของข้อมูล (Data Persistence):**  
+> ข้อมูลใน PostgreSQL และรูปภาพใน MinIO ถูกผูกไว้กับ Named Volumes (`postgres_data`, `minio_data`) ใน `docker-compose.yml` ข้อมูลจะไม่สูญหายเมื่อสั่ง `docker compose down` หรือ `docker compose up -d --build`
+
+---
+
+## 🔒 10. แนวทางการจัดการรูปภาพอย่างปลอดภัย (Image Delivery Strategy)
 
 เนื่องจากรูปภาพในระบบอาจมีข้อมูลเอกสารหรือหน้าจอระบบภายใน การจัดเก็บและเข้าถึงภาพจึงใช้กลยุทธ์:
 1. **จัดเก็บเป็น Private ใน MinIO:** บักเก็ต `shore-procedures` ถูกตั้งค่า `mc anonymous set none` บุคคลภายนอกไม่สามารถเดา URL เข้าถึงตรงๆ ได้
@@ -284,9 +368,10 @@ docker compose ps
 
 ---
 
-## 📋 10. แผนการพัฒนาต่อยอด (Future Roadmap)
+## 📋 11. แผนการพัฒนาต่อยอด (Future Roadmap)
 
 - [ ] **Quick Search / Command Palette:** กด `Ctrl + K` เพื่อพิมพ์ค้นหาชื่อท่าหรือสายเรือแบบ Instant Search
+- [ ] **Export Mindmap as Image (PNG):** ปุ่มบันทึกภาพผังงานสายงานปฏิบัติการความละเอียดสูง สำหรับแชร์เข้ากลุ่มชิปปิ้ง
 - [ ] **PDF Export / Print View:** ปุ่มดาวน์โหลดขั้นตอนออกเป็นเอกสาร PDF ในรูปแบบมาตรฐานสำหรับปริ้นท์ติดบอร์ดหน้างาน
 - [ ] **Audit Trail & Changelog:** บันทึกประวัติการแก้ไข ว่าใครแก้เงื่อนไขใด เมื่อใด เพื่อความโปร่งใส
 - [ ] **Offline / PWA Support:** แคชขั้นตอนงานที่ใช้บ่อยไว้ในเบราว์เซอร์ สำหรับเปิดดูยามเน็ตหน้าท่าเรือช้าหรือขัดข้อง
