@@ -94,6 +94,80 @@ export const WorkflowDetailPage: React.FC = () => {
     setSelectedSopId(procedureId);
   };
 
+  // Critical Path Method (CPM) calculation for workflow total duration
+  const totalWorkflowEstimatedMinutes = React.useMemo(() => {
+    if (!workflow.steps || workflow.steps.length === 0) return 0;
+
+    const steps = workflow.steps;
+    const deps = workflow.dependencies || [];
+
+    // Map of step id to step object
+    const stepMap = new Map(steps.map((s) => [s.id, s]));
+
+    // Graph adjacency: incoming prerequisites for each step
+    const prereqsMap = new Map<number, number[]>();
+    steps.forEach((s) => prereqsMap.set(s.id, []));
+
+    if (deps.length > 0) {
+      deps.forEach((d) => {
+        if (prereqsMap.has(d.stepId)) {
+          prereqsMap.get(d.stepId)!.push(d.dependsOnStepId);
+        }
+      });
+    } else {
+      // Default sequential dependency by sortOrder
+      const sorted = [...steps].sort((a, b) => a.sortOrder - b.sortOrder);
+      for (let i = 1; i < sorted.length; i++) {
+        prereqsMap.get(sorted[i].id)!.push(sorted[i - 1].id);
+      }
+    }
+
+    // Earliest Finish Time (EF) for each node using memoized DP
+    const earliestFinish = new Map<number, number>();
+
+    const getEF = (stepId: number, visited = new Set<number>()): number => {
+      if (earliestFinish.has(stepId)) return earliestFinish.get(stepId)!;
+      if (visited.has(stepId)) return 0; // Prevent cycle recursion
+      visited.add(stepId);
+
+      const step = stepMap.get(stepId);
+      const stepDuration = step?.estimatedMinutes || 0;
+
+      const prereqs = prereqsMap.get(stepId) || [];
+      let maxPrereqEF = 0;
+
+      for (const pId of prereqs) {
+        const pEF = getEF(pId, new Set(visited));
+        if (pEF > maxPrereqEF) {
+          maxPrereqEF = pEF;
+        }
+      }
+
+      const ef = maxPrereqEF + stepDuration;
+      earliestFinish.set(stepId, ef);
+      return ef;
+    };
+
+    let projectDuration = 0;
+    steps.forEach((s) => {
+      const ef = getEF(s.id);
+      if (ef > projectDuration) {
+        projectDuration = ef;
+      }
+    });
+
+    return projectDuration;
+  }, [workflow.steps, workflow.dependencies]);
+
+  const formattedWorkflowTime = React.useMemo(() => {
+    if (totalWorkflowEstimatedMinutes <= 0) return null;
+    const hours = Math.floor(totalWorkflowEstimatedMinutes / 60);
+    const mins = totalWorkflowEstimatedMinutes % 60;
+    if (hours > 0 && mins > 0) return `${hours} ชม. ${mins} นาที`;
+    if (hours > 0) return `${hours} ชั่วโมง`;
+    return `${mins} นาที`;
+  }, [totalWorkflowEstimatedMinutes]);
+
   const handleCreateSop = (step: JobWorkflowStep) => {
     const params = new URLSearchParams();
     params.set('title', step.title);
@@ -118,6 +192,7 @@ export const WorkflowDetailPage: React.FC = () => {
         procedureId: step.procedureId || null,
         governmentAgencyId: step.governmentAgencyId || null,
         portId: step.portId || null,
+        estimatedMinutes: step.estimatedMinutes || undefined,
         dependsOnStepIds: currentDeps,
         outputsText: (step.outputs || []).join('\n'),
       });
@@ -128,6 +203,7 @@ export const WorkflowDetailPage: React.FC = () => {
       stepForm.setFieldsValue({
         sortOrder: nextOrder,
         stepType: 'standard',
+        estimatedMinutes: 30,
         outputsText: '',
         dependsOnStepIds: [],
       });
@@ -146,6 +222,12 @@ export const WorkflowDetailPage: React.FC = () => {
       (proc.governmentAgencyIds && proc.governmentAgencyIds.length > 0 ? proc.governmentAgencyIds[0] : null) ||
       null;
 
+    // Calculate total duration from procedure steps if available
+    let totalProcMinutes = 0;
+    if (proc.variants && proc.variants.length > 0) {
+      totalProcMinutes = (proc.variants[0].steps || []).reduce((acc: number, s: any) => acc + (s.estimatedMinutes || 0), 0);
+    }
+
     const patch: Record<string, any> = {
       title: proc.title,
     };
@@ -158,6 +240,9 @@ export const WorkflowDetailPage: React.FC = () => {
     }
     if (proc.portId) {
       patch.portId = proc.portId;
+    }
+    if (totalProcMinutes > 0) {
+      patch.estimatedMinutes = totalProcMinutes;
     }
 
     stepForm.setFieldsValue(patch);
@@ -179,6 +264,7 @@ export const WorkflowDetailPage: React.FC = () => {
         portId: values.portId || null,
         sortOrder: values.sortOrder || 1,
         stepType: values.stepType || 'standard',
+        estimatedMinutes: values.estimatedMinutes || null,
         outputs,
         dependsOnStepIds: values.dependsOnStepIds || [],
       };
@@ -264,6 +350,22 @@ export const WorkflowDetailPage: React.FC = () => {
             <Text type="secondary" style={{ fontSize: 11 }}>-</Text>
           )}
         </Space>
+      ),
+    },
+    {
+      title: 'เวลาโดยประมาณ',
+      dataIndex: 'estimatedMinutes',
+      key: 'estimatedMinutes',
+      width: 120,
+      align: 'center' as const,
+      render: (mins?: number | null) => (
+        mins ? (
+          <Tag color="orange" style={{ margin: 0, fontSize: 11, fontWeight: 500 }}>
+            <ClockCircleOutlined /> ~{mins} นาที
+          </Tag>
+        ) : (
+          <Text type="secondary" style={{ fontSize: 11 }}>-</Text>
+        )
       ),
     },
     {
@@ -407,6 +509,11 @@ export const WorkflowDetailPage: React.FC = () => {
               )}
               {workflow.estimatedDuration && (
                 <Tag color="default"><ClockCircleOutlined /> {workflow.estimatedDuration}</Tag>
+              )}
+              {formattedWorkflowTime && (
+                <Tag color="success" style={{ fontWeight: 600 }}>
+                  <ClockCircleOutlined /> รวมประมาณการ: ~{formattedWorkflowTime}
+                </Tag>
               )}
             </Space>
             <Title level={4} style={{ margin: '4px 0 6px 0', fontSize: 17 }}>
@@ -555,13 +662,32 @@ export const WorkflowDetailPage: React.FC = () => {
             </Form.Item>
           </div>
 
-          <Form.Item
-            name="title"
-            label="ชื่อขั้นตอนการปฏิบัติงาน"
-            rules={[{ required: true, message: 'กรุณาระบุชื่อขั้นตอน' }]}
-          >
-            <Input placeholder="เช่น ยื่นขอใบอนุญาต อย. (LPI) หรือ นัดหมายตรวจสอบสินค้า" />
-          </Form.Item>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <Form.Item
+              name="title"
+              label="ชื่อขั้นตอนการปฏิบัติงาน"
+              rules={[{ required: true, message: 'กรุณาระบุชื่อขั้นตอน' }]}
+              style={{ flex: 1 }}
+            >
+              <Input placeholder="เช่น ยื่นขอใบอนุญาต อย. (LPI) หรือ นัดหมายตรวจสอบสินค้า" />
+            </Form.Item>
+
+            <Form.Item
+              name="estimatedMinutes"
+              label="เวลาโดยประมาณ (นาที)"
+              extra="* เผื่อเวลาปฏิบัติงาน"
+              style={{ width: 170 }}
+            >
+              <InputNumber
+                placeholder="เช่น 30"
+                min={1}
+                max={1440}
+                prefix={<span style={{ fontSize: 11, color: '#94a3b8' }}>⏱️</span>}
+                addonAfter="นาที"
+                style={{ width: '100%' }}
+              />
+            </Form.Item>
+          </div>
 
           <Form.Item name="briefDescription" label="คำอธิบายสรุปย่อขั้นตอน">
             <Input.TextArea rows={2} placeholder="อธิบายสิ่งที่ต้องปฏิบัติในขั้นตอนนี้..." />

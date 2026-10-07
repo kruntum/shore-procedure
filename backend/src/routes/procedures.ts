@@ -41,6 +41,7 @@ const stepCreateSchema = z.object({
   title: z.string().min(1, 'กรุณาระบุชื่อขั้นตอน'),
   description: z.string().optional().default(''),
   responsibleRole: z.string().optional().default('พนักงานหน้างาน'),
+  estimatedMinutes: z.number().int().nonnegative().optional().nullable(),
   sortOrder: z.number().int().default(0),
 });
 
@@ -292,6 +293,7 @@ proceduresRouter.post('/', requireAuth, zValidator('json', procedureCreateSchema
             title: s.title,
             description: s.description,
             responsibleRole: s.responsibleRole || 'พนักงานหน้างาน',
+            estimatedMinutes: s.estimatedMinutes ?? null,
             sortOrder: s.sortOrder || j + 1,
           });
         }
@@ -339,6 +341,7 @@ const stepUpdateItemSchema = z.object({
   title: z.string().min(1, 'กรุณาระบุชื่อขั้นตอน'),
   description: z.string().optional().default(''),
   responsibleRole: z.string().optional().default('พนักงานหน้างาน'),
+  estimatedMinutes: z.number().int().nonnegative().optional().nullable(),
   sortOrder: z.number().int().optional().default(0),
 });
 
@@ -523,6 +526,7 @@ proceduresRouter.put('/:id', requireAuth, zValidator('json', procedureUpdateFull
               title: s.title,
               description: s.description,
               responsibleRole: s.responsibleRole || 'พนักงานหน้างาน',
+              estimatedMinutes: s.estimatedMinutes !== undefined ? s.estimatedMinutes : null,
               sortOrder: s.sortOrder || j + 1,
             }).where(eq(procedureSteps.id, s.id));
           } else {
@@ -532,6 +536,7 @@ proceduresRouter.put('/:id', requireAuth, zValidator('json', procedureUpdateFull
               title: s.title,
               description: s.description,
               responsibleRole: s.responsibleRole || 'พนักงานหน้างาน',
+              estimatedMinutes: s.estimatedMinutes ?? null,
               sortOrder: s.sortOrder || j + 1,
             });
           }
@@ -675,6 +680,7 @@ proceduresRouter.post('/:id/duplicate', requireAuth, async (c) => {
             title: s.title,
             description: s.description,
             responsibleRole: s.responsibleRole,
+            estimatedMinutes: s.estimatedMinutes,
             sortOrder: s.sortOrder,
           }).returning();
 
@@ -847,6 +853,7 @@ proceduresRouter.post('/variants/:variantId/steps', requireAuth, zValidator('jso
     title: body.title,
     description: body.description,
     responsibleRole: body.responsibleRole || 'พนักงานหน้างาน',
+    estimatedMinutes: body.estimatedMinutes ?? null,
     sortOrder: body.sortOrder,
   }).returning();
 

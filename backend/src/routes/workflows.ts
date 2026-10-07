@@ -34,6 +34,7 @@ const workflowCreateSchema = z.object({
     portId: z.number().int().positive().nullable().optional(),
     sortOrder: z.number().int().default(1),
     stepType: z.string().default('standard'),
+    estimatedMinutes: z.number().int().nonnegative().optional().nullable(),
     outputs: z.array(z.string()).default([]),
     dependsOnStepIndices: z.array(z.number().int()).optional(), // indices or ids of prerequisites
   })).optional(),
@@ -154,6 +155,7 @@ workflowsRouter.get('/:id', async (c) => {
     portId: jobWorkflowSteps.portId,
     sortOrder: jobWorkflowSteps.sortOrder,
     stepType: jobWorkflowSteps.stepType,
+    estimatedMinutes: jobWorkflowSteps.estimatedMinutes,
     outputs: jobWorkflowSteps.outputs,
     createdAt: jobWorkflowSteps.createdAt,
     procedureTitle: procedures.title,
@@ -223,6 +225,7 @@ workflowsRouter.post('/', requireAuth, requireAdmin, zValidator('json', workflow
         portId: s.portId || null,
         sortOrder: s.sortOrder || i + 1,
         stepType: s.stepType || 'standard',
+        estimatedMinutes: s.estimatedMinutes ?? null,
         outputs: s.outputs || [],
       }).returning();
       createdStepIds.push(newStep.id);
@@ -271,6 +274,7 @@ workflowsRouter.put('/:id', requireAuth, requireAdmin, zValidator('json', workfl
         portId: s.portId || null,
         sortOrder: s.sortOrder || i + 1,
         stepType: s.stepType || 'standard',
+        estimatedMinutes: s.estimatedMinutes ?? null,
         outputs: s.outputs || [],
       }).returning();
 
@@ -316,6 +320,7 @@ const stepSchema = z.object({
   portId: z.number().int().positive().optional().nullable(),
   sortOrder: z.number().int().default(1),
   stepType: z.string().default('standard'),
+  estimatedMinutes: z.number().int().nonnegative().optional().nullable(),
   outputs: z.array(z.string()).default([]),
   dependsOnStepIds: z.array(z.number().int()).optional(),
 });
@@ -350,6 +355,7 @@ workflowsRouter.post('/:id/steps', requireAuth, requireAdmin, zValidator('json',
     portId: body.portId || null,
     sortOrder,
     stepType: body.stepType || 'standard',
+    estimatedMinutes: body.estimatedMinutes ?? null,
     outputs: body.outputs || [],
   }).returning();
 
@@ -389,6 +395,7 @@ workflowsRouter.put('/:id/steps/:stepId', requireAuth, requireAdmin, zValidator(
     portId: body.portId !== undefined ? body.portId : existing.portId,
     sortOrder: body.sortOrder !== undefined ? body.sortOrder : existing.sortOrder,
     stepType: body.stepType || existing.stepType,
+    estimatedMinutes: body.estimatedMinutes !== undefined ? body.estimatedMinutes : existing.estimatedMinutes,
     outputs: body.outputs || existing.outputs,
   }).where(eq(jobWorkflowSteps.id, stepId)).returning();
 

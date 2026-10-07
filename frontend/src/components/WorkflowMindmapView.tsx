@@ -113,6 +113,11 @@ export const StepNode: React.FC<NodeProps> = ({ data }: any) => {
               <CompassOutlined /> {step.portCode}
             </Tag>
           )}
+          {step.estimatedMinutes && (
+            <Tag color="gold" style={{ margin: 0, fontSize: 10, padding: '0 4px', fontWeight: 600 }}>
+              <ClockCircleOutlined /> {step.estimatedMinutes}m
+            </Tag>
+          )}
         </Space>
 
         <Space size={4}>

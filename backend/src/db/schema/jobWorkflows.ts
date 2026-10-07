@@ -28,6 +28,7 @@ export const jobWorkflowSteps = pgTable('job_workflow_steps', {
   portId: integer('port_id').references(() => ports.id, { onDelete: 'set null' }),
   sortOrder: integer('sort_order').notNull().default(1),
   stepType: text('step_type').default('standard').notNull(), // 'standard', 'parallel', 'decision'
+  estimatedMinutes: integer('estimated_minutes'), // e.g. 15, 30, 60 mins
   outputs: jsonb('outputs').$type<string[]>().default([]), // e.g. ['เลขที่ใบอนุญาต LPI 13 หลัก', 'เอกสาร พก.5']
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });

@@ -10,6 +10,19 @@ export const SummaryBanner: React.FC<{ variant?: ProcedureVariant }> = ({ varian
   const { isDarkMode, primaryColor } = useTheme();
   if (!variant) return null;
 
+  // Calculate total estimated minutes
+  const totalMinutes = (variant.steps || []).reduce((acc, s) => acc + (s.estimatedMinutes || 0), 0);
+  const formatDuration = (mins: number) => {
+    if (mins <= 0) return null;
+    const hours = Math.floor(mins / 60);
+    const remainingMins = mins % 60;
+    if (hours > 0 && remainingMins > 0) return `${hours} ชม. ${remainingMins} นาที`;
+    if (hours > 0) return `${hours} ชั่วโมง`;
+    return `${mins} นาที`;
+  };
+
+  const formattedTime = formatDuration(totalMinutes);
+
   return (
     <Card
       size="small"
@@ -23,7 +36,7 @@ export const SummaryBanner: React.FC<{ variant?: ProcedureVariant }> = ({ varian
       }}
     >
       <Row gutter={[16, 8]} align="middle">
-        <Col xs={24} sm={8}>
+        <Col xs={24} sm={totalMinutes > 0 ? 6 : 8}>
           <Space>
             <DollarOutlined style={{ color: '#1677ff' }} />
             <Text type="secondary">วิธีการดำเนินการ:</Text>
@@ -31,7 +44,19 @@ export const SummaryBanner: React.FC<{ variant?: ProcedureVariant }> = ({ varian
           </Space>
         </Col>
 
-        <Col xs={24} sm={8}>
+        {totalMinutes > 0 && (
+          <Col xs={24} sm={6}>
+            <Space>
+              <ClockCircleOutlined style={{ color: '#10b981' }} />
+              <Text type="secondary">ประมาณการรวม:</Text>
+              <Tag color="success" style={{ margin: 0, fontWeight: 600 }}>
+                ~{formattedTime}
+              </Tag>
+            </Space>
+          </Col>
+        )}
+
+        <Col xs={24} sm={totalMinutes > 0 ? 6 : 8}>
           <Space>
             <ClockCircleOutlined style={{ color: '#fa8c16' }} />
             <Text type="secondary">เวลาตัดรอบ:</Text>
@@ -41,7 +66,7 @@ export const SummaryBanner: React.FC<{ variant?: ProcedureVariant }> = ({ varian
           </Space>
         </Col>
 
-        <Col xs={24} sm={8}>
+        <Col xs={24} sm={totalMinutes > 0 ? 6 : 8}>
           {variant.notes && (
             <Space align="start">
               <InfoCircleOutlined style={{ color: '#faad14', marginTop: 3 }} />

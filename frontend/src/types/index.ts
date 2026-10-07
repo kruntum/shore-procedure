@@ -35,6 +35,7 @@ export interface JobWorkflowStep {
   portName?: string | null;
   sortOrder: number;
   stepType: string;
+  estimatedMinutes?: number | null;
   outputs?: string[];
   createdAt?: string;
 }
@@ -122,6 +123,7 @@ export interface ProcedureStep {
   title: string;
   description?: string;
   responsibleRole?: string;
+  estimatedMinutes?: number | null;
   sortOrder: number;
   images?: StepImage[];
 }

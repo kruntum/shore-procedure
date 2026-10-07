@@ -1,5 +1,6 @@
 import React from 'react';
-import { Timeline, Typography, Card, Empty, Row, Col, Space } from 'antd';
+import { Timeline, Typography, Card, Empty, Row, Col, Space, Tag } from 'antd';
+import { ClockCircleOutlined } from '@ant-design/icons';
 import { ProcedureStep } from '../types';
 import { StepImageViewer } from './StepImageViewer';
 import { RoleTag } from './RoleTag';
@@ -34,9 +35,28 @@ export const StepTimeline: React.FC<{ steps?: ProcedureStep[] }> = ({ steps }) =
           <Row gutter={[16, 12]} align="top">
             {/* Left Column: Title, Description & RoleTag */}
             <Col xs={24} md={hasImages ? 15 : 24} lg={hasImages ? 16 : 24}>
-              <Title level={5} style={{ margin: '0 0 6px 0', color: isDarkMode ? '#f1f5f9' : '#1e293b', fontSize: 13.5 }}>
-                ขั้นตอนที่ {step.stepNumber}: {step.title}
-              </Title>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6, marginBottom: 6 }}>
+                <Title level={5} style={{ margin: 0, color: isDarkMode ? '#f1f5f9' : '#1e293b', fontSize: 13.5 }}>
+                  ขั้นตอนที่ {step.stepNumber}: {step.title}
+                </Title>
+                {step.estimatedMinutes && (
+                  <Tag
+                    color="orange"
+                    style={{
+                      margin: 0,
+                      fontSize: 11,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      borderRadius: 12,
+                      padding: '1px 8px',
+                      fontWeight: 500,
+                    }}
+                  >
+                    <ClockCircleOutlined /> ~{step.estimatedMinutes} นาที
+                  </Tag>
+                )}
+              </div>
 
               {step.description ? (
                 <Paragraph

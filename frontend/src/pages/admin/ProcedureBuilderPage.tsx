@@ -3,6 +3,7 @@ import {
   Card,
   Form,
   Input,
+  InputNumber,
   Select,
   AutoComplete,
   Button,
@@ -103,6 +104,7 @@ export const ProcedureBuilderPage: React.FC = () => {
             title: s.title,
             description: s.description,
             responsibleRole: s.responsibleRole || 'พนักงานหน้างาน / ชิปปิ้ง',
+            estimatedMinutes: s.estimatedMinutes || undefined,
           })),
         })),
       });
@@ -131,6 +133,7 @@ export const ProcedureBuilderPage: React.FC = () => {
                 title: 'เข้าสู่ระบบและตรวจสอบเอกสาร',
                 description: '',
                 responsibleRole: 'พนักงานหน้างาน / ชิปปิ้ง',
+                estimatedMinutes: 15,
               },
             ],
           },
@@ -561,7 +564,7 @@ export const ProcedureBuilderPage: React.FC = () => {
                                         </Tag>
                                       </Col>
 
-                                      <Col xs={20} sm={8}>
+                                      <Col xs={20} sm={7}>
                                         <Form.Item
                                           {...stepField}
                                           name={[stepField.name, 'title']}
@@ -572,7 +575,7 @@ export const ProcedureBuilderPage: React.FC = () => {
                                         </Form.Item>
                                       </Col>
 
-                                      <Col xs={16} sm={6}>
+                                      <Col xs={14} sm={4}>
                                         <Form.Item
                                           {...stepField}
                                           name={[stepField.name, 'responsibleRole']}
@@ -580,10 +583,27 @@ export const ProcedureBuilderPage: React.FC = () => {
                                         >
                                           <AutoComplete
                                             options={roleOptions}
-                                            placeholder="ผู้รับผิดชอบ (เช่น พนักงานหน้างาน)"
+                                            placeholder="ผู้รับผิดชอบ"
                                             filterOption={(inputValue, option) =>
                                               (option?.value ?? '').toLowerCase().includes(inputValue.toLowerCase())
                                             }
+                                          />
+                                        </Form.Item>
+                                      </Col>
+
+                                      <Col xs={10} sm={3}>
+                                        <Form.Item
+                                          {...stepField}
+                                          name={[stepField.name, 'estimatedMinutes']}
+                                          style={{ marginBottom: 0 }}
+                                        >
+                                          <InputNumber
+                                            placeholder="เวลา (นาที)"
+                                            min={1}
+                                            max={1440}
+                                            prefix={<span style={{ fontSize: 11, color: '#94a3b8' }}>⏱️</span>}
+                                            addonAfter="น."
+                                            style={{ width: '100%' }}
                                           />
                                         </Form.Item>
                                       </Col>
