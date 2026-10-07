@@ -318,16 +318,17 @@ export const WorkflowDetailPage: React.FC = () => {
       key: 'sortOrder',
       width: 60,
       align: 'center' as const,
-      render: (val: number) => <Tag color="blue">#{val}</Tag>,
+      render: (val: number) => <Tag color="blue" style={{ margin: 0, fontWeight: 600 }}>#{val}</Tag>,
     },
     {
       title: 'ขั้นตอนการปฏิบัติงาน',
       key: 'title',
+      width: 280,
       render: (_: any, record: JobWorkflowStep) => (
-        <div>
-          <Text strong style={{ fontSize: 13 }}>{record.title}</Text>
+        <div style={{ wordBreak: 'break-word' }}>
+          <Text strong style={{ fontSize: 13, lineHeight: 1.4, display: 'inline-block' }}>{record.title}</Text>
           {record.briefDescription && (
-            <div style={{ fontSize: 11.5, color: isDarkMode ? '#a1a1aa' : '#64748b', marginTop: 2 }}>
+            <div style={{ fontSize: 11.5, color: isDarkMode ? '#a1a1aa' : '#64748b', marginTop: 3, lineHeight: 1.35 }}>
               {record.briefDescription}
             </div>
           )}
@@ -337,14 +338,14 @@ export const WorkflowDetailPage: React.FC = () => {
     {
       title: 'หน่วยงาน / สถานที่',
       key: 'location',
-      width: 180,
+      width: 170,
       render: (_: any, record: JobWorkflowStep) => (
-        <Space size={4} wrap>
+        <Space size={[0, 4]} wrap>
           {record.agencyShortName && (
-            <Tag color="volcano"><BankOutlined /> {record.agencyShortName}</Tag>
+            <Tag color="volcano" style={{ margin: '1px 2px' }}><BankOutlined /> {record.agencyShortName}</Tag>
           )}
           {record.portCode && (
-            <Tag color="blue"><CompassOutlined /> ท่า {record.portCode}</Tag>
+            <Tag color="blue" style={{ margin: '1px 2px' }}><CompassOutlined /> ท่า {record.portCode}</Tag>
           )}
           {!record.agencyShortName && !record.portCode && (
             <Text type="secondary" style={{ fontSize: 11 }}>-</Text>
@@ -356,11 +357,11 @@ export const WorkflowDetailPage: React.FC = () => {
       title: 'เวลาโดยประมาณ',
       dataIndex: 'estimatedMinutes',
       key: 'estimatedMinutes',
-      width: 120,
+      width: 125,
       align: 'center' as const,
       render: (mins?: number | null) => (
         mins ? (
-          <Tag color="orange" style={{ margin: 0, fontSize: 11, fontWeight: 500 }}>
+          <Tag color="orange" style={{ margin: 0, fontSize: 11, fontWeight: 500, whiteSpace: 'nowrap' }}>
             <ClockCircleOutlined /> ~{mins} นาที
           </Tag>
         ) : (
@@ -372,12 +373,12 @@ export const WorkflowDetailPage: React.FC = () => {
       title: 'สิ่งที่ต้องได้ (Outputs)',
       dataIndex: 'outputs',
       key: 'outputs',
-      width: 200,
+      width: 190,
       render: (outputs?: string[]) => (
         <div>
           {outputs && outputs.length > 0 ? (
             outputs.map((out, idx) => (
-              <Tag key={idx} color="default" style={{ margin: '2px', fontSize: 11 }}>
+              <Tag key={idx} color="default" style={{ margin: '2px', fontSize: 11, wordBreak: 'break-word' }}>
                 • {out}
               </Tag>
             ))
@@ -399,7 +400,7 @@ export const WorkflowDetailPage: React.FC = () => {
             type="primary"
             size="small"
             icon={<BookOutlined />}
-            style={{ backgroundColor: '#52c41a', fontSize: 11 }}
+            style={{ backgroundColor: '#52c41a', fontSize: 11, whiteSpace: 'nowrap' }}
             onClick={() => handleOpenSop(record.procedureId!)}
           >
             ดูคู่มือขั้นตอน
@@ -409,7 +410,7 @@ export const WorkflowDetailPage: React.FC = () => {
             type="dashed"
             size="small"
             icon={<PlusOutlined />}
-            style={{ color: '#faad14', borderColor: '#faad14', fontSize: 11 }}
+            style={{ color: '#faad14', borderColor: '#faad14', fontSize: 11, whiteSpace: 'nowrap' }}
             onClick={() => handleCreateSop(record)}
           >
             + สร้างคู่มือนี้
@@ -422,6 +423,7 @@ export const WorkflowDetailPage: React.FC = () => {
       key: 'actions',
       width: isAuthenticated ? 100 : 50,
       align: 'center' as const,
+      fixed: 'right' as const,
       render: (_: any, record: JobWorkflowStep) => (
         <Space size={2}>
           {isAuthenticated && (
@@ -585,8 +587,11 @@ export const WorkflowDetailPage: React.FC = () => {
           style={{
             borderRadius: 8,
             border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
+            boxShadow: isDarkMode ? '0 4px 16px -2px rgba(0, 0, 0, 0.45)' : '0 1px 3px rgba(0, 0, 0, 0.03)',
             background: isDarkMode ? '#1a1d21' : '#fff',
+            overflow: 'hidden',
           }}
+          bodyStyle={{ padding: 0 }}
         >
           <Table
             columns={tableColumns}
@@ -594,6 +599,7 @@ export const WorkflowDetailPage: React.FC = () => {
             rowKey="id"
             size="small"
             pagination={false}
+            scroll={{ x: 950 }}
           />
         </Card>
       )}
