@@ -93,12 +93,6 @@ export const AdminLayout: React.FC = () => {
 
   return (
     <div>
-      <div style={{ marginBottom: 12 }}>
-        <a onClick={() => navigate('/')} style={{ fontSize: 12.5 }}>
-          <ArrowLeftOutlined style={{ marginRight: 6 }} /> กลับสู่หน้าผู้ใช้งาน (User Manual)
-        </a>
-      </div>
-
       <Layout
         style={{
           background: isDarkMode ? '#1a1d21' : '#fff',
@@ -157,12 +151,15 @@ export const AdminLayout: React.FC = () => {
             style={{ borderRight: 0, background: 'transparent' }}
           />
 
-          {/* Sider Collapse Button placed directly below the menu items */}
+          {/* Bottom Actions: Collapse button & Return to User Manual */}
           <div
             style={{
               padding: '8px 10px',
               borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #f0f0f0',
               marginTop: 6,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 4,
             }}
           >
             <Button
@@ -181,6 +178,24 @@ export const AdminLayout: React.FC = () => {
               }}
             >
               {!collapsed && <span style={{ marginLeft: 6 }}>ย่อแถบเมนู</span>}
+            </Button>
+
+            <Button
+              type="text"
+              size="small"
+              icon={<ArrowLeftOutlined style={{ color: '#10b981' }} />}
+              onClick={() => navigate('/')}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: collapsed ? 'center' : 'flex-start',
+                color: isDarkMode ? '#34d399' : '#059669',
+                fontSize: 12,
+                borderRadius: 4,
+              }}
+            >
+              {!collapsed && <span style={{ marginLeft: 6 }}>กลับหน้าหลักผู้ใช้</span>}
             </Button>
           </div>
         </Sider>

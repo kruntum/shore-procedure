@@ -71,32 +71,9 @@ export const WorkflowDetailPage: React.FC = () => {
   // Hook to fetch linked SOP when clicked in modal
   const { data: selectedProcedure, isLoading: isSopLoading } = useProcedure(selectedSopId || undefined);
 
-  if (isLoading) {
-    return (
-      <div style={{ textAlign: 'center', padding: '60px 0' }}>
-        <Spin size="large" tip="กำลังโหลดแผนผังสายงานปฏิบัติการ..." />
-      </div>
-    );
-  }
-
-  if (error || !workflow) {
-    return (
-      <div>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/workflows')} style={{ marginBottom: 16 }}>
-          ย้อนกลับ
-        </Button>
-        <Alert type="error" message="ไม่พบสายงานปฏิบัติการที่ระบุ" showIcon />
-      </div>
-    );
-  }
-
-  const handleOpenSop = (procedureId: number) => {
-    setSelectedSopId(procedureId);
-  };
-
   // Critical Path Method (CPM) calculation for workflow total duration
   const totalWorkflowEstimatedMinutes = React.useMemo(() => {
-    if (!workflow.steps || workflow.steps.length === 0) return 0;
+    if (!workflow?.steps || workflow.steps.length === 0) return 0;
 
     const steps = workflow.steps;
     const deps = workflow.dependencies || [];
@@ -157,7 +134,7 @@ export const WorkflowDetailPage: React.FC = () => {
     });
 
     return projectDuration;
-  }, [workflow.steps, workflow.dependencies]);
+  }, [workflow?.steps, workflow?.dependencies]);
 
   const formattedWorkflowTime = React.useMemo(() => {
     if (totalWorkflowEstimatedMinutes <= 0) return null;
@@ -167,6 +144,29 @@ export const WorkflowDetailPage: React.FC = () => {
     if (hours > 0) return `${hours} ชั่วโมง`;
     return `${mins} นาที`;
   }, [totalWorkflowEstimatedMinutes]);
+
+  if (isLoading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '60px 0' }}>
+        <Spin size="large" tip="กำลังโหลดแผนผังสายงานปฏิบัติการ..." />
+      </div>
+    );
+  }
+
+  if (error || !workflow) {
+    return (
+      <div>
+        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/workflows')} style={{ marginBottom: 16 }}>
+          ย้อนกลับ
+        </Button>
+        <Alert type="error" message="ไม่พบสายงานปฏิบัติการที่ระบุ" showIcon />
+      </div>
+    );
+  }
+
+  const handleOpenSop = (procedureId: number) => {
+    setSelectedSopId(procedureId);
+  };
 
   const handleCreateSop = (step: JobWorkflowStep) => {
     const params = new URLSearchParams();
