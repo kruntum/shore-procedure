@@ -6,6 +6,7 @@ import {
   TeamOutlined,
   PhoneOutlined,
   RightOutlined,
+  ClockCircleOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { Procedure } from '../types';
@@ -22,6 +23,24 @@ export const ProcedureCard: React.FC<ProcedureCardProps> = ({ procedure }) => {
   const { isDarkMode, primaryColor } = useTheme();
 
   const totalSteps = procedure.variants?.reduce((acc, v) => acc + (v.steps?.length || 0), 0) || 0;
+  
+  // Calculate total estimated duration across steps (taking variant 1 as default or max across variants)
+  const totalEstimatedMinutes = React.useMemo(() => {
+    if (!procedure.variants || procedure.variants.length === 0) return 0;
+    // Calculate total minutes for each variant and take the primary variant (variant 0)
+    const primaryVariant = procedure.variants[0];
+    return (primaryVariant.steps || []).reduce((acc, s) => acc + (s.estimatedMinutes || 0), 0);
+  }, [procedure.variants]);
+
+  const formattedProcedureDuration = React.useMemo(() => {
+    if (totalEstimatedMinutes <= 0) return null;
+    const hours = Math.floor(totalEstimatedMinutes / 60);
+    const mins = totalEstimatedMinutes % 60;
+    if (hours > 0 && mins > 0) return `${hours} ชม. ${mins} นาที`;
+    if (hours > 0) return `${hours} ชั่วโมง`;
+    return `${mins} นาที`;
+  }, [totalEstimatedMinutes]);
+
   const govList = procedure.governmentAgencies && procedure.governmentAgencies.length > 0
     ? procedure.governmentAgencies
     : procedure.governmentAgency ? [procedure.governmentAgency] : [];
@@ -134,9 +153,9 @@ export const ProcedureCard: React.FC<ProcedureCardProps> = ({ procedure }) => {
           )}
         </div>
 
-        {/* WorkType Tag placed above footer */}
-        {procedure.workType && (
-          <div style={{ marginTop: 8, marginBottom: 2 }}>
+        {/* Context Tags: WorkType and Estimated Duration placed above footer */}
+        <div style={{ marginTop: 8, marginBottom: 2, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          {procedure.workType && (
             <Tag
               color="purple"
               style={{
@@ -151,8 +170,26 @@ export const ProcedureCard: React.FC<ProcedureCardProps> = ({ procedure }) => {
             >
               🏷️ {procedure.workType.name}
             </Tag>
-          </div>
-        )}
+          )}
+
+          {formattedProcedureDuration && (
+            <Tag
+              color="orange"
+              style={{
+                margin: 0,
+                fontSize: 10.5,
+                borderRadius: 10,
+                padding: '0 8px',
+                fontWeight: 500,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 3,
+              }}
+            >
+              <ClockCircleOutlined /> ประมาณการ: {formattedProcedureDuration}
+            </Tag>
+          )}
+        </div>
       </div>
 
       {/* Card Bottom: Variants, Steps, and Action */}
