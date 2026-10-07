@@ -53,8 +53,8 @@ export const ProcedureCard: React.FC<ProcedureCardProps> = ({ procedure }) => {
       }}
     >
       <div>
-        {/* Card Top: Category and WorkType tags */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        {/* Card Top: Category tag only */}
+        <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: 8 }}>
           {procedure.category ? (
             <Tag color={procedure.category.color || 'blue'} style={{ margin: 0, fontSize: 10.5, fontWeight: 500 }}>
               <span style={{ marginRight: 3 }}>{procedure.category.icon}</span>
@@ -62,12 +62,6 @@ export const ProcedureCard: React.FC<ProcedureCardProps> = ({ procedure }) => {
             </Tag>
           ) : (
             <Tag color="default" style={{ margin: 0, fontSize: 10.5 }}>ทั่วไป</Tag>
-          )}
-
-          {procedure.workType && (
-            <Tag color="purple" style={{ margin: 0, fontSize: 10.5 }}>
-              {procedure.workType.name}
-            </Tag>
           )}
         </div>
 
@@ -139,10 +133,30 @@ export const ProcedureCard: React.FC<ProcedureCardProps> = ({ procedure }) => {
             </div>
           )}
         </div>
+
+        {/* WorkType Tag placed above footer */}
+        {procedure.workType && (
+          <div style={{ marginTop: 8, marginBottom: 2 }}>
+            <Tag
+              color="purple"
+              style={{
+                margin: 0,
+                fontSize: 10.5,
+                borderRadius: 10,
+                padding: '0 8px',
+                fontWeight: 500,
+                display: 'inline-flex',
+                alignItems: 'center',
+              }}
+            >
+              🏷️ {procedure.workType.name}
+            </Tag>
+          </div>
+        )}
       </div>
 
       {/* Card Bottom: Variants, Steps, and Action */}
-      <div style={{ marginTop: 12, paddingTop: 8, borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #f0f0f0' }}>
+      <div style={{ marginTop: 8, paddingTop: 8, borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #f0f0f0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Space size={6} style={{ fontSize: 11, color: isDarkMode ? '#94a3b8' : '#64748b' }}>
             <span>📋 {procedure.variants?.length || 0} เงื่อนไข</span>

@@ -54,19 +54,12 @@ export const WorkflowCard: React.FC<WorkflowCardProps> = ({ workflow }) => {
     >
       <div>
         {/* Header Tags */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <Space size={4}>
-            {workflow.code && (
-              <Tag color="cyan" style={{ margin: 0, fontSize: 10, fontWeight: 600, padding: '0 5px' }}>
-                {workflow.code}
-              </Tag>
-            )}
-            {workflow.category && (
-              <Tag color={workflow.category.color || 'blue'} style={{ margin: 0, fontSize: 10.5, fontWeight: 500 }}>
-                {workflow.category.icon} {workflow.category.name}
-              </Tag>
-            )}
-          </Space>
+        <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: 8 }}>
+          {workflow.category && (
+            <Tag color={workflow.category.color || 'blue'} style={{ margin: 0, fontSize: 10.5, fontWeight: 500 }}>
+              {workflow.category.icon} {workflow.category.name}
+            </Tag>
+          )}
         </div>
 
         {/* Title */}
