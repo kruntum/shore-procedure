@@ -65,12 +65,6 @@ export const WorkflowCard: React.FC<WorkflowCardProps> = ({ workflow }) => {
               </Tag>
             )}
           </Space>
-
-          {workflow.estimatedDuration && (
-            <Text type="secondary" style={{ fontSize: 10.5, display: 'flex', alignItems: 'center', gap: 3 }}>
-              <ClockCircleOutlined /> {workflow.estimatedDuration}
-            </Text>
-          )}
         </div>
 
         {/* Title */}
@@ -92,7 +86,7 @@ export const WorkflowCard: React.FC<WorkflowCardProps> = ({ workflow }) => {
           <Paragraph
             ellipsis={{ rows: 2 }}
             type="secondary"
-            style={{ fontSize: 11.5, margin: '0 0 10px', lineHeight: 1.35 }}
+            style={{ fontSize: 11.5, margin: '0 0 8px', lineHeight: 1.35 }}
           >
             {workflow.description}
           </Paragraph>
@@ -100,15 +94,36 @@ export const WorkflowCard: React.FC<WorkflowCardProps> = ({ workflow }) => {
 
         {/* Audience */}
         {workflow.targetAudience && (
-          <div style={{ fontSize: 11, marginBottom: 8 }}>
+          <div style={{ fontSize: 11, marginBottom: 6 }}>
             <Text type="secondary">ผู้รับผิดชอบ: </Text>
             <Text style={{ fontSize: 11 }}>{workflow.targetAudience}</Text>
+          </div>
+        )}
+
+        {/* Estimated Duration Tag placed nicely above footer */}
+        {workflow.estimatedDuration && (
+          <div style={{ marginTop: 4, marginBottom: 2 }}>
+            <Tag
+              color="orange"
+              style={{
+                margin: 0,
+                fontSize: 10.5,
+                fontWeight: 500,
+                borderRadius: 10,
+                padding: '0 8px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              <ClockCircleOutlined /> ประมาณการ: {workflow.estimatedDuration}
+            </Tag>
           </div>
         )}
       </div>
 
       {/* Footer Progress & Action */}
-      <div style={{ marginTop: 10, paddingTop: 8, borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #f0f0f0' }}>
+      <div style={{ marginTop: 8, paddingTop: 8, borderTop: isDarkMode ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid #f0f0f0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
           <Space size={6} style={{ fontSize: 11 }}>
             <span style={{ fontWeight: 600 }}>👣 {totalSteps} ขั้นตอน</span>
